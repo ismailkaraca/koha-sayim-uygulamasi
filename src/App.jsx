@@ -641,7 +641,7 @@ export default function App() {
     };
     
     return (
-        <div className="bg-gray-100 min-h-screen font-sans">
+        <div className="fixed top-0 left-0 right-0 bg-white shadow-md z-30">
             <WarningModal isOpen={warningModal.isOpen} onClose={() => setWarningModal({ isOpen: false, title: '', warnings: [], barcode: null })} {...warningModal} />
             <ConfirmationModal isOpen={confirmationModal.isOpen} onClose={() => setConfirmationModal({ isOpen: false, message: '', onConfirm: () => {} })} {...confirmationModal} />
             <AddDataModal isOpen={addDataModal.isOpen} onClose={() => setAddDataModal({isOpen: false, type: ''})} onAdd={handleAddCustomData} type={addDataModal.type} />
