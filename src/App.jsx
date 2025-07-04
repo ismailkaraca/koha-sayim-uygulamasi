@@ -641,7 +641,7 @@ export default function App() {
     };
     
     return (
-        <div className="fixed top-0 left-0 right-0 bg-white shadow-md z-30">
+        <div className="bg-gray-100 min-h-screen font-sans">
             <WarningModal isOpen={warningModal.isOpen} onClose={() => setWarningModal({ isOpen: false, title: '', warnings: [], barcode: null })} {...warningModal} />
             <ConfirmationModal isOpen={confirmationModal.isOpen} onClose={() => setConfirmationModal({ isOpen: false, message: '', onConfirm: () => {} })} {...confirmationModal} />
             <AddDataModal isOpen={addDataModal.isOpen} onClose={() => setAddDataModal({isOpen: false, type: ''})} onAdd={handleAddCustomData} type={addDataModal.type} />
@@ -657,13 +657,13 @@ export default function App() {
             )}
             
             <main className={`w-full ${page !== 'permission' ? 'pt-16' : ''}`}>
-                 {/* The scan page needs full height, others are centered. */}
+                 {/* The scan page needs full height, others are centered and scrollable. */}
                 {page === 'scan' ? (
                     <div className="h-[calc(100vh-4rem)]">
                         {renderScanScreen()}
                     </div>
                 ) : (
-                    <div className="flex items-center justify-center w-full min-h-[calc(100vh-4rem)] p-4">
+                    <div className="flex justify-center w-full min-h-[calc(100vh-4rem)] p-4">
                        {renderPageContent()}
                     </div>
                 )}
@@ -671,4 +671,3 @@ export default function App() {
         </div>
     );
 }
- 
