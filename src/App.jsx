@@ -497,8 +497,42 @@ export default function App() {
         setPage('start');
     };
 
-    const startNewSession = () => { if (!sessionNameInput) { setError("Lütfen yeni sayım için bir isim girin."); return; } if (sessions[sessionNameInput]) { setError("Bu isimde bir sayım zaten mevcut. Farklı bir isim seçin."); return; } const newSession = { name: sessionNameInput, library: '', location: '', items: [], lastUpdated: new Date().toISOString() }; setSessions({...sessions, [sessionNameInput]: newSession}); setCurrentSessionName(sessionNameInput); setSelectedLibrary(''); setSelectedLocation(''); setKohaData([]); setKohaDataMap(new Map()); setScannedItems([]); setLastScanned(null); processedBarcodesRef.current.clear(); setError(''); setPage('setup'); };
-    const loadSession = (sessionName) => { const session = sessions[sessionName]; if(session){ setCurrentSessionName(session.name); setSelectedLibrary(session.library); setSelectedLocation(session.location); const items = session.items || []; setScannedItems(items); processedBarcodesRef.current = new Set(items.map(i => i.barcode)); setLastScanned(items.length > 0 ? items[0] : null); setKohaData([]); setKohaDataMap(new Map()); setPage('setup'); setError("Kayıtlı oturum yüklendi. Lütfen devam etmek için ilgili Koha Excel dosyasını tekrar yükleyin.")} };
+    const startNewSession = () => {
+        if (!sessionNameInput) { setError("Lütfen yeni sayım için bir isim girin."); return; }
+        if (sessions[sessionNameInput]) { setError("Bu isimde bir sayım zaten mevcut. Farklı bir isim seçin."); return; }
+        const newSession = { name: sessionNameInput, library: '', location: '', items: [], lastUpdated: new Date().toISOString() };
+        setSessions({...sessions, [sessionNameInput]: newSession});
+        setCurrentSessionName(sessionNameInput);
+        setSelectedLibrary('');
+        setSelectedLocation('');
+        setScannedItems([]);
+        setLastScanned(null);
+        processedBarcodesRef.current.clear();
+        setError('');
+        setPage('setup');
+    };
+    
+    const loadSession = (sessionName) => {
+        const session = sessions[sessionName];
+        if (session) {
+            setCurrentSessionName(session.name);
+            setSelectedLibrary(session.library);
+            setSelectedLocation(session.location);
+            const items = session.items || [];
+            setScannedItems(items);
+            processedBarcodesRef.current = new Set(items.map(i => i.barcode));
+            setLastScanned(items.length > 0 ? items[0] : null);
+            setError('');
+
+            if (kohaData.length > 0) {
+                setPage('scan');
+            } else {
+                setPage('setup');
+                setError("Kayıtlı oturum yüklendi. Lütfen devam etmek için ilgili Koha Excel dosyasını yükleyin.");
+            }
+        }
+    };
+
     const deleteSession = (sessionName) => { setConfirmationModal({ isOpen: true, message: `"${sessionName}" isimli sayımı silmek istediğinizden emin misiniz? Bu işlem geri alınamaz.`, onConfirm: () => { const newSessions = { ...sessions }; delete newSessions[sessionName]; setSessions(newSessions); localStorage.setItem('kohaInventorySessions', JSON.stringify(newSessions)); } }); };
     
     const handleAddCustomData = (type, code, name) => {
