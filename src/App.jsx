@@ -335,18 +335,23 @@ export default function App() {
     const manualInputDebounceRef = useRef(null);
 
     // Ybug Entegrasyonu
-<!-- Ybug code start (https://ybug.io) -->
-<script type='text/javascript'>
-(function() {
-    window.ybug_settings = {"id":"bj4wjkqsyg165gqnpjmy"};
-    var ybug = document.createElement('script'); ybug.type = 'text/javascript'; ybug.async = true;
-    ybug.src = 'https://widget.ybug.io/button/'+window.ybug_settings.id+'.js';
-    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ybug, s);
-})();
-</script>
-<!-- Ybug code end -->
+    useEffect(() => {
+        const ybugId = 'bj4wjkqsyg165gqnpjmy'; // <-- YBUG PROJE ID'NİZİ BURAYA GİRİN
+        if (ybugId && !ybugId.startsWith('YOUR')) {
+            const script = document.createElement('script');
+            script.src = "https://widget.ybug.io/button.js";
+            script.async = true;
+            script.setAttribute('data-ybug-id', ybugId);
+            document.body.appendChild(script);
 
-  
+            return () => {
+                if (document.body.contains(script)) {
+                    document.body.removeChild(script);
+                }
+            };
+        }
+    }, []);
+
     useEffect(() => {
         try {
             const choiceMade = localStorage.getItem('cameraPermissionChoiceMade');
