@@ -336,8 +336,8 @@ export default function App() {
 
     // Ybug Entegrasyonu
     useEffect(() => {
-        const ybugId = 'YOUR_YBUG_ID'; // <-- YBUG PROJE ID'NİZİ BURAYA GİRİN
-        if (ybugId && !ybugId.startsWith('bj4wjkqsyg165gqnpjmy')) {
+        const ybugId = 'bj4wjkqsyg165gqnpjmy'; // <-- YBUG PROJE ID'NİZİ BURAYA GİRİN
+        if (ybugId && !ybugId.startsWith('YOUR')) {
             const script = document.createElement('script');
             script.src = "https://widget.ybug.io/button.js";
             script.async = true;
