@@ -119,7 +119,7 @@ const RobustBarcodeScanner = ({ onScan, onClose, isPaused }) => {
     
     return (
         <div className="fixed inset-0 bg-black bg-opacity-75 z-40 flex flex-col items-center justify-center p-4">
-            <div className="w-full max-w-md bg-white rounded-lg overflow-hidden shadow-2xl">
+            <div className="w-full max-w-md bg-white rounded-lg overflow-hidden shadow-2xl dark:bg-slate-800">
                  <div id={readerId} />
                  <div
                     role="alert"
@@ -137,7 +137,7 @@ const RobustBarcodeScanner = ({ onScan, onClose, isPaused }) => {
 // --- Data Constants & Icons ---
 const INITIAL_LIBRARIES = { "12":"ADANA İL HALK KÜTÜPHANESİ","1530":"Adana Adalet Halk Kütüphanesi","1317":"Adana Aladağ İlçe Halk Kütüphanesi","113":"Adana Ceyhan İlçe Halk Kütüphanesi","1310":"Adana Ceyhan Murat Göğebakan Kültür Merkezi Halk Kütüphanesi","670":"Adana Feke İlçe Halk Kütüphanesi","760":"Adana İmamoğlu Remzi Oğuz Arık İlçe Halk Kütüphanesi","1200":"Adana Karacaoğlan Edebiyat Müze Kütüphanesi","796":"Adana Karaisalı İlçe Halk Kütüphanesi","675":"Adana Kozan Gazi Halk Kütüphanesi","114":"Adana Kozan Karacaoğlan İlçe Halk Kütüphanesi","1320":"Adana Kozan Özden Kültür Merkezi Halk Kütüphanesi","956":"Adana Pozantı İlçe Halk Kütüphanesi","499":"Adana Saimbeyli Azmi Yazıcıoğlu İlçe Halk Kütüphanesi","1588":"Adana Sarıçam Bebek ve Çocuk Kütüphanesi","1007":"Adana Sarıçam İlçe Halk Kütüphanesi","763":"Adana Sarıçam İncirlik 100. Yıl Çocuk Kütüphanesi","557":"Adana Seyhan Çağdaş Çocuk Kütüphanesi","1024":"Adana Seyhan Şakirpaşa Halk Kütüphanesi","995":"Adana Seyhan Yusuf Fırat Kotan İlçe Halk Kütüphanesi","1071":"Adana Tufanbeyli İlçe Halk Kütüphanesi","1135":"Adana Yumurtalık İlçe Halk Kütüphanesi","1139":"Adana Yüreğir Hacı Mehmet Sabancı İlçe Halk Kütüphanesi","1237":"Adana Yüreğir Kültür Merkezi Çocuk ve Gençlik Kütüphanesi","13":"ADIYAMAN İL HALK KÜTÜPHANESİ", "110": "DEMO EĞİTİM KÜTÜPHANESİ"};
 const INITIAL_LOCATIONS = {"AB":"Atatürk Bölümü","AÖÖK":"Adnan Ötüken Özel Koleksiyonu (Adnan Ötüken İl Halk İçin)","Bakanlık Yayınları":"Bakanlık Yayınları (Edebiyat Müze Kütüphaneleri İçin)","BB":"Bebek Bölümü (0-3 Yaş)","BEYRA":"Rami Yerleşkesi","D":"Depo","DB":"Danışma Bölümü","DG":"Diğer","Edebiyat Kuramı":"Edebiyat Kuramı (Edebiyat Müze Kütüphaneleri İçin)","EK":"Etkinlik Kitapları Bölümü","GAY":"Gezici Kütüphane Anadolu Yakası","GB":"Gençlik Bölümü","GD1":"Geçici Derme1","GD2":"Geçici Derme2","GD3":"Geçici Derme3","GD4":"Geçici Derme4 (Kurumlar)","Gİ":"Gör-İşit Bölümü","GK":"Gezici Kütüphane","GK2":"Gezici Kütüphane 2","IOK":"İlk Okuma Kitapları Bölümü","İmzalı Kitaplar":"İmzalı Kitaplar (Edebiyat Müze Kütüphaneleri İçin)","KB":"Kataloglama Bölümü","KK":"Kent Kitaplığı","KOK":"Osmaniye Fakıuşağı Konteyner Kent","NE":"Nadir Eserler Bölümü","NÖ":"Nobel Ödüllü Kitaplar","OÖ":"Okul Öncesi Bölümü","RA1":"Atatürk İhtisas (Rami Kütüphanesi)","RA10":"Toplum Bilimleri: 142 (Rami Kütüphanesi)","RA11":"Dil ve Dil Bilimi: 163 (Rami Kütüphanesi)","RA12":"Doğa Bilimleri ve Matematik: 141 (Rami Kütüphanesi)","RA13":"Teknoloji ve Uygulamalı Bilimler: 150 (Rami Kütüphanesi)","RA14":"Güzel Sanatlar: 153 (Rami Kütüphanesi)","RA15":"Edebiyat & Retorik: 154/155 (Rami Kütüphanesi)","RA16":"Tarih & Coğrafya: 168 (Rami Kütüphanesi)","RA18":"İlk Öğretim Çalışma Salonu (10-14 yaş): 125 (Rami Kütüphanesi)","RA19":"Atatürk İhtisas: 114 (Rami Kütüphanesi)","RA2":"İlk Öğretim Çalışma Salonu (6-9 yaş): 124 (Rami Kütüphanesi)","RA20":"Atatürk İhtisas: 115 (Rami Kütüphanesi)","RA21":"Biyografi Kitaplığı: 118 (Rami Kütüphanesi)","RA22":"Günay-Turgut Kut İhtisas Kitaplığı (Yazma Eserler Okuma Salonu): 177 (Rami Kütüphanesi)","RA23":"Engelsiz Bilgi Merkezi: 148 (Rami Kütüphanesi)","RA3":"Bebek Kütüphanesi (Masal 0-3 yaş): 126/127 (Rami Kütüphanesi)","RA4":"Lise Hazırlık: 129/130 (Rami Kütüphanesi)","RA5":"Üniversite Hazırlık: 134 (Rami Kütüphanesi)","RA7":"Genel Konular: 156 (Rami Kütüphanesi)","RA8":"Psikoloji ve Felsefe: 139 (Rami Kütüphanesi)","RA9":"Din: 146 (Rami Kütüphanesi)","S":"Salon","SAM":"Şehir Araştırmaları Merkezi","SB":"Sanat Bölümü","SY":"Süreli Yayınlar Bölümü","TEDA Kitapları":"TEDA Kitapları","Türk Edebiyatı":"Türk Edebiyatı (Edebiyat Müze Kütüphaneleri İçin)","YB":"Yetişkin Bölümü","YC":"Yetişkin Cep (Adnan Ötüken İl Halk İçin)","YDB":"Yabancı Diller Bölümü","ZBB":"Ziya Bey Bölümü","ÇB":"Çocuk Bölümü","Ödüllü Kitaplar - Dünya Edebiyatı":"Ödüllü Kitaplar - Dünya Edebiyatı (Edebiyat Müze Kütüphaneleri İçin)","Ödüllü Kitaplar - Türk Edebiyatı":"Ödüllü Kitaplar - Türk Edebiyatı (Edebiyat Müze Kütüphaneleri İçin)","ÖK":"Özel Koleksiyon"};
-const WARNING_DEFINITIONS = { invalidStructure: { id: 'invalidStructure', text: 'Yapıya Uygun Olmayan', color: '#E74C3C', sound: 'A#3', message: 'Barkod Yapısına uygun olmayan barkod okundu.' }, locationMismatch: { id: 'locationMismatch', text: 'Konum Farklı', color: '#FAD7A0', sound: 'C4', message: 'Okutulan materyal seçilen lokasyonda bulunmuyor.' }, notLoanable: { id: 'notLoanable', text: 'Ödünç Verilemez', color: '#F08080', sound: 'E5', message: 'Materyalin ödünç verilebilirlik durumu uygun değil.' }, notInCollection: { id: 'notInCollection', text: 'Düşüm/Devir', color: '#A9C9F5', sound: 'G4', message: 'Materyal koleksiyonda değil (düşüm veya devir yapılmış).' }, complaintKHK: { id: 'complaintKHK', text: 'Şikayet/KHK', color: '#B39EB5', sound: 'E5', message: 'Bu materyal üzerinde şikayet veya KHK bildirimi var.' }, onLoan: { id: 'onLoan', text: 'Okuyucuda', color: '#F7B38D', sound: 'C4', message: 'Materyal şu anda ödünçte ve iade edilmesi gerekiyor.' }, wrongLibrary: { id: 'wrongLibrary', text: 'Farklı Kütüphane', color: '#C7AED9', sound: 'C4', message: 'Materyal sizin kütüphanenize ait değil.' }, deleted: { id: 'deleted', text: 'Listede Yok', color: '#808080', sound: 'A3', message: 'Barkod formatı doğru ancak içeri aktarılan listede bulunamadı.' }, autoCompletedNotFound: { id: 'autoCompletedNotFound', text: 'Manuel Girilen Ancak Listede Olmayan Barkodlar', color: '#8E44AD', sound: 'A3', message: 'Barkod 12 Haneli Olacak Şekilde Tamamlanmış Ancak İçeri Aktardığınız Materyal Listesinde Bulunmamaktadır. Materyal Barkodunu Kontrol Ediniz.' }, duplicate: { id: 'duplicate', text: 'Tekrar Okutuldu', color: '#FFC300', sound: 'B4', message: 'Bu barkod daha önce okutuldu.'} };
+const WARNING_DEFINITIONS = { invalidStructure: { id: 'invalidStructure', text: 'Yapıya Uygun Olmayan', color: '#E74C3C', sound: 'A#3', message: 'Barkod Yapısına uygun olmayan barkod okundu.' }, locationMismatch: { id: 'locationMismatch', text: 'Konum Farklı', color: '#FAD7A0', sound: 'C4', message: 'Okutulan materyal seçilen lokasyonda bulunmuyor.' }, notLoanable: { id: 'notLoanable', text: 'Ödünç Verilemez', color: '#F08080', sound: 'E5', message: 'Materyalin ödünç verilebilirlik durumu uygun değil.' }, notInCollection: { id: 'notInCollection', text: 'Düşüm/Devir', color: '#A9C9F5', sound: 'G4', message: 'Materyal koleksiyonda değil (düşüm veya devir yapılmış).' }, onLoan: { id: 'onLoan', text: 'Okuyucuda', color: '#F7B38D', sound: 'C4', message: 'Materyal şu anda ödünçte ve iade edilmesi gerekiyor.' }, wrongLibrary: { id: 'wrongLibrary', text: 'Farklı Kütüphane', color: '#C7AED9', sound: 'C4', message: 'Materyal sizin kütüphanenize ait değil.' }, deleted: { id: 'deleted', text: 'Listede Yok', color: '#808080', sound: 'A3', message: 'Barkod formatı doğru ancak içeri aktarılan listede bulunamadı.' }, autoCompletedNotFound: { id: 'autoCompletedNotFound', text: 'Manuel Girilen Ancak Listede Olmayan Barkodlar', color: '#8E44AD', sound: 'A3', message: 'Barkod 12 Haneli Olacak Şekilde Tamamlanmış Ancak İçeri Aktardığınız Materyal Listesinde Bulunmamaktadır. Materyal Barkodunu Kontrol Ediniz.' }, duplicate: { id: 'duplicate', text: 'Tekrar Okutuldu', color: '#FFC300', sound: 'B4', message: 'Bu barkod daha önce okutuldu.'} };
 const PIE_CHART_COLORS = { valid: '#2ECC71', invalid: '#E74C3C', missing: '#95A5A6' };
 const ICONS = {
     download: <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>,
@@ -149,20 +149,33 @@ const ICONS = {
     location: <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>,
     notLoanable: <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg>,
     status: <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17 2.1l4 4-4 4"/><path d="M3 12.6v-2.1c0-2.8 2.2-5 5-5h11"/><path d="M7 21.9l-4-4 4-4"/><path d="M21 11.4v2.1c0 2.8-2.2 5-5 5H5"/></svg>,
-    complaint: <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.46 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" x2="12" y1="9" y2="13"/><line x1="12" x2="12.01" y1="17" y2="17"/></svg>,
     onLoan: <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"/><circle cx="12" cy="8" r="2"/><path d="M15 13a3 3 0 1 0-6 0"/></svg>,
+    moon: <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>,
+    sun: <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></svg>,
+    soundOn: <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>,
+    soundOff: <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M11 5 6 9H2v6h4l5 4V5Z"/><path d="M22 9 12 19"/></svg>,
 };
 
 // --- Utilities & Components ---
 const synth = new Tone.Synth().toDestination();
-const playSound = (note) => { try { if (Tone.context.state !== 'running') { Tone.context.resume(); } synth.triggerAttackRelease(note, "8n"); } catch (e) { console.error("Ses çalınamadı:", e); } };
-const playMultipleWarningSound = () => { try { if (Tone.context.state !== 'running') { Tone.context.resume(); } const now = Tone.now(); synth.triggerAttackRelease("C5", "16n", now); synth.triggerAttackRelease("G4", "16n", now + 0.1); synth.triggerAttackRelease("C5", "16n", now + 0.2); synth.triggerAttackRelease("G4", "16n", now + 0.3); synth.triggerAttackRelease("E5", "8n", now + 0.4); } catch (e) { console.error("Ses çalınamadı:", e); } };
-const CustomTooltip = ({ active, payload, label }) => { if (active && payload && payload.length) { return <div className="bg-white p-2 border border-gray-300 rounded shadow-lg"><p className="font-bold">{label}</p><p className="text-sm">{`Sayı: ${payload[0].value}`}</p></div>; } return null; };
-const FileUploader = ({ onFileAccepted, children, title, disabled, accept }) => { const onDrop = useCallback(acceptedFiles => { onFileAccepted(acceptedFiles[0]); }, [onFileAccepted]); const { getRootProps, getInputProps, isDragActive } = useDropzone({ onDrop, multiple: false, disabled, accept }); return <div {...getRootProps()} className={`border-2 border-dashed rounded-lg p-8 text-center transition-colors ${disabled ? 'bg-slate-100 text-slate-400' : 'cursor-pointer'} ${isDragActive ? 'border-blue-500 bg-blue-50' : 'border-slate-300 hover:border-blue-400'}`}><input {...getInputProps()} /><p className="text-slate-500">{title}</p>{children}</div>; };
-const Modal = ({ isOpen, onClose, children }) => { if (!isOpen) return null; return <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex justify-center items-center p-4"><div className="bg-white rounded-lg shadow-2xl w-full max-w-md mx-auto">{children}</div></div>; };
-const WarningModal = ({ isOpen, onClose, title, warnings, barcode }) => { const [isCopied, setIsCopied] = useState(false); const handleCopy = (text) => { const textArea = document.createElement("textarea"); textArea.value = text; textArea.style.position = "fixed"; document.body.appendChild(textArea); textArea.focus(); textArea.select(); try { document.execCommand('copy'); setIsCopied(true); setTimeout(() => setIsCopied(false), 2000); } catch (err) { console.error("Panoya kopyalanamadı: ", err); } document.body.removeChild(textArea); }; const onLoanWarning = warnings.find(w => w.id === 'onLoan'); return <Modal isOpen={isOpen} onClose={onClose}><div className="flex justify-between items-center p-4 border-b"><h3 className="text-lg font-bold text-slate-800">{title}</h3><button onClick={onClose} className="text-slate-500 hover:text-slate-800 text-2xl">&times;</button></div><div className="p-5"><ul className="space-y-2 list-disc list-inside">{warnings.map(w => <li key={w.id} style={{color: w.color}} className="font-semibold">{w.message}</li>)}</ul>{onLoanWarning && barcode && <div className="mt-4 p-3 bg-slate-100 rounded-lg border border-slate-200"><p className="text-sm font-medium">Bu materyali Koha'da iade almak için:</p><a href={`https://personel.ekutuphane.gov.tr/cgi-bin/koha/circ/returns.pl`} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline font-semibold block mt-2 hover:text-blue-800 transition-colors">Koha İade Sayfasına Git</a><p className="text-xs text-slate-500 mt-1">İade sayfasını açtıktan sonra aşağıdaki barkodu yapıştırabilirsiniz.</p><div className="mt-3 flex items-center gap-2"><input type="text" readOnly value={barcode} className="w-full p-2 border bg-slate-200 rounded-md font-mono text-sm" /><button onClick={() => handleCopy(barcode)} className={`px-4 py-2 rounded-md text-white font-semibold transition-colors ${isCopied ? 'bg-green-500' : 'bg-blue-500 hover:bg-blue-600'}`}>{isCopied ? 'Kopyalandı!' : 'Barkodu Kopyala'}</button></div></div>}<button onClick={onClose} className="mt-6 bg-slate-600 text-white py-2 px-4 rounded hover:bg-slate-700 w-full font-bold">Tamam</button></div></Modal>; };
-const ConfirmationModal = ({ isOpen, onClose, message, onConfirm }) => { if (!isOpen) return null; const handleConfirm = () => { onConfirm(); onClose(); }; return <Modal isOpen={isOpen} onClose={onClose}><div className="p-6 text-center"><h3 className="text-lg font-medium text-slate-800 mb-4">{message}</h3><div className="flex justify-center gap-4"><button onClick={onClose} className="px-6 py-2 rounded-md bg-slate-200 text-slate-800 hover:bg-slate-300 font-semibold">Hayır</button><button onClick={handleConfirm} className="px-6 py-2 rounded-md bg-red-600 text-white hover:bg-red-700 font-semibold">Evet, Sil</button></div></div></Modal>; };
-const AddDataModal = ({ isOpen, onClose, onAdd, type }) => { const [code, setCode] = useState(''); const [name, setName] = useState(''); const handleAdd = () => { if(code && name) { onAdd(type, code, name); onClose(); setCode(''); setName(''); } }; return <Modal isOpen={isOpen} onClose={onClose}><div className="p-5"><h3 className="text-lg font-bold mb-4">Yeni {type === 'library' ? 'Kütüphane' : 'Lokasyon'} Ekle</h3><div className="space-y-4"><input type="text" value={code} onChange={e => setCode(e.target.value)} placeholder="Kod" className="w-full p-2 border border-slate-300 rounded-md" /><input type="text" value={name} onChange={e => setName(e.target.value)} placeholder="İsim" className="w-full p-2 border border-slate-300 rounded-md" /></div><div className="flex justify-end gap-2 mt-4"><button onClick={onClose} className="px-4 py-2 rounded-md bg-slate-200">İptal</button><button onClick={handleAdd} className="px-4 py-2 rounded-md bg-blue-600 text-white">Ekle</button></div></div></Modal>; };
+const CustomTooltip = ({ active, payload, label }) => { if (active && payload && payload.length) { return <div className="bg-white dark:bg-slate-700 p-2 border border-gray-300 dark:border-slate-600 rounded shadow-lg"><p className="font-bold text-slate-800 dark:text-slate-200">{label}</p><p className="text-sm text-slate-600 dark:text-slate-300">{`Sayı: ${payload[0].value}`}</p></div>; } return null; };
+const FileUploader = ({ onFileAccepted, children, title, disabled, accept }) => { const onDrop = useCallback(acceptedFiles => { onFileAccepted(acceptedFiles[0]); }, [onFileAccepted]); const { getRootProps, getInputProps, isDragActive } = useDropzone({ onDrop, multiple: false, disabled, accept }); return <div {...getRootProps()} className={`border-2 border-dashed rounded-lg p-8 text-center transition-colors ${disabled ? 'bg-slate-100 text-slate-400 dark:bg-slate-800 dark:text-slate-500' : 'cursor-pointer'} ${isDragActive ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/50' : 'border-slate-300 hover:border-blue-400 dark:border-slate-600 dark:hover:border-blue-500'}`}><input {...getInputProps()} /><p className="text-slate-500 dark:text-slate-400">{title}</p>{children}</div>; };
+const Modal = ({ isOpen, onClose, children }) => { if (!isOpen) return null; return <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex justify-center items-center p-4"><div className="bg-white dark:bg-slate-800 rounded-lg shadow-2xl w-full max-w-md mx-auto">{children}</div></div>; };
+const WarningModal = ({ isOpen, onClose, title, warnings, barcode }) => { const [isCopied, setIsCopied] = useState(false); const handleCopy = (text) => { const textArea = document.createElement("textarea"); textArea.value = text; textArea.style.position = "fixed"; document.body.appendChild(textArea); textArea.focus(); textArea.select(); try { document.execCommand('copy'); setIsCopied(true); setTimeout(() => setIsCopied(false), 2000); } catch (err) { console.error("Panoya kopyalanamadı: ", err); } document.body.removeChild(textArea); }; const onLoanWarning = warnings.find(w => w.id === 'onLoan'); return <Modal isOpen={isOpen} onClose={onClose}><div className="flex justify-between items-center p-4 border-b dark:border-slate-700"><h3 className="text-lg font-bold text-slate-800 dark:text-slate-200">{title}</h3><button onClick={onClose} className="text-slate-500 hover:text-slate-800 dark:hover:text-slate-200 text-2xl">&times;</button></div><div className="p-5"><ul className="space-y-2 list-disc list-inside">{warnings.map(w => <li key={w.id} style={{color: w.color}} className="font-semibold">{w.message}</li>)}</ul>{onLoanWarning && barcode && <div className="mt-4 p-3 bg-slate-100 dark:bg-slate-700 rounded-lg border border-slate-200 dark:border-slate-600"><p className="text-sm font-medium text-slate-800 dark:text-slate-200">Bu materyali Koha'da iade almak için:</p><a href={`https://personel.ekutuphane.gov.tr/cgi-bin/koha/circ/returns.pl`} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline font-semibold block mt-2 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 transition-colors">Koha İade Sayfasına Git</a><p className="text-xs text-slate-500 dark:text-slate-400 mt-1">İade sayfasını açtıktan sonra aşağıdaki barkodu yapıştırabilirsiniz.</p><div className="mt-3 flex items-center gap-2"><input type="text" readOnly value={barcode} className="w-full p-2 border bg-slate-200 dark:bg-slate-600 rounded-md font-mono text-sm" /><button onClick={() => handleCopy(barcode)} className={`px-4 py-2 rounded-md text-white font-semibold transition-colors ${isCopied ? 'bg-green-500' : 'bg-blue-500 hover:bg-blue-600'}`}>{isCopied ? 'Kopyalandı!' : 'Barkodu Kopyala'}</button></div></div>}<button onClick={onClose} className="mt-6 bg-slate-600 text-white py-2 px-4 rounded hover:bg-slate-700 w-full font-bold">Tamam</button></div></Modal>; };
+const ConfirmationModal = ({ isOpen, onClose, message, onConfirm }) => { if (!isOpen) return null; const handleConfirm = () => { onConfirm(); onClose(); }; return <Modal isOpen={isOpen} onClose={onClose}><div className="p-6 text-center"><h3 className="text-lg font-medium text-slate-800 dark:text-slate-200 mb-4">{message}</h3><div className="flex justify-center gap-4"><button onClick={onClose} className="px-6 py-2 rounded-md bg-slate-200 text-slate-800 hover:bg-slate-300 dark:bg-slate-600 dark:text-slate-200 dark:hover:bg-slate-500 font-semibold">Hayır</button><button onClick={handleConfirm} className="px-6 py-2 rounded-md bg-red-600 text-white hover:bg-red-700 font-semibold">Evet, Sil</button></div></div></Modal>; };
+const AddDataModal = ({ isOpen, onClose, onAdd, type }) => { const [code, setCode] = useState(''); const [name, setName] = useState(''); const handleAdd = () => { if(code && name) { onAdd(type, code, name); onClose(); setCode(''); setName(''); } }; return <Modal isOpen={isOpen} onClose={onClose}><div className="p-5"><h3 className="text-lg font-bold mb-4 dark:text-slate-200">Yeni {type === 'library' ? 'Kütüphane' : 'Lokasyon'} Ekle</h3><div className="space-y-4"><input type="text" value={code} onChange={e => setCode(e.target.value)} placeholder="Kod" className="w-full p-2 border border-slate-300 rounded-md dark:bg-slate-700 dark:border-slate-600 dark:text-white" /><input type="text" value={name} onChange={e => setName(e.target.value)} placeholder="İsim" className="w-full p-2 border border-slate-300 rounded-md dark:bg-slate-700 dark:border-slate-600 dark:text-white" /></div><div className="flex justify-end gap-2 mt-4"><button onClick={onClose} className="px-4 py-2 rounded-md bg-slate-200 dark:bg-slate-600 dark:text-slate-200">İptal</button><button onClick={handleAdd} className="px-4 py-2 rounded-md bg-blue-600 text-white">Ekle</button></div></div></Modal>; };
+
+const FullScreenLoader = ({ text }) => (
+    <div className="fixed inset-0 bg-black bg-opacity-60 z-50 flex flex-col justify-center items-center">
+        <div className="flex items-center justify-center space-x-3 p-6 bg-white dark:bg-slate-800 rounded-lg shadow-xl">
+            <svg className="animate-spin h-8 w-8 text-slate-600 dark:text-slate-300" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+            <span className="text-xl text-slate-700 dark:text-slate-200 font-semibold">{text}</span>
+        </div>
+    </div>
+);
 
 // --- Permission Screen Component ---
 const PermissionScreen = ({ onDecision }) => {
@@ -220,13 +233,13 @@ const PermissionScreen = ({ onDecision }) => {
     };
 
     return (
-        <div className="flex items-center justify-center min-h-screen bg-slate-100">
-            <div className="max-w-lg w-full p-8 bg-white rounded-xl shadow-lg text-center space-y-6">
-                <h1 className="text-3xl font-bold text-slate-800">Kamera Erişimi</h1>
+        <div className="flex items-center justify-center min-h-screen bg-slate-100 dark:bg-slate-900">
+            <div className="max-w-lg w-full p-8 bg-white dark:bg-slate-800 rounded-xl shadow-lg text-center space-y-6">
+                <h1 className="text-3xl font-bold text-slate-800 dark:text-slate-200">Kamera Erişimi</h1>
                 
                 {step === 'initial' && (
                     <>
-                        <p className="text-slate-600">Kamera ile sayım yapmak istiyor musunuz?</p>
+                        <p className="text-slate-600 dark:text-slate-400">Kamera ile sayım yapmak istiyor musunuz?</p>
                         <div className="flex flex-col sm:flex-row gap-4">
                             <button onClick={requestPermission} className="w-full flex items-center justify-center gap-2 px-6 py-4 bg-green-600 text-white font-bold rounded-md hover:bg-green-700 transition-colors">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="3"/></svg>
@@ -243,7 +256,7 @@ const PermissionScreen = ({ onDecision }) => {
                 {step === 'testing' && (
                      <>
                         <p className={`text-lg ${getMessageStyles(message.type)}`}>{message.text}</p>
-                        <div className="p-4 border border-slate-200 rounded-lg space-y-3">
+                        <div className="p-4 border border-slate-200 dark:border-slate-700 rounded-lg space-y-3">
                             <button onClick={handleCameraTest} className="w-full px-6 py-3 bg-blue-600 text-white font-semibold rounded-md hover:bg-blue-700 transition-colors">
                                 Kamerayı Test Et
                             </button>
@@ -262,43 +275,71 @@ const PermissionScreen = ({ onDecision }) => {
 };
 
 // --- Sidebar Component ---
-const Sidebar = ({ page, setPage, currentSessionName, selectedLibrary, kohaData }) => {
+const Sidebar = ({ page, setPage, currentSessionName, selectedLibrary, kohaData, scannedItems, isMuted, setIsMuted, isDarkMode, setIsDarkMode, isMobileMenuOpen, setMobileMenuOpen }) => {
     const navItems = [
         { id: 'start', label: 'Yeni Sayım', disabled: false },
         { id: 'setup', label: 'Kurulum', disabled: !currentSessionName },
         { id: 'scan', label: 'Sayım', disabled: !selectedLibrary || kohaData.length === 0 },
-        { id: 'summary', label: 'Özet & Raporlar', disabled: !selectedLibrary || kohaData.length === 0 }
+        { id: 'summary', label: 'Özet & Raporlar', disabled: !selectedLibrary || kohaData.length === 0 || scannedItems.length === 0 }
     ];
 
+    const handleLinkClick = (pageId) => {
+        if (navItems.find(item => item.id === pageId)?.disabled) return;
+        setPage(pageId);
+        setMobileMenuOpen(false);
+    };
+
     return (
-        <aside className="w-64 bg-white shadow-lg flex-col h-screen fixed hidden md:flex">
-            <div className="p-6 flex items-center gap-3 border-b border-slate-200">
-                <svg className="h-10 w-10 text-slate-700" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-                </svg>
-                <div>
-                     <h1 className="text-xl font-bold text-slate-800">Koha</h1>
-                     <p className="text-xs text-slate-500">Çevrimdışı Sayım</p>
-                </div>
-            </div>
-            <nav className="flex-1 p-4 space-y-2">
-                {navItems.map((item, index) => (
-                    <button
-                        key={item.id}
-                        onClick={() => setPage(item.id)}
-                        disabled={item.disabled}
-                        className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left font-semibold transition-colors ${
-                            page === item.id
-                                ? 'bg-slate-700 text-white shadow-md'
-                                : 'text-slate-500 hover:bg-slate-100 hover:text-slate-800'
-                        } ${item.disabled ? 'opacity-40 cursor-not-allowed' : ''}`}
-                    >
-                        <span className={`flex items-center justify-center w-6 h-6 rounded-full text-xs ${page === item.id ? 'bg-white text-slate-800' : 'bg-slate-200 text-slate-600'}`}>{index + 1}</span>
-                        {item.label}
+        <>
+            {/* Overlay for mobile */}
+            {isMobileMenuOpen && (
+                <div
+                    className="fixed inset-0 bg-black bg-opacity-50 z-30 md:hidden"
+                    onClick={() => setMobileMenuOpen(false)}
+                ></div>
+            )}
+            <aside className={`w-64 bg-white dark:bg-slate-800 shadow-lg flex flex-col h-screen fixed top-0 left-0 z-40 transition-transform transform ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'} md:translate-x-0`}>
+                <div className="p-6 flex items-center justify-between border-b border-slate-200 dark:border-slate-700">
+                     <div className="flex items-center gap-3">
+                        <svg className="h-10 w-10 text-slate-700 dark:text-slate-300" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                        </svg>
+                        <div>
+                             <h1 className="text-xl font-bold text-slate-800 dark:text-slate-200">Koha</h1>
+                             <p className="text-xs text-slate-500 dark:text-slate-400">Çevrimdışı Sayım</p>
+                        </div>
+                    </div>
+                    <button className="md:hidden p-1 text-slate-500 dark:text-slate-400" onClick={() => setMobileMenuOpen(false)}>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
                     </button>
-                ))}
-            </nav>
-        </aside>
+                </div>
+                <nav className="flex-1 p-4 space-y-2">
+                    {navItems.map((item, index) => (
+                        <button
+                            key={item.id}
+                            onClick={() => handleLinkClick(item.id)}
+                            disabled={item.disabled}
+                            className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left font-semibold transition-colors ${
+                                page === item.id
+                                    ? 'bg-slate-700 text-white shadow-md'
+                                    : 'text-slate-500 hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-slate-700 dark:hover:text-slate-200'
+                            } ${item.disabled ? 'opacity-40 cursor-not-allowed' : ''}`}
+                        >
+                            <span className={`flex items-center justify-center w-6 h-6 rounded-full text-xs ${page === item.id ? 'bg-white text-slate-800' : 'bg-slate-200 text-slate-600 dark:bg-slate-600 dark:text-slate-200'}`}>{index + 1}</span>
+                            {item.label}
+                        </button>
+                    ))}
+                </nav>
+                <div className="p-4 border-t border-slate-200 dark:border-slate-700 flex justify-around items-center">
+                    <button onClick={() => setIsMuted(!isMuted)} className="p-2 rounded-full text-slate-500 hover:bg-slate-200 dark:text-slate-400 dark:hover:bg-slate-700" title={isMuted ? "Sesi Aç" : "Sesi Kapat"}>
+                        {isMuted ? ICONS.soundOff : ICONS.soundOn}
+                    </button>
+                     <button onClick={() => setIsDarkMode(!isDarkMode)} className="p-2 rounded-full text-slate-500 hover:bg-slate-200 dark:text-slate-400 dark:hover:bg-slate-700" title={isDarkMode ? "Aydınlık Mod" : "Karanlık Mod"}>
+                        {isDarkMode ? ICONS.sun : ICONS.moon}
+                    </button>
+                </div>
+            </aside>
+        </>
     );
 };
 
@@ -308,6 +349,7 @@ export default function App() {
     const isQrCodeReady = useScript('https://unpkg.com/html5-qrcode', 'Html5Qrcode');
     
     const [page, setPage] = useState('permission'); // 'permission', 'start', 'setup', 'scan', 'summary'
+    const [isMobileMenuOpen, setMobileMenuOpen] = useState(false);
     const [isCameraAllowed, setIsCameraAllowed] = useState(false);
     const [sessions, setSessions] = useState({});
     const [currentSessionName, setCurrentSessionName] = useState('');
@@ -320,6 +362,7 @@ export default function App() {
     const [lastScanned, setLastScanned] = useState(null);
     const [barcodeInput, setBarcodeInput] = useState('');
     const [isLoading, setIsLoading] = useState(false);
+    const [isBulkLoading, setIsBulkLoading] = useState(false);
     const [error, setError] = useState('');
     const [warningModal, setWarningModal] = useState({ isOpen: false, title: '', warnings: [], barcode: null });
     const [confirmationModal, setConfirmationModal] = useState({ isOpen: false, message: '', onConfirm: () => {} });
@@ -330,9 +373,63 @@ export default function App() {
     const [isProcessingScan, setIsProcessingScan] = useState(false);
     const [searchTerm, setSearchTerm] = useState('');
     const [warningFilter, setWarningFilter] = useState('all');
+    const [isMuted, setIsMuted] = useState(false);
+    const [isDarkMode, setIsDarkMode] = useState(false);
     
     const processedBarcodesRef = useRef(new Set());
     const manualInputDebounceRef = useRef(null);
+
+    // Load settings from localStorage on initial mount
+    useEffect(() => {
+        const savedMute = localStorage.getItem('isMuted') === 'true';
+        setIsMuted(savedMute);
+        const savedDarkMode = localStorage.getItem('isDarkMode') === 'true';
+        setIsDarkMode(savedDarkMode);
+    }, []);
+
+    // Apply dark mode class and save to localStorage
+    useEffect(() => {
+        if (isDarkMode) {
+            document.documentElement.classList.add('dark');
+        } else {
+            document.documentElement.classList.remove('dark');
+        }
+        localStorage.setItem('isDarkMode', isDarkMode);
+    }, [isDarkMode]);
+
+    // Save mute setting to localStorage
+    useEffect(() => {
+        localStorage.setItem('isMuted', isMuted);
+    }, [isMuted]);
+
+    const playSound = useCallback((note) => {
+        if (isMuted) return;
+        try {
+            if (Tone.context.state !== 'running') {
+                Tone.context.resume();
+            }
+            synth.triggerAttackRelease(note, "8n");
+        } catch (e) {
+            console.error("Ses çalınamadı:", e);
+        }
+    }, [isMuted]);
+
+    const playMultipleWarningSound = useCallback(() => {
+        if (isMuted) return;
+        try {
+            if (Tone.context.state !== 'running') {
+                Tone.context.resume();
+            }
+            const now = Tone.now();
+            synth.triggerAttackRelease("C5", "16n", now);
+            synth.triggerAttackRelease("G4", "16n", now + 0.1);
+            synth.triggerAttackRelease("C5", "16n", now + 0.2);
+            synth.triggerAttackRelease("G4", "16n", now + 0.3);
+            synth.triggerAttackRelease("E5", "8n", now + 0.4);
+        } catch (e) {
+            console.error("Ses çalınamadı:", e);
+        }
+    }, [isMuted]);
 
     // Ybug Entegrasyonu
     useEffect(() => {
@@ -462,7 +559,13 @@ export default function App() {
         }
         
         if (processedBarcodesRef.current.has(normalizedBarcode)) {
-            return false;
+            const warning = WARNING_DEFINITIONS.duplicate;
+            const existingItemData = scannedItems.find(item => item.barcode === normalizedBarcode)?.data;
+            const scanResultForDisplay = { barcode: normalizedBarcode, isValid: false, warnings: [warning], data: existingItemData, timestamp: new Date().toISOString() };
+            setLastScanned(scanResultForDisplay);
+            playSound(warning.sound);
+            setWarningModal({ isOpen: true, title: 'Tekrarlı Barkod Uyarısı', warnings: [warning], barcode: normalizedBarcode });
+            return false; 
         }
 
         processedBarcodesRef.current.add(normalizedBarcode);
@@ -494,7 +597,6 @@ export default function App() {
             }
             
             if (String(itemData['MATERYAL STATÜSÜ KODU'] || '0') !== '0') warnings.push(WARNING_DEFINITIONS.notInCollection);
-            if (['0', '1'].includes(String(itemData['ŞİKAYET / KHK DURUMU']))) warnings.push(WARNING_DEFINITIONS.complaintKHK);
             if (itemData['İADE EDİLMESİ GEREKEN TARİH']) warnings.push(WARNING_DEFINITIONS.onLoan);
         } else {
              warnings.push(wasAutoCompleted ? WARNING_DEFINITIONS.autoCompletedNotFound : WARNING_DEFINITIONS.deleted);
@@ -513,7 +615,7 @@ export default function App() {
         
         playSound('C5');
         return false;
-    }, [selectedLibrary, selectedLocation, kohaDataMap, combinedLibraries]);
+    }, [selectedLibrary, selectedLocation, kohaDataMap, combinedLibraries, playSound, playMultipleWarningSound, scannedItems]);
 
     const handleCameraScan = useCallback((decodedText) => {
         setIsProcessingScan(true);
@@ -572,22 +674,22 @@ export default function App() {
 
     const handleBulkUpload = (file) => {
         if (!file) return;
+        setIsBulkLoading(true);
+        setError('');
         const reader = new FileReader();
         const fileExtension = file.name.split('.').pop().toLowerCase();
 
-        if (fileExtension === 'txt') {
-            reader.onload = (e) => {
-                const barcodes = e.target.result.split(/\r?\n/).filter(line => line.trim() !== '');
-                barcodes.forEach(b => processBarcode(b));
-            };
-            reader.readAsText(file);
-        } else if (fileExtension === 'xlsx' || fileExtension === 'xls') {
-            if (!isXlsxReady) {
-                setError("Excel kütüphanesi henüz hazır değil. Lütfen birkaç saniye sonra tekrar deneyin.");
-                return;
-            }
-            reader.onload = (e) => {
-                try {
+        reader.onload = (e) => {
+            try {
+                if (fileExtension === 'txt') {
+                    const barcodes = e.target.result.split(/\r?\n/).filter(line => line.trim() !== '');
+                    barcodes.forEach(b => processBarcode(b));
+                } else if (fileExtension === 'xlsx' || fileExtension === 'xls') {
+                    if (!isXlsxReady) {
+                        setError("Excel kütüphanesi henüz hazır değil. Lütfen birkaç saniye sonra tekrar deneyin.");
+                        setIsBulkLoading(false);
+                        return;
+                    }
                     const data = new Uint8Array(e.target.result);
                     const workbook = window.XLSX.read(data, { type: 'array' });
                     const sheetName = workbook.SheetNames[0];
@@ -595,13 +697,26 @@ export default function App() {
                     const json = window.XLSX.utils.sheet_to_json(worksheet, { header: 1 });
                     const barcodes = json.map(row => row[0]).filter(barcode => barcode !== null && barcode !== undefined && String(barcode).trim() !== '');
                     barcodes.forEach(b => processBarcode(b));
-                } catch (err) {
-                    setError(`Excel dosyası okunurken bir hata oluştu: ${err.message}`);
                 }
-            };
+            } catch (err) {
+                setError(`Toplu yükleme sırasında hata: ${err.message}`);
+            } finally {
+                setIsBulkLoading(false);
+            }
+        };
+
+        reader.onerror = () => {
+            setError("Dosya okuma başarısız oldu.");
+            setIsBulkLoading(false);
+        };
+
+        if (fileExtension === 'txt') {
+            reader.readAsText(file);
+        } else if (fileExtension === 'xlsx' || fileExtension === 'xls') {
             reader.readAsArrayBuffer(file);
         } else {
             setError("Lütfen geçerli bir .txt veya .xlsx dosyası yükleyin.");
+            setIsBulkLoading(false);
         }
     };
 
@@ -614,43 +729,60 @@ export default function App() {
     const REPORTS_CONFIG = useMemo(() => [
         { id: 'writeOff', title: 'Düşüm İşlemi İçin Barkodlar', format: '.txt', icon: ICONS.writeOff, description: "Bu dosya, Koha Materyal Düzeltme/Düşüm Modülü'ne yüklenerek materyallerin topluca düşümünü sağlar.", links: [{ text: 'Koha Düşüm Modülü', url: 'https://personel.ekutuphane.gov.tr/cgi-bin/koha/tools/batchMod.pl' }, { text: 'Genel Kullanım Kılavuzu', url: 'https://drive.google.com/drive/u/1/folders/1Rez8t9wLl_6u1uNTkGRFURbsvTX58sVK' }], notes: ['Sadece Müdür/Yönetici yetkisine sahip personel erişebilir.', 'Yetkisi olmayanlar koha@ktb.gov.tr adresinden talep edebilir.'], generator: () => { const scannedBarcodes = new Set(scannedItems.map(i => i.barcode)); const missingBarcodes = kohaData.filter(i => String(i['KÜTÜPHANE KODU']) === selectedLibrary && !scannedBarcodes.has(String(i.BARKOD))).map(i => String(i.BARKOD).slice(0, 12)); downloadTxt(missingBarcodes.join('\n'), `dusum_icin_eksik_barkodlar_${currentSessionName}.txt`); } },
         { id: 'missing', title: 'Eksik Materyaller', format: '.xlsx', icon: ICONS.missing, description: 'Sayım sırasında hiç okutulmamış olan, kütüphane koleksiyonuna ait materyallerin listesi.', generator: () => { const scannedBarcodes = new Set(scannedItems.map(i => i.barcode)); const missingItems = kohaData.filter(i => String(i['KÜTÜPHANE KODU']) === selectedLibrary && !scannedBarcodes.has(String(i.BARKOD))); downloadXlsx(missingItems, `eksik_materyaller_${currentSessionName}.xlsx`); } },
-        { id: 'invalidStructure', title: '❗ Yapıya Uygun Olmayan Barkodlar', format: '.xlsx', icon: ICONS.complaint, description: 'Barkod yapısı, bilinen hiçbir kütüphane koduna uymayan barkodlar.', generator: () => { const data = scannedItems.filter(i => i.warnings.some(w => w.id === 'invalidStructure')).map(i => ({ Hatalı_Barkod: i.barcode })); downloadXlsx(data, `yapiya_uygun_olmayanlar_${currentSessionName}.xlsx`); } },
-        { id: 'deletedScanned', title: '❗ Listede Olmayan ve Sayımı Yapılan Barkod', format: '.xlsx', icon: ICONS.complaint, description: 'Barkod listede bulunamadı (muhtemelen sistemden silinmiş veya hatalı girilmiş vs.).', generator: () => { const data = scannedItems.filter(i => i.warnings.some(w => w.id === 'deleted' || w.id === 'autoCompletedNotFound')).map(i => ({ Barkod: i.barcode, 'Not': 'Okutuldu, listede bulunamadı' })); downloadXlsx(data, `listede_olmayan_okutulanlar_${currentSessionName}.xlsx`); } },
+        { id: 'invalidStructure', title: '❗ Yapıya Uygun Olmayan Barkodlar', format: '.xlsx', icon: ICONS.status, description: 'Barkod yapısı, bilinen hiçbir kütüphane koduna uymayan barkodlar.', generator: () => { const data = scannedItems.filter(i => i.warnings.some(w => w.id === 'invalidStructure')).map(i => ({ Hatalı_Barkod: i.barcode })); downloadXlsx(data, `yapiya_uygun_olmayanlar_${currentSessionName}.xlsx`); } },
+        { id: 'deletedScanned', title: '❗ Listede Olmayan ve Sayımı Yapılan Barkod', format: '.xlsx', icon: ICONS.status, description: 'Barkod listede bulunamadı (muhtemelen sistemden silinmiş veya hatalı girilmiş vs.).', generator: () => { const data = scannedItems.filter(i => i.warnings.some(w => w.id === 'deleted' || w.id === 'autoCompletedNotFound')).map(i => ({ Barkod: i.barcode, 'Not': 'Okutuldu, listede bulunamadı' })); downloadXlsx(data, `listede_olmayan_okutulanlar_${currentSessionName}.xlsx`); } },
         { id: 'allResults', title: 'Tüm Sonuçlar (Uyarılar Dahil)', format: '.xlsx', icon: ICONS.all, description: 'Sayım boyunca okutulan tüm materyallerin, aldıkları uyarılarla birlikte tam listesi.', generator: () => { const data = scannedItems.map(i => ({ Barkod: i.barcode, 'Eser Adı': i.data?.['ESER ADI'] || '', Uyarılar: i.warnings.map(w => w.text).join(', ') || 'Temiz', ...i.data })); downloadXlsx(data, `tum_sonuclar_${currentSessionName}.xlsx`); } },
         { id: 'cleanList', title: 'Temiz Liste (Uyarısız)', format: '.xlsx', icon: ICONS.clean, description: 'Hiçbir uyarı almayan, durumu ve konumu doğru olan materyallerin listesi.', generator: () => { const data = scannedItems.filter(i => i.isValid).map(i => i.data); downloadXlsx(data, `temiz_liste_${currentSessionName}.xlsx`); } },
         { id: 'wrongLibrary', title: 'Kütüphanenize Ait Olmayan Ancak Okunan Barkodlar', format: '.xlsx', icon: ICONS.wrongLib, description: 'Sayım yapılan kütüphaneye ait olmayan (farklı şube koduna sahip) materyaller.', generator: () => { const data = scannedItems.filter(i => i.warnings.some(w => w.id === 'wrongLibrary')).map(i => i.data); downloadXlsx(data, `kutuphane_disi_${currentSessionName}.xlsx`); } },
         { id: 'locationMismatch', title: 'Yer Uyumsuzları', format: '.xlsx', icon: ICONS.location, description: 'Başlangıçta seçilen lokasyon dışında bir yerde okutulan materyaller.', generator: () => { const data = scannedItems.filter(i => i.warnings.some(w => w.id === 'locationMismatch')).map(i => i.data); downloadXlsx(data, `yer_uyumsuz_${currentSessionName}.xlsx`); } },
         { id: 'notLoanableScanned', title: 'Statüsü Ödünç Verilebilir Olmayan (Devir/Düşüm Olan) Materyaller', format: '.xlsx', icon: ICONS.notLoanable, description: 'Ödünç verilebilirlik durumu "uygun değil" olarak işaretlenmiş materyaller.', generator: () => { const data = kohaData.filter(i => !['0', '2'].includes(String(i['ÖDÜNÇ VERİLEBİLİRLİK KODU']))); downloadXlsx(data, `odunc_verilemeyenler_${currentSessionName}.xlsx`); } },
         { id: 'statusIssues', title: 'Düşüm / Devir Statüsündekiler', format: '.xlsx', icon: ICONS.status, description: 'Materyal statüsü "düşüm" veya "devir" gibi koleksiyon dışı bir durumu gösteren materyaller.', generator: () => { const data = scannedItems.filter(i => i.warnings.some(w => w.id === 'notInCollection')).map(i => i.data); downloadXlsx(data, `dusum_devir_statulu_${currentSessionName}.xlsx`); } },
-        { id: 'complaints', title: 'Şikayet / KHK Durumu Olanlar (Okutulan)', format: '.xlsx', icon: ICONS.complaint, description: 'Sayım sırasında okutulan ve üzerinde "Şikayet" veya "KHK" bildirimi bulunan materyaller.', generator: () => { const data = scannedItems.filter(i => i.warnings.some(w => w.id === 'complaintKHK')).map(i => ({ ...i.data, 'Durum': String(i.data['ŞİKAYET / KHK DURUMU']) === '0' ? 'KHK' : 'Şikayet' })); downloadXlsx(data, `okutulan_sikayet_khk_durumu_${currentSessionName}.xlsx`); } },
         { id: 'onLoan', title: 'Ödünçteki Materyaller', format: '.xlsx', icon: ICONS.onLoan, description: 'Koha verisine göre halihazırda bir okuyucunun üzerinde ödünçte görünen materyaller.', generator: () => { const data = kohaData.filter(i => String(i['ÖDÜNÇTE Mİ']) === '1').map(i => ({ 'İade Tarihi': i['ÖDÜNÇTEKİ MATERYALİN İADE EDİLMESİ GEREKEN TARİH'], ...i })); downloadXlsx(data, `oduncteki_materyaller_${currentSessionName}.xlsx`); } }
     ], [kohaData, scannedItems, currentSessionName, selectedLibrary, isXlsxReady]);
 
     const summaryData = useMemo(() => { if(scannedItems.length === 0) return null; const valid = scannedItems.filter(item => item.isValid).length; const kohaBarcodes = new Set(kohaData.map(item => String(item.BARKOD))); const scannedBarcodes = new Set(scannedItems.map(item => item.barcode)); const notScannedCount = [...kohaBarcodes].filter(b => !scannedBarcodes.has(b)).length; const warningCounts = scannedItems.flatMap(item => item.warnings).reduce((acc, warning) => { acc[warning.id] = (acc[warning.id] || 0) + 1; return acc; }, {}); let scanSpeed = 0; if(scannedItems.length > 1){ const firstScanTime = new Date(scannedItems[scannedItems.length - 1].timestamp).getTime(); const lastScanTime = new Date(scannedItems[0].timestamp).getTime(); const durationMinutes = (lastScanTime - firstScanTime) / (1000 * 60); scanSpeed = durationMinutes > 0 ? Math.round(scannedItems.length / durationMinutes) : "∞"; } const locationMismatches = scannedItems.filter(i => i.warnings.some(w => w.id === 'locationMismatch')).reduce((acc, item) => { const loc = item.data['MATERYALİN YERİ'] || 'Bilinmeyen'; acc[loc] = (acc[loc] || 0) + 1; return acc; }, {}); const materialTypes = scannedItems.reduce((acc, item) => { const type = item.data?.['MATERYAL TÜRÜ'] || 'Bilinmiyor'; acc[type] = (acc[type] || 0) + 1; return acc; }, {}); return { totalScanned: scannedItems.length, valid, invalid: scannedItems.length - valid, notScannedCount, scanSpeed, pieData: [ { name: 'Geçerli', value: valid }, { name: 'Uyarılı', value: scannedItems.length - valid }, { name: 'Eksik', value: notScannedCount } ], warningBarData: Object.entries(warningCounts).map(([id, count]) => ({ name: WARNING_DEFINITIONS[id]?.text || id, sayı: count })), locationMismatchData: Object.entries(locationMismatches).map(([name, count]) => ({name, sayı: count})), materialTypeData: Object.entries(materialTypes).map(([name, count]) => ({name, value: count}))}; }, [scannedItems, kohaData]);
     
     // --- Render Functions ---
+    const pageTitles = {
+        start: 'Yeni Sayım',
+        setup: 'Kurulum',
+        scan: 'Sayım',
+        summary: 'Özet & Raporlar',
+        permission: 'Kamera İzni'
+    };
+
+    const MobileHeader = ({ onMenuClick, pageTitle }) => (
+        <header className="md:hidden bg-white dark:bg-slate-800 shadow-md p-4 flex items-center justify-between sticky top-0 z-20">
+            <button onClick={onMenuClick} className="p-2 text-slate-600 dark:text-slate-300">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+            </button>
+            <h2 className="text-lg font-bold text-slate-800 dark:text-slate-200">{pageTitle}</h2>
+            <div className="w-8"></div> {/* Spacer to balance the title */}
+        </header>
+    );
+
     const renderStartScreen = () => (
         <div className="w-full">
-            <h1 className="text-3xl font-bold text-slate-800 mb-2">Hoş Geldiniz</h1>
-            <p className="text-slate-600 mb-8">Yeni bir sayım başlatın veya kayıtlı bir oturuma devam edin.</p>
+            <h1 className="text-3xl font-bold text-slate-800 dark:text-slate-200 mb-2">Hoş Geldiniz</h1>
+            <p className="text-slate-600 dark:text-slate-400 mb-8">Yeni bir sayım başlatın veya kayıtlı bir oturuma devam edin.</p>
             <div className="grid md:grid-cols-2 gap-8">
-                <div className="bg-white p-6 rounded-lg shadow-sm border">
-                    <h2 className="text-2xl font-semibold mb-4 text-slate-700">Yeni Sayım Başlat</h2>
+                <div className="bg-white dark:bg-slate-800 p-6 rounded-lg shadow-sm border dark:border-slate-700">
+                    <h2 className="text-2xl font-semibold mb-4 text-slate-700 dark:text-slate-300">Yeni Sayım Başlat</h2>
                     <div className="flex flex-col sm:flex-row gap-2">
-                        <input type="text" value={sessionNameInput} onChange={e => {setSessionNameInput(e.target.value); setError('')}} onKeyDown={(e) => e.key === 'Enter' && startNewSession()} placeholder="Sayım için bir isim girin..." className="flex-grow p-3 border border-slate-300 rounded-md shadow-sm focus:ring-slate-500 focus:border-slate-500" />
+                        <input type="text" value={sessionNameInput} onChange={e => {setSessionNameInput(e.target.value); setError('')}} onKeyDown={(e) => e.key === 'Enter' && startNewSession()} placeholder="Sayım için bir isim girin..." className="flex-grow p-3 border border-slate-300 rounded-md shadow-sm focus:ring-slate-500 focus:border-slate-500 dark:bg-slate-700 dark:border-slate-600 dark:text-white" />
                         <button onClick={startNewSession} className="bg-slate-700 text-white font-bold py-3 px-6 rounded-md hover:bg-slate-800 transition-colors">Başlat</button>
                     </div>
                 </div>
-                <div className="bg-white p-6 rounded-lg shadow-sm border">
-                    <h2 className="text-2xl font-semibold mb-4 text-slate-700">Kayıtlı Oturumlar</h2>
-                    {Object.keys(sessions).length > 0 ? <ul className="space-y-3 max-h-60 overflow-y-auto pr-2">{Object.values(sessions).sort((a,b) => new Date(b.lastUpdated) - new Date(a.lastUpdated)).map(session => <li key={session.name} className="flex flex-col sm:flex-row items-center justify-between p-3 bg-slate-50 rounded-lg border"><div><p className="font-bold text-slate-800">{session.name}</p><p className="text-sm text-slate-500">{new Date(session.lastUpdated).toLocaleString('tr-TR')} - {session.items.length} kayıt</p></div><div className="flex gap-2 mt-2 sm:mt-0"><button onClick={() => loadSession(session.name)} className="px-4 py-2 text-sm bg-green-600 text-white rounded hover:bg-green-700">Yükle</button><button onClick={() => deleteSession(session.name)} className="px-4 py-2 text-sm bg-red-600 text-white rounded hover:bg-red-700">Sil</button></div></li>)}</ul> : <p className="text-slate-500">Kayıtlı oturum bulunamadı.</p>}
+                <div className="bg-white dark:bg-slate-800 p-6 rounded-lg shadow-sm border dark:border-slate-700">
+                    <h2 className="text-2xl font-semibold mb-4 text-slate-700 dark:text-slate-300">Kayıtlı Oturumlar</h2>
+                    {Object.keys(sessions).length > 0 ? <ul className="space-y-3 max-h-60 overflow-y-auto pr-2">{Object.values(sessions).sort((a,b) => new Date(b.lastUpdated) - new Date(a.lastUpdated)).map(session => <li key={session.name} className="flex flex-col sm:flex-row items-center justify-between p-3 bg-slate-50 dark:bg-slate-700/50 rounded-lg border dark:border-slate-600"><div><p className="font-bold text-slate-800 dark:text-slate-200">{session.name}</p><p className="text-sm text-slate-500 dark:text-slate-400">{new Date(session.lastUpdated).toLocaleString('tr-TR')} - {session.items.length} kayıt</p></div><div className="flex gap-2 mt-2 sm:mt-0"><button onClick={() => loadSession(session.name)} className="px-4 py-2 text-sm bg-green-600 text-white rounded hover:bg-green-700">Yükle</button><button onClick={() => deleteSession(session.name)} className="px-4 py-2 text-sm bg-red-600 text-white rounded hover:bg-red-700">Sil</button></div></li>)}</ul> : <p className="text-slate-500 dark:text-slate-400">Kayıtlı oturum bulunamadı.</p>}
                 </div>
             </div>
         </div>
     );
 
-    const renderSetupScreen = () => <div className="max-w-3xl mx-auto w-full p-8 bg-white rounded-xl shadow-sm space-y-6 border">
-        <h1 className="text-3xl font-bold text-slate-800">Sayım Kurulumu: "{currentSessionName}"</h1>{error && <div className="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 rounded" role="alert"><p>{error}</p></div>}<div className="space-y-4"><div><label htmlFor="library-select" className="block text-sm font-medium text-slate-700 mb-1">Kütüphanenizi Seçin</label><div className="flex gap-2"><select id="library-select" value={selectedLibrary} onChange={(e) => setSelectedLibrary(e.target.value)} className="w-full p-3 border border-slate-300 rounded-md shadow-sm"><option value="">-- Kütüphane Seçiniz --</option>{Object.entries(combinedLibraries).map(([code, name]) => <option key={code} value={code}>{name}</option>)}</select><button onClick={()=> setAddDataModal({isOpen: true, type: 'library'})} className="px-3 bg-slate-200 rounded-md hover:bg-slate-300">Yeni Ekle</button></div></div><div><label htmlFor="location-select" className="block text-sm font-medium text-slate-700 mb-1">Bölüm/Materyalin Yeri (Opsiyonel)</label><div className="flex gap-2"><select id="location-select" value={selectedLocation} onChange={(e) => setSelectedLocation(e.target.value)} className="w-full p-3 border border-slate-300 rounded-md shadow-sm"><option value="">-- Tüm Lokasyonlar --</option>{Object.entries(combinedLocations).map(([code, name]) => <option key={code} value={code}>{name}</option>)}</select><button onClick={()=> setAddDataModal({isOpen: true, type: 'location'})} className="px-3 bg-slate-200 rounded-md hover:bg-slate-300">Yeni Ekle</button></div><p className="text-xs text-slate-500 mt-1">Yer seçimi yaparsanız, sayım yaptığınız yerde olmayan materyallerle ilgili uyarı verilecektir.</p></div></div><div><h3 className="text-sm font-medium text-slate-700 mb-1">Koha'dan Aldığınız Sayım İçin Hazırlanmış Dosya (.xlsx)</h3><FileUploader onFileAccepted={handleExcelUpload} title={kohaData.length > 0 ? `${kohaData.length} kayıt yüklendi.` : "Dosyayı buraya sürükleyin veya seçmek için tıklayın"} disabled={!isXlsxReady} accept={{'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': ['.xlsx'], 'application/vnd.ms-excel': ['.xls']}}><svg xmlns="http://www.w3.org/2000/svg" className="mx-auto h-12 w-12 text-green-700" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" /></svg></FileUploader>{isLoading && <p className="text-blue-600 mt-2">Dosya okunuyor...</p>}</div><button onClick={() => { if(selectedLibrary && kohaData.length > 0) setPage('scan'); else setError("Sayıma başlamak için Kütüphane seçmeli ve Excel dosyası yüklemelisiniz."); }} disabled={!selectedLibrary || kohaData.length === 0 || isLoading || !isXlsxReady} className="w-full bg-slate-700 text-white font-bold py-3 px-4 rounded-md hover:bg-slate-800 disabled:bg-slate-400">Sayıma Devam Et</button>
+    const renderSetupScreen = () => <div className="max-w-3xl mx-auto w-full p-8 bg-white dark:bg-slate-800 rounded-xl shadow-sm space-y-6 border dark:border-slate-700">
+        <h1 className="text-3xl font-bold text-slate-800 dark:text-slate-200">Sayım Kurulumu: "{currentSessionName}"</h1>{error && <div className="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 rounded" role="alert"><p>{error}</p></div>}<div className="space-y-4"><div><label htmlFor="library-select" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Kütüphanenizi Seçin</label><div className="flex gap-2"><select id="library-select" value={selectedLibrary} onChange={(e) => setSelectedLibrary(e.target.value)} className="w-full p-3 border border-slate-300 rounded-md shadow-sm dark:bg-slate-700 dark:border-slate-600 dark:text-white"><option value="">-- Kütüphane Seçiniz --</option>{Object.entries(combinedLibraries).map(([code, name]) => <option key={code} value={code}>{name}</option>)}</select><button onClick={()=> setAddDataModal({isOpen: true, type: 'library'})} className="px-3 bg-slate-200 dark:bg-slate-600 rounded-md hover:bg-slate-300 dark:hover:bg-slate-500">Yeni Ekle</button></div></div><div><label htmlFor="location-select" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Bölüm/Materyalin Yeri (Opsiyonel)</label><div className="flex gap-2"><select id="location-select" value={selectedLocation} onChange={(e) => setSelectedLocation(e.target.value)} className="w-full p-3 border border-slate-300 rounded-md shadow-sm dark:bg-slate-700 dark:border-slate-600 dark:text-white"><option value="">-- Tüm Lokasyonlar --</option>{Object.entries(combinedLocations).map(([code, name]) => <option key={code} value={code}>{name}</option>)}</select><button onClick={()=> setAddDataModal({isOpen: true, type: 'location'})} className="px-3 bg-slate-200 dark:bg-slate-600 rounded-md hover:bg-slate-300 dark:hover:bg-slate-500">Yeni Ekle</button></div><p className="text-xs text-slate-500 dark:text-slate-400 mt-1">Yer seçimi yaparsanız, sayım yaptığınız yerde olmayan materyallerle ilgili uyarı verilecektir.</p></div></div><div><h3 className="text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Koha'dan Aldığınız Sayım İçin Hazırlanmış Dosya (.xlsx)</h3><FileUploader onFileAccepted={handleExcelUpload} title={kohaData.length > 0 ? `${kohaData.length} kayıt yüklendi.` : "Dosyayı buraya sürükleyin veya seçmek için tıklayın"} disabled={!isXlsxReady || isLoading} accept={{'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': ['.xlsx'], 'application/vnd.ms-excel': ['.xls']}}><svg xmlns="http://www.w3.org/2000/svg" className="mx-auto h-12 w-12 text-green-700" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" /></svg></FileUploader></div><button onClick={() => { if(selectedLibrary && kohaData.length > 0) setPage('scan'); else setError("Sayıma başlamak için Kütüphane seçmeli ve Excel dosyası yüklemelisiniz."); }} disabled={!selectedLibrary || kohaData.length === 0 || isLoading || !isXlsxReady} className="w-full bg-slate-700 text-white font-bold py-3 px-4 rounded-md hover:bg-slate-800 disabled:bg-slate-400">Sayıma Devam Et</button>
     </div>;
 
     const renderScanScreen = () => {
@@ -661,32 +793,33 @@ export default function App() {
             'application/vnd.ms-excel': ['.xls']
         };
 
-        return (<>{isCameraOpen && isQrCodeReady && isCameraAllowed && <RobustBarcodeScanner onClose={() => setIsCameraOpen(false)} onScan={handleCameraScan} isPaused={warningModal.isOpen} />} <div className="flex flex-col md:flex-row h-full bg-slate-50">
-            <div className="w-full md:w-1/3 lg:w-1/4 p-4 bg-white border-r flex flex-col"><div className="flex-grow space-y-4"><h2 className="text-xl font-bold text-slate-800">Sayım: {currentSessionName}</h2><div className="text-sm text-slate-600"><p><span className="font-semibold">Kütüphane:</span> {combinedLibraries[selectedLibrary]}</p><p><span className="font-semibold">Lokasyon:</span> {selectedLocation ? combinedLocations[selectedLocation] : 'Tümü'}</p></div>
+        return (<>{isCameraOpen && isQrCodeReady && isCameraAllowed && <RobustBarcodeScanner onClose={() => setIsCameraOpen(false)} onScan={handleCameraScan} isPaused={warningModal.isOpen} />} <div className="flex flex-col md:flex-row h-full bg-slate-50 dark:bg-slate-900">
+            <div className="w-full md:w-1/3 lg:w-1/4 p-4 bg-white dark:bg-slate-800 border-r dark:border-slate-700 flex flex-col"><div className="flex-grow space-y-4"><h2 className="text-xl font-bold text-slate-800 dark:text-slate-200">Sayım: {currentSessionName}</h2><div className="text-sm text-slate-600 dark:text-slate-400"><p><span className="font-semibold">Kütüphane:</span> {combinedLibraries[selectedLibrary]}</p><p><span className="font-semibold">Lokasyon:</span> {selectedLocation ? combinedLocations[selectedLocation] : 'Tümü'}</p></div>
             <button onClick={() => setIsCameraOpen(true)} disabled={!isQrCodeReady || !isCameraAllowed} className="w-full flex items-center justify-center gap-2 p-2 bg-slate-700 text-white rounded-md hover:bg-slate-800 disabled:bg-slate-400 disabled:cursor-not-allowed">
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
-                {isCameraAllowed ? 'Kamera ile Tara' : 'İlk Aşamada Kameraya İzin Verilmedi'}
+                Kamera İle Barkod Okutma
             </button>
             {!isCameraAllowed && (
                 <div className="mt-2 text-xs text-center text-red-800 bg-red-100 p-2 rounded-lg border border-red-200">
-                    <p>İzin Vermek İçin Sayfayı Yenileyerek İlk Aşamaya Tekrar Geçebilirsiniz.</p>
-                    <p className="font-semibold mt-1">
+                    <p className="font-semibold">
                         <a href="#" onClick={(e) => { e.preventDefault(); localStorage.removeItem('cameraPermissionChoiceMade'); localStorage.removeItem('cameraPermissionStatus'); window.location.reload(); }} className="underline hover:text-red-900">
-                            İlk Aşamaya Geçerek Kamera İzni Vermek İçin Tıklayınız!
+                           Kamera İzni Vermek İçin Tıklayın.
                         </a>
                     </p>
-                    <p className="font-bold mt-1">Uyarı: Tüm İşlemler Sıfırlanacaktır</p>
+                    <p className="font-bold mt-1">Not: Tüm işlemler sıfırlanacaktır.</p>
                 </div>
             )}
-        <form onSubmit={handleManualEntry} className="space-y-2"><label htmlFor="barcode-input" className="font-semibold text-slate-700">Barkod Okut/Gir:</label><input id="barcode-input" type="tel" value={barcodeInput} onChange={handleBarcodeInput} placeholder="Barkodu okutun veya elle girin" className="w-full p-2 border border-slate-300 rounded-md" autoFocus /><button type="submit" className="w-full bg-slate-600 text-white p-2 rounded-md hover:bg-slate-700">Ekle</button></form>{lastScanned && <div className={`p-3 rounded-md border-l-4 ${lastScanned.isValid ? 'bg-green-100 border-green-500' : 'bg-red-100 border-red-500'}`}><p className="font-bold text-slate-800">{lastScanned.barcode}</p><p className="text-sm">{lastScanned.data?.['ESER ADI'] || 'Eser bilgisi bulunamadı'}</p>{lastScanned.warnings.map(w => <p key={w.id} style={{color: w.color}} className="text-sm font-semibold">{w.text}</p>)}</div>}</div><div className="mt-4 space-y-2">
-            <div className='md:hidden'><label className="font-semibold text-slate-700">Toplu Yükleme (.txt/.xlsx):</label><FileUploader onFileAccepted={handleBulkUpload} title={bulkUploadTitle} accept={bulkUploadAccept} /></div>
-            <div className="hidden md:block"><label className="font-semibold text-slate-700">Toplu Yükleme (.txt/.xlsx):</label><FileUploader onFileAccepted={handleBulkUpload} title={bulkUploadTitle} accept={bulkUploadAccept} /></div>
-            <button onClick={() => setPage('summary')} className="w-full bg-green-600 text-white font-bold py-3 px-4 rounded-md hover:bg-green-700">Özeti ve Raporları Gör</button></div></div><div className="w-full md:w-2/3 lg:w-3/4 p-4 flex flex-col"><h3 className="text-lg font-bold text-slate-800 mb-2">Okutulan Materyaller ({filteredScannedItems.length} / {scannedItems.length})</h3><div className="flex flex-col sm:flex-row gap-2 mb-2"><input type="text" placeholder="Barkod veya eserde ara..." value={searchTerm} onChange={e => setSearchTerm(e.target.value)} className="flex-grow p-2 border border-slate-300 rounded-md" /><select value={warningFilter} onChange={e => setWarningFilter(e.target.value)} className="p-2 border border-slate-300 rounded-md"><option value="all">Tümünü Göster</option>{Object.values(WARNING_DEFINITIONS).filter(w => w.id !== 'duplicate').map(w => <option key={w.id} value={w.id}>{w.text}</option>)}</select></div><div className="flex-grow overflow-y-auto space-y-2 pr-2">{filteredScannedItems.map((item) => <div key={item.timestamp} className={`p-2 rounded-md border flex items-center justify-between gap-2 ${item.isValid ? 'bg-white' : 'bg-yellow-50'}`}><div className="flex-grow"><p className="font-mono text-slate-800">{item.barcode}</p><p className="text-xs text-slate-600">{item.data?.['ESER ADI'] || 'Bilinmeyen Eser'}</p></div><div className="flex items-center gap-2 flex-shrink-0"><div className="flex flex-wrap justify-end gap-1">{item.warnings.map(w => <span key={w.id} style={{backgroundColor: w.color, color: '#fff'}} className="px-2 py-1 text-xs font-semibold rounded-full">{w.text}</span>)}{item.isValid && <span className="px-2 py-1 text-xs font-semibold text-green-800 bg-green-200 rounded-full">Temiz</span>}</div><button onClick={() => handleDeleteItem(item.timestamp)} className="p-1 rounded-full text-slate-400 hover:bg-red-100 hover:text-red-600" title="Bu kaydı sil"><svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" /></svg></button></div></div>)}</div></div>
+        <form onSubmit={handleManualEntry} className="space-y-2"><label htmlFor="barcode-input" className="font-semibold text-slate-700 dark:text-slate-300">Barkod Okut/Gir:</label><input id="barcode-input" type="tel" value={barcodeInput} onChange={handleBarcodeInput} placeholder="Barkodu okutun veya elle girin" className="w-full p-2 border border-slate-300 rounded-md dark:bg-slate-700 dark:border-slate-600 dark:text-white" autoFocus /><button type="submit" className="w-full bg-slate-600 text-white p-2 rounded-md hover:bg-slate-700">Ekle</button></form>{lastScanned && <div className={`p-3 rounded-md border-l-4 ${lastScanned.isValid ? 'bg-green-100 border-green-500 dark:bg-green-900/50 dark:border-green-600' : 'bg-red-100 border-red-500 dark:bg-red-900/50 dark:border-red-600'}`}><p className="font-bold text-slate-800 dark:text-slate-200">{lastScanned.barcode}</p><p className="text-sm text-slate-600 dark:text-slate-400">{lastScanned.data?.['ESER ADI'] || 'Eser bilgisi bulunamadı'}</p>{lastScanned.warnings.map(w => <p key={w.id} style={{color: w.color}} className="text-sm font-semibold">{w.text}</p>)}</div>}</div><div className="mt-4 space-y-2">
+            <div>
+                <label className="font-semibold text-slate-700 dark:text-slate-300">Toplu Yükleme (.txt/.xlsx):</label>
+                <FileUploader onFileAccepted={handleBulkUpload} title={bulkUploadTitle} accept={bulkUploadAccept} disabled={isBulkLoading} />
+            </div>
+            <button onClick={() => setPage('summary')} disabled={scannedItems.length === 0 || isBulkLoading} className="w-full bg-green-600 text-white font-bold py-3 px-4 rounded-md hover:bg-green-700 disabled:bg-green-400 disabled:cursor-not-allowed">Özeti ve Raporları Gör</button></div></div><div className="w-full md:w-2/3 lg:w-3/4 p-4 flex flex-col"><h3 className="text-lg font-bold text-slate-800 dark:text-slate-200 mb-2">Okutulan Materyaller ({filteredScannedItems.length} / {scannedItems.length})</h3><div className="flex flex-col sm:flex-row gap-2 mb-2"><input type="text" placeholder="Barkod veya eserde ara..." value={searchTerm} onChange={e => setSearchTerm(e.target.value)} className="flex-grow p-2 border border-slate-300 rounded-md dark:bg-slate-700 dark:border-slate-600 dark:text-white" /><select value={warningFilter} onChange={e => setWarningFilter(e.target.value)} className="p-2 border border-slate-300 rounded-md dark:bg-slate-700 dark:border-slate-600 dark:text-white"><option value="all">Tümünü Göster</option>{Object.values(WARNING_DEFINITIONS).filter(w => w.id !== 'duplicate').map(w => <option key={w.id} value={w.id}>{w.text}</option>)}</select></div><div className="flex-grow overflow-y-auto space-y-2 pr-2">{filteredScannedItems.map((item) => <div key={item.timestamp} className={`p-2 rounded-md border dark:border-slate-700 flex items-center justify-between gap-2 ${item.isValid ? 'bg-white dark:bg-slate-800' : 'bg-yellow-50 dark:bg-yellow-900/50'}`}><div className="flex-grow"><p className="font-mono text-slate-800 dark:text-slate-300">{item.barcode}</p><p className="text-xs text-slate-600 dark:text-slate-400">{item.data?.['ESER ADI'] || 'Bilinmeyen Eser'}</p></div><div className="flex items-center gap-2 flex-shrink-0"><div className="flex flex-wrap justify-end gap-1">{item.warnings.map(w => <span key={w.id} style={{backgroundColor: w.color, color: '#fff'}} className="px-2 py-1 text-xs font-semibold rounded-full">{w.text}</span>)}{item.isValid && <span className="px-2 py-1 text-xs font-semibold text-green-800 bg-green-200 dark:text-green-200 dark:bg-green-800/50 rounded-full">Temiz</span>}</div><button onClick={() => handleDeleteItem(item.timestamp)} className="p-1 rounded-full text-slate-400 hover:bg-red-100 hover:text-red-600 dark:hover:bg-red-900/50 dark:hover:text-red-400" title="Bu kaydı sil"><svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" /></svg></button></div></div>)}</div></div>
         </div></>);
     }
 
     const renderSummaryScreen = () => <div className="w-full">
-        <div className="flex justify-between items-start mb-6"><h1 className="text-3xl font-bold text-slate-800">Sayım Özeti: {currentSessionName}</h1></div><div className="bg-white p-6 rounded-lg shadow-sm border mb-8"><div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 text-center"><div className="bg-blue-100 p-4 rounded-lg"><p className="text-2xl font-bold text-blue-800">{summaryData.totalScanned}</p><p>Toplam Okutulan</p></div><div className="bg-green-100 p-4 rounded-lg"><p className="text-2xl font-bold text-green-800">{summaryData.valid}</p><p>Geçerli (Temiz)</p></div><div className="bg-yellow-100 p-4 rounded-lg"><p className="text-2xl font-bold text-yellow-800">{summaryData.invalid}</p><p>Hatalı/Uyarılı</p></div><div className="bg-slate-200 p-4 rounded-lg"><p className="text-2xl font-bold text-slate-800">{summaryData.notScannedCount}</p><p>Eksik</p></div><div className="bg-indigo-100 p-4 rounded-lg"><p className="text-2xl font-bold text-indigo-800">{summaryData.scanSpeed}</p><p>Materyal / dk</p></div></div></div><div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-8 mb-8"><div className="bg-white p-6 rounded-lg shadow-sm border h-96"><h3 className="text-xl font-semibold mb-2 text-center text-slate-700">Genel Durum</h3><ResponsiveContainer><PieChart><Pie data={summaryData.pieData} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={100} label>{summaryData.pieData.map((entry, i) => <Cell key={`cell-${i}`} fill={PIE_CHART_COLORS[entry.name === 'Geçerli' ? 'valid' : entry.name === 'Uyarılı' ? 'invalid' : 'missing']} />)}</Pie><Tooltip /><Legend /></PieChart></ResponsiveContainer></div><div className="bg-white p-6 rounded-lg shadow-sm border h-96"><h3 className="text-xl font-semibold mb-2 text-center text-slate-700">Materyal Türü Dağılımı</h3><ResponsiveContainer><PieChart><Pie data={summaryData.materialTypeData} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={100} labelLine={false} label={({cx,cy,midAngle,innerRadius,outerRadius,percent}) => { const r = innerRadius+(outerRadius-innerRadius)*0.5; const x=cx+r*Math.cos(-midAngle*Math.PI/180); const y=cy+r*Math.sin(-midAngle*Math.PI/180); return <text x={x} y={y} fill="white" textAnchor={x > cx ? 'start' : 'end'} dominantBaseline="central">{`${(percent*100).toFixed(0)}%`}</text>;}}>{summaryData.materialTypeData.map((e, i) => <Cell key={`cell-${i}`} fill={['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#AF19FF'][i % 5]} />)}</Pie><Tooltip /><Legend /></PieChart></ResponsiveContainer></div><div className="bg-white p-6 rounded-lg shadow-sm border h-96"><h3 className="text-xl font-semibold mb-2 text-center text-slate-700">Uyarı Türleri</h3><ResponsiveContainer><BarChart data={summaryData.warningBarData} layout="vertical" margin={{left: 100}}><CartesianGrid /><XAxis type="number" /><YAxis type="category" dataKey="name" width={100} tick={{ fontSize: 10 }} /><Tooltip content={<CustomTooltip />} /><Bar dataKey="sayı">{summaryData.warningBarData.map((e, i) => <Cell key={`cell-${i}`} fill={WARNING_DEFINITIONS[Object.keys(WARNING_DEFINITIONS).find(k => WARNING_DEFINITIONS[k].text === e.name)]?.color || '#8884d8'} />)}</Bar></BarChart></ResponsiveContainer></div>{summaryData.locationMismatchData.length > 0 && <div className="bg-white p-6 rounded-lg shadow-sm border h-96 lg:col-span-2 xl:col-span-3"><h3 className="text-xl font-semibold mb-2 text-center text-slate-700">Konum Uyuşmazlığı Olan Raflar</h3><ResponsiveContainer><BarChart data={summaryData.locationMismatchData} margin={{bottom: 50}}><CartesianGrid /><XAxis dataKey="name" angle={-45} textAnchor="end" interval={0} height={60} /><YAxis allowDecimals={false}/><Tooltip content={<CustomTooltip />} /><Bar dataKey="sayı" fill="#FAD7A0" /></BarChart></ResponsiveContainer></div>}</div><div className="mt-10"><h2 className="text-3xl font-bold mb-6 text-slate-800">Raporlar</h2><div className="space-y-4">{REPORTS_CONFIG.map(report => <div key={report.id} className="bg-white border border-slate-200 rounded-lg p-4 transition-shadow hover:shadow-md"><div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4"><div className="flex items-center gap-4 flex-grow"><div className="text-slate-600 flex-shrink-0 w-6 h-6">{report.icon}</div><div><h4 className="font-bold text-slate-800">{report.title}</h4><p className="text-sm text-slate-500">Format: {report.format}</p></div></div><div className="flex-shrink-0 mt-2 sm:mt-0"><button onClick={report.generator} disabled={!isXlsxReady} className="flex items-center gap-2 bg-slate-700 text-white font-semibold px-4 py-2 rounded-md hover:bg-slate-800 disabled:bg-slate-400 transition-colors">{ICONS.download} İndir</button></div></div><div className="mt-3 pt-3 border-t border-slate-200 text-sm text-slate-600 space-y-2"><p>{report.description}</p>{report.notes && <ul className="list-disc list-inside text-xs text-slate-500 space-y-1">{report.notes.map((note,i) => <li key={i}>{note}</li>)}</ul>}{report.links && <div className="flex flex-col items-start gap-1">{report.links.map((link,i) => <a key={i} href={link.url} target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline text-xs">{link.text}</a>)}</div>}</div></div>)}</div></div>
+        <div className="flex justify-between items-start mb-6"><h1 className="text-3xl font-bold text-slate-800 dark:text-slate-200">Sayım Özeti: {currentSessionName}</h1></div><div className="bg-white dark:bg-slate-800 p-6 rounded-lg shadow-sm border dark:border-slate-700 mb-8"><div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 text-center"><div className="bg-blue-100 dark:bg-blue-900/50 p-4 rounded-lg"><p className="text-2xl font-bold text-blue-800 dark:text-blue-300">{summaryData.totalScanned}</p><p className="dark:text-slate-300">Toplam Okutulan</p></div><div className="bg-green-100 dark:bg-green-900/50 p-4 rounded-lg"><p className="text-2xl font-bold text-green-800 dark:text-green-300">{summaryData.valid}</p><p className="dark:text-slate-300">Geçerli (Temiz)</p></div><div className="bg-yellow-100 dark:bg-yellow-900/50 p-4 rounded-lg"><p className="text-2xl font-bold text-yellow-800 dark:text-yellow-300">{summaryData.invalid}</p><p className="dark:text-slate-300">Hatalı/Uyarılı</p></div><div className="bg-slate-200 dark:bg-slate-700 p-4 rounded-lg"><p className="text-2xl font-bold text-slate-800 dark:text-slate-200">{summaryData.notScannedCount}</p><p className="dark:text-slate-300">Eksik</p></div><div className="bg-indigo-100 dark:bg-indigo-900/50 p-4 rounded-lg"><p className="text-2xl font-bold text-indigo-800 dark:text-indigo-300">{summaryData.scanSpeed}</p><p className="dark:text-slate-300">Materyal / dk</p></div></div></div><div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-8 mb-8"><div className="bg-white dark:bg-slate-800 p-6 rounded-lg shadow-sm border dark:border-slate-700 h-96"><h3 className="text-xl font-semibold mb-2 text-center text-slate-700 dark:text-slate-300">Genel Durum</h3><ResponsiveContainer><PieChart><Pie data={summaryData.pieData} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={100} label={{ fill: isDarkMode ? '#ddd' : '#333' }}>{summaryData.pieData.map((entry, i) => <Cell key={`cell-${i}`} fill={PIE_CHART_COLORS[entry.name === 'Geçerli' ? 'valid' : entry.name === 'Uyarılı' ? 'invalid' : 'missing']} />)}</Pie><Tooltip content={<CustomTooltip />} /><Legend wrapperStyle={{ color: isDarkMode ? '#ddd' : '#333' }} /></PieChart></ResponsiveContainer></div><div className="bg-white dark:bg-slate-800 p-6 rounded-lg shadow-sm border dark:border-slate-700 h-96"><h3 className="text-xl font-semibold mb-2 text-center text-slate-700 dark:text-slate-300">Materyal Türü Dağılımı</h3><ResponsiveContainer><PieChart><Pie data={summaryData.materialTypeData} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={100} labelLine={false} label={({cx,cy,midAngle,innerRadius,outerRadius,percent}) => { const r = innerRadius+(outerRadius-innerRadius)*0.5; const x=cx+r*Math.cos(-midAngle*Math.PI/180); const y=cy+r*Math.sin(-midAngle*Math.PI/180); return <text x={x} y={y} fill="white" textAnchor={x > cx ? 'start' : 'end'} dominantBaseline="central">{`${(percent*100).toFixed(0)}%`}</text>;}}>{summaryData.materialTypeData.map((e, i) => <Cell key={`cell-${i}`} fill={['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#AF19FF'][i % 5]} />)}</Pie><Tooltip content={<CustomTooltip />} /><Legend wrapperStyle={{ color: isDarkMode ? '#ddd' : '#333' }} /></PieChart></ResponsiveContainer></div><div className="bg-white dark:bg-slate-800 p-6 rounded-lg shadow-sm border dark:border-slate-700 h-96"><h3 className="text-xl font-semibold mb-2 text-center text-slate-700 dark:text-slate-300">Uyarı Türleri</h3><ResponsiveContainer><BarChart data={summaryData.warningBarData} layout="vertical" margin={{left: 100}}><CartesianGrid strokeDasharray="3 3" stroke={isDarkMode ? '#555' : '#ccc'} /><XAxis type="number" stroke={isDarkMode ? '#999' : '#666'} /><YAxis type="category" dataKey="name" width={100} tick={{ fontSize: 10, fill: isDarkMode ? '#ddd' : '#333' }} stroke={isDarkMode ? '#999' : '#666'} /><Tooltip content={<CustomTooltip />} /><Bar dataKey="sayı">{summaryData.warningBarData.map((e, i) => <Cell key={`cell-${i}`} fill={WARNING_DEFINITIONS[Object.keys(WARNING_DEFINITIONS).find(k => WARNING_DEFINITIONS[k].text === e.name)]?.color || '#8884d8'} />)}</Bar></BarChart></ResponsiveContainer></div>{summaryData.locationMismatchData.length > 0 && <div className="bg-white dark:bg-slate-800 p-6 rounded-lg shadow-sm border dark:border-slate-700 h-96 lg:col-span-2 xl:col-span-3"><h3 className="text-xl font-semibold mb-2 text-center text-slate-700 dark:text-slate-300">Konum Uyuşmazlığı Olan Raflar</h3><ResponsiveContainer><BarChart data={summaryData.locationMismatchData} margin={{bottom: 50}}><CartesianGrid strokeDasharray="3 3" stroke={isDarkMode ? '#555' : '#ccc'} /><XAxis dataKey="name" angle={-45} textAnchor="end" interval={0} height={60} tick={{fill: isDarkMode ? '#ddd' : '#333' }} /><YAxis allowDecimals={false} tick={{fill: isDarkMode ? '#ddd' : '#333' }}/><Tooltip content={<CustomTooltip />} /><Bar dataKey="sayı" fill="#FAD7A0" /></BarChart></ResponsiveContainer></div>}</div><div className="mt-10"><h2 className="text-3xl font-bold mb-6 text-slate-800 dark:text-slate-200">Raporlar</h2><div className="space-y-4">{REPORTS_CONFIG.map(report => <div key={report.id} className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg p-4 transition-shadow hover:shadow-md"><div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4"><div className="flex items-center gap-4 flex-grow"><div className="text-slate-600 dark:text-slate-400 flex-shrink-0 w-6 h-6">{report.icon}</div><div><h4 className="font-bold text-slate-800 dark:text-slate-200">{report.title}</h4><p className="text-sm text-slate-500 dark:text-slate-400">Format: {report.format}</p></div></div><div className="flex-shrink-0 mt-2 sm:mt-0"><button onClick={report.generator} disabled={!isXlsxReady} className="flex items-center gap-2 bg-slate-700 text-white font-semibold px-4 py-2 rounded-md hover:bg-slate-800 disabled:bg-slate-400 transition-colors">{ICONS.download} İndir</button></div></div><div className="mt-3 pt-3 border-t border-slate-200 dark:border-slate-700 text-sm text-slate-600 dark:text-slate-400 space-y-2"><p>{report.description}</p>{report.notes && <ul className="list-disc list-inside text-xs text-slate-500 dark:text-slate-500 space-y-1">{report.notes.map((note,i) => <li key={i}>{note}</li>)}</ul>}{report.links && <div className="flex flex-col items-start gap-1">{report.links.map((link,i) => <a key={i} href={link.url} target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline text-xs">{link.text}</a>)}</div>}</div></div>)}</div></div>
     </div>;
 
     const renderPageContent = () => {
@@ -705,34 +838,49 @@ export default function App() {
     };
     
     return (
-        <div className="bg-slate-100 min-h-screen font-sans flex">
+        <div className="bg-slate-100 dark:bg-slate-900 min-h-screen font-sans">
+            {isBulkLoading && <FullScreenLoader text="Barkodlar işleniyor..." />}
+            {isLoading && <FullScreenLoader text="Koha dosyası okunuyor, lütfen bekleyin..." />}
             <WarningModal isOpen={warningModal.isOpen} onClose={() => setWarningModal({ isOpen: false, title: '', warnings: [], barcode: null })} {...warningModal} />
             <ConfirmationModal isOpen={confirmationModal.isOpen} onClose={() => setConfirmationModal({ isOpen: false, message: '', onConfirm: () => {} })} {...confirmationModal} />
             <AddDataModal isOpen={addDataModal.isOpen} onClose={() => setAddDataModal({isOpen: false, type: ''})} onAdd={handleAddCustomData} type={addDataModal.type} />
             
-            {page !== 'permission' && (
-                <Sidebar
-                  page={page}
-                  setPage={setPage}
-                  currentSessionName={currentSessionName}
-                  selectedLibrary={selectedLibrary}
-                  kohaData={kohaData}
-                />
-            )}
+            <Sidebar
+              page={page}
+              setPage={setPage}
+              currentSessionName={currentSessionName}
+              selectedLibrary={selectedLibrary}
+              kohaData={kohaData}
+              scannedItems={scannedItems}
+              isMuted={isMuted}
+              setIsMuted={setIsMuted}
+              isDarkMode={isDarkMode}
+              setIsDarkMode={setIsDarkMode}
+              isMobileMenuOpen={isMobileMenuOpen}
+              setMobileMenuOpen={setMobileMenuOpen}
+            />
             
-            <main className={`flex-1 ${page !== 'permission' ? 'md:ml-64' : ''}`}>
-                {page === 'permission' ? (
-                    <PermissionScreen onDecision={handlePermissionDecision} />
-                ) : page === 'scan' ? (
-                    <div className="h-screen">
-                        {renderScanScreen()}
-                    </div>
-                ) : (
-                    <div className="w-full p-4 sm:p-6 md:p-8">
-                       {renderPageContent()}
-                    </div>
-                )}
-            </main>
+            <div className="md:ml-64 flex flex-col min-h-screen">
+                 {page !== 'permission' && (
+                    <MobileHeader
+                        onMenuClick={() => setMobileMenuOpen(true)}
+                        pageTitle={pageTitles[page]}
+                    />
+                 )}
+                <main className="flex-1">
+                    {page === 'permission' ? (
+                        <PermissionScreen onDecision={handlePermissionDecision} />
+                    ) : page === 'scan' ? (
+                        <div className="h-full">
+                            {renderScanScreen()}
+                        </div>
+                    ) : (
+                        <div className="w-full p-4 sm:p-6 md:p-8">
+                           {renderPageContent()}
+                        </div>
+                    )}
+                </main>
+            </div>
         </div>
     );
 }
