@@ -422,6 +422,190 @@ const ShareModal = ({ isOpen, onClose }) => {
     );
 };
 
+const StartScreen = ({ sessions, sessionNameInput, setSessionNameInput, startNewSession, error, setError, loadSession, deleteSession }) => (
+    <div className="w-full">
+        <h1 className="text-3xl font-bold text-slate-800 dark:text-slate-200 mb-2">Hoş Geldiniz</h1>
+        <p className="text-slate-600 dark:text-slate-400 mb-8">Yeni bir sayım başlatın veya kayıtlı bir oturuma devam edin.</p>
+        <div className="space-y-8">
+            <div className="bg-white dark:bg-slate-800 p-6 rounded-lg shadow-sm border dark:border-slate-700">
+                <h2 className="text-2xl font-semibold mb-4 text-slate-700 dark:text-slate-300">Yeni Sayım Başlat</h2>
+                {error && <div className="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 rounded mb-4" role="alert"><p>{error}</p></div>}
+                <div className="flex flex-col sm:flex-row gap-2">
+                    <input type="text" value={sessionNameInput} onChange={e => {setSessionNameInput(e.target.value); setError('')}} onKeyDown={(e) => e.key === 'Enter' && startNewSession()} placeholder="Sayım için bir isim girin..." className="flex-grow p-3 border border-slate-300 rounded-md shadow-sm focus:ring-slate-500 focus:border-slate-500 dark:bg-slate-700 dark:border-slate-600 dark:text-white" />
+                    <button onClick={startNewSession} className="bg-slate-700 text-white font-bold py-3 px-6 rounded-md hover:bg-slate-800 transition-colors">Başlat</button>
+                </div>
+            </div>
+            <div className="bg-white dark:bg-slate-800 p-6 rounded-lg shadow-sm border dark:border-slate-700">
+                <h2 className="text-2xl font-semibold mb-4 text-slate-700 dark:text-slate-300">Kayıtlı Oturumlar</h2>
+                {Object.keys(sessions).length > 0 ? <ul className="space-y-3 max-h-60 overflow-y-auto pr-2">{Object.values(sessions).sort((a,b) => new Date(b.lastUpdated) - new Date(a.lastUpdated)).map(session => <li key={session.name} className="flex flex-col sm:flex-row items-center justify-between p-3 bg-slate-50 dark:bg-slate-700/50 rounded-lg border dark:border-slate-600"><div><p className="font-bold text-slate-800 dark:text-slate-200">{session.name}</p><p className="text-sm text-slate-500 dark:text-slate-400">{new Date(session.lastUpdated).toLocaleString('tr-TR')} - {session.items.length} kayıt</p></div><div className="flex gap-2 mt-2 sm:mt-0"><button onClick={() => loadSession(session.name)} className="px-4 py-2 text-sm bg-green-600 text-white rounded hover:bg-green-700">Yükle</button><button onClick={() => deleteSession(session.name)} className="px-4 py-2 text-sm bg-red-600 text-white rounded hover:bg-red-700">Sil</button></div></li>)}</ul> : <p className="text-slate-500 dark:text-slate-400">Kayıtlı oturum bulunamadı.</p>}
+            </div>
+        </div>
+    </div>
+);
+
+const SetupScreen = ({ currentSessionName, error, selectedLibrary, setSelectedLibrary, combinedLibraries, setAddDataModal, selectedLocation, setSelectedLocation, combinedLocations, kohaData, handleExcelUpload, isXlsxReady, isLoading, setPage, setError }) => (
+    <div className="max-w-3xl mx-auto w-full p-8 bg-white dark:bg-slate-800 rounded-lg shadow-sm space-y-6 border dark:border-slate-700">
+        <h1 className="text-3xl font-bold text-slate-800 dark:text-slate-200">Sayım Kurulumu: "{currentSessionName}"</h1>
+        {error && <div className="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 rounded" role="alert"><p>{error}</p></div>}
+        <div className="space-y-4">
+            <div>
+                <label htmlFor="library-select" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Kütüphanenizi Seçin</label>
+                <div className="flex gap-2">
+                    <select id="library-select" value={selectedLibrary} onChange={(e) => setSelectedLibrary(e.target.value)} className="w-full p-3 border border-slate-300 rounded-md shadow-sm dark:bg-slate-700 dark:border-slate-600 dark:text-white">
+                        <option value="">-- Kütüphane Seçiniz --</option>
+                        {Object.entries(combinedLibraries).map(([code, name]) => <option key={code} value={code}>{name}</option>)}
+                    </select>
+                    <button onClick={()=> setAddDataModal({isOpen: true, type: 'library'})} className="px-3 bg-slate-200 dark:bg-slate-600 rounded-md hover:bg-slate-300 dark:hover:bg-slate-500">Yeni Ekle</button>
+                </div>
+            </div>
+            <div>
+                <label htmlFor="location-select" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Bölüm/Materyalin Yeri (Opsiyonel)</label>
+                <div className="flex gap-2">
+                    <select id="location-select" value={selectedLocation} onChange={(e) => setSelectedLocation(e.target.value)} className="w-full p-3 border border-slate-300 rounded-md shadow-sm dark:bg-slate-700 dark:border-slate-600 dark:text-white">
+                        <option value="">-- Tüm Lokasyonlar --</option>
+                        {Object.entries(combinedLocations).map(([code, name]) => <option key={code} value={code}>{name}</option>)}
+                    </select>
+                    <button onClick={()=> setAddDataModal({isOpen: true, type: 'location'})} className="px-3 bg-slate-200 dark:bg-slate-600 rounded-md hover:bg-slate-300 dark:hover:bg-slate-500">Yeni Ekle</button>
+                </div>
+                <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">Yer seçimi yaparsanız, sayım yaptığınız yerde olmayan materyallerle ilgili uyarı verilecektir.</p>
+            </div>
+        </div>
+        <div>
+            <h3 className="text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Koha'dan Aldığınız Sayım İçin Hazırlanmış Dosya (.xlsx)</h3>
+            <FileUploader onFileAccepted={handleExcelUpload} title={kohaData.length > 0 ? `${kohaData.length} kayıt yüklendi.` : "Dosyayı buraya sürükleyin veya seçmek için tıklayın"} disabled={!isXlsxReady || isLoading} accept={{'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': ['.xlsx'], 'application/vnd.ms-excel': ['.xls']}}><svg xmlns="http://www.w3.org/2000/svg" className="mx-auto h-12 w-12 text-green-700" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" /></svg></FileUploader>
+        </div>
+        <button onClick={() => { if(selectedLibrary && kohaData.length > 0) setPage('scan'); else setError("Sayıma başlamak için Kütüphane seçmeli ve Excel dosyası yüklemelisiniz."); }} disabled={!selectedLibrary || kohaData.length === 0 || isLoading || !isXlsxReady} className="w-full bg-slate-700 text-white font-bold py-3 px-4 rounded-md hover:bg-slate-800 disabled:bg-slate-400">Sayıma Devam Et</button>
+    </div>
+);
+
+const ScanScreen = ({ isCameraOpen, isQrCodeReady, isCameraAllowed, setIsCameraOpen, handleCameraScan, warningModal, currentSessionName, combinedLibraries, selectedLibrary, combinedLocations, selectedLocation, barcodeInput, handleBarcodeInput, handleManualEntry, lastScanned, handleBulkUpload, isBulkLoading, setPage, scannedItems, filteredScannedItems, searchTerm, setSearchTerm, warningFilter, setWarningFilter, handleDeleteItem }) => {
+    const bulkUploadTitle = "Toplu barkod(12 veya 13 haneli) içeren not defteri(.txt) veya Excel(.xlsx) dosyası yüklemek için tıklayın";
+    const bulkUploadAccept = {
+        'text/plain': ['.txt'],
+        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': ['.xlsx'],
+        'application/vnd.ms-excel': ['.xls']
+    };
+
+    return (
+        <>
+            {isCameraOpen && isQrCodeReady && isCameraAllowed && <RobustBarcodeScanner onClose={() => setIsCameraOpen(false)} onScan={handleCameraScan} isPaused={warningModal.isOpen} />}
+            <div className="flex flex-col md:flex-row h-full bg-slate-50 dark:bg-slate-900">
+                <div className="w-full md:w-1/3 lg:w-1/4 p-4 bg-white dark:bg-slate-800 border-r dark:border-slate-700 flex flex-col">
+                    <div className="flex-grow space-y-4">
+                        <h2 className="text-xl font-bold text-slate-800 dark:text-slate-200">Sayım: {currentSessionName}</h2>
+                        <div className="text-sm text-slate-600 dark:text-slate-400">
+                            <p><span className="font-semibold">Kütüphane:</span> {combinedLibraries[selectedLibrary]}</p>
+                            <p><span className="font-semibold">Lokasyon:</span> {selectedLocation ? combinedLocations[selectedLocation] : 'Tümü'}</p>
+                        </div>
+                        <button onClick={() => setIsCameraOpen(true)} disabled={!isQrCodeReady || !isCameraAllowed} className="w-full flex items-center justify-center gap-2 p-2 bg-slate-700 text-white rounded-md hover:bg-slate-800 disabled:bg-slate-400 disabled:cursor-not-allowed">
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+                            Kamera İle Barkod Okutma
+                        </button>
+                        {!isCameraAllowed && (
+                            <div className="mt-2 text-xs text-center text-red-800 bg-red-100 p-2 rounded-lg border border-red-200">
+                                <p className="font-semibold">
+                                    <a href="#" onClick={(e) => { e.preventDefault(); localStorage.removeItem('cameraPermissionChoiceMade'); localStorage.removeItem('cameraPermissionStatus'); window.location.reload(); }} className="underline hover:text-red-900">
+                                       Kamera İzni Vermek İçin Tıklayın.
+                                    </a>
+                                </p>
+                                <p className="font-bold mt-1">Not: Tüm işlemler sıfırlanacaktır.</p>
+                            </div>
+                        )}
+                        <form onSubmit={handleManualEntry} className="space-y-2">
+                            <label htmlFor="barcode-input" className="font-semibold text-slate-700 dark:text-slate-300">Barkod Okut/Gir:</label>
+                            <input id="barcode-input" type="tel" value={barcodeInput} onChange={handleBarcodeInput} placeholder="Barkodu okutun veya elle girin" className="w-full p-2 border border-slate-300 rounded-md dark:bg-slate-700 dark:border-slate-600 dark:text-white" autoFocus />
+                            <button type="submit" className="w-full bg-slate-600 text-white p-2 rounded-md hover:bg-slate-700">Ekle</button>
+                        </form>
+                        {lastScanned && <div className={`p-3 rounded-md border-l-4 ${lastScanned.isValid ? 'bg-green-100 border-green-500 dark:bg-green-900/50 dark:border-green-600' : 'bg-yellow-100 border-yellow-500 dark:bg-yellow-900/50 dark:border-yellow-600'}`}><p className="font-bold text-slate-800 dark:text-slate-200">{lastScanned.barcode}</p><p className="text-sm text-slate-600 dark:text-slate-400">{lastScanned.data?.['ESER ADI'] || 'Eser bilgisi bulunamadı'}</p>{lastScanned.warnings.map(w => <p key={w.id} style={{color: w.color}} className="text-sm font-semibold">{w.text}</p>)}</div>}
+                    </div>
+                    <div className="mt-4 space-y-2">
+                        <div>
+                            <label className="font-semibold text-slate-700 dark:text-slate-300">Toplu Yükleme (.txt/.xlsx):</label>
+                            <FileUploader onFileAccepted={handleBulkUpload} title={bulkUploadTitle} accept={bulkUploadAccept} disabled={isBulkLoading} />
+                        </div>
+                        <button onClick={() => setPage('summary')} disabled={scannedItems.length === 0 || isBulkLoading} className="w-full bg-green-600 text-white font-bold py-3 px-4 rounded-md hover:bg-green-700 disabled:bg-green-400 disabled:cursor-not-allowed">Özeti ve Raporları Gör</button>
+                    </div>
+                </div>
+                <div className="w-full md:w-2/3 lg:w-3/4 p-4 flex flex-col">
+                    <h3 className="text-lg font-bold text-slate-800 dark:text-slate-200 mb-2">Okutulan Materyaller ({filteredScannedItems.length} / {scannedItems.length})</h3>
+                    <div className="flex flex-col sm:flex-row gap-2 mb-2">
+                        <input type="text" placeholder="Barkod veya eserde ara..." value={searchTerm} onChange={e => setSearchTerm(e.target.value)} className="flex-grow p-2 border border-slate-300 rounded-md dark:bg-slate-700 dark:border-slate-600 dark:text-white" />
+                        <select value={warningFilter} onChange={e => setWarningFilter(e.target.value)} className="p-2 border border-slate-300 rounded-md dark:bg-slate-700 dark:border-slate-600 dark:text-white">
+                            <option value="all">Tümünü Göster</option>
+                            {Object.values(WARNING_DEFINITIONS).map(w => <option key={w.id} value={w.id}>{w.text}</option>)}
+                        </select>
+                    </div>
+                    <div className="flex-grow overflow-y-auto space-y-2 pr-2">
+                        {filteredScannedItems.map((item) => (
+                            <div key={item.timestamp} className={`p-2 rounded-md border dark:border-slate-700 flex items-center justify-between gap-2 ${item.isValid ? 'bg-white dark:bg-slate-800' : 'bg-yellow-50 dark:bg-yellow-900/50'}`}>
+                                <div className="flex-grow">
+                                    <p className="font-mono text-slate-800 dark:text-slate-300">{item.barcode}</p>
+                                    <p className="text-xs text-slate-600 dark:text-slate-400">{item.data?.['ESER ADI'] || 'Bilinmeyen Eser'}</p>
+                                </div>
+                                <div className="flex items-center gap-2 flex-shrink-0">
+                                    <div className="flex flex-wrap justify-end gap-1">
+                                        {item.warnings.map(w => <span key={w.id} style={{backgroundColor: w.color, color: '#fff'}} className="px-2 py-1 text-xs font-semibold rounded-full">{w.text}</span>)}
+                                        {item.isValid && <span className="px-2 py-1 text-xs font-semibold text-green-800 bg-green-200 dark:text-green-200 dark:bg-green-800/50 rounded-full">Temiz</span>}
+                                    </div>
+                                    <button onClick={() => handleDeleteItem(item.timestamp)} className="p-1 rounded-full text-slate-400 hover:bg-red-100 hover:text-red-600 dark:hover:bg-red-900/50 dark:hover:text-red-400" title="Bu kaydı sil">
+                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" /></svg>
+                                    </button>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            </div>
+        </>
+    );
+};
+
+const SummaryScreen = ({ currentSessionName, summaryData, isDarkMode, REPORTS_CONFIG, isXlsxReady }) => (
+    <div className="w-full">
+        <div className="flex justify-between items-start mb-6"><h1 className="text-3xl font-bold text-slate-800 dark:text-slate-200">Sayım Özeti: {currentSessionName}</h1></div>
+        <div className="bg-white dark:bg-slate-800 p-6 rounded-lg shadow-sm border dark:border-slate-700 mb-8">
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 text-center">
+                <div className="bg-blue-100 dark:bg-blue-900/50 p-4 rounded-lg"><p className="text-2xl font-bold text-blue-800 dark:text-blue-300">{summaryData.totalScanned}</p><p className="dark:text-slate-300">Toplam Okutulan</p></div>
+                <div className="bg-green-100 dark:bg-green-900/50 p-4 rounded-lg"><p className="text-2xl font-bold text-green-800 dark:text-green-300">{summaryData.valid}</p><p className="dark:text-slate-300">Geçerli (Temiz)</p></div>
+                <div className="bg-yellow-100 dark:bg-yellow-900/50 p-4 rounded-lg"><p className="text-2xl font-bold text-yellow-800 dark:text-yellow-300">{summaryData.invalid}</p><p className="dark:text-slate-300">Hatalı/Uyarılı</p></div>
+                <div className="bg-slate-200 dark:bg-slate-700 p-4 rounded-lg"><p className="text-2xl font-bold text-slate-800 dark:text-slate-200">{summaryData.notScannedCount}</p><p className="dark:text-slate-300">Eksik</p></div>
+                <div className="bg-indigo-100 dark:bg-indigo-900/50 p-4 rounded-lg"><p className="text-2xl font-bold text-indigo-800 dark:text-indigo-300">{summaryData.scanSpeed}</p><p className="dark:text-slate-300">Materyal / dk</p></div>
+            </div>
+        </div>
+        <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-8 mb-8">
+            <div className="bg-white dark:bg-slate-800 p-6 rounded-lg shadow-sm border dark:border-slate-700 h-96"><h3 className="text-xl font-semibold mb-2 text-center text-slate-700 dark:text-slate-300">Genel Durum</h3><ResponsiveContainer><PieChart><Pie data={summaryData.pieData} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={100} label={{ fill: isDarkMode ? '#ddd' : '#333' }}>{summaryData.pieData.map((entry, i) => <Cell key={`cell-${i}`} fill={PIE_CHART_COLORS[entry.name === 'Geçerli' ? 'valid' : entry.name === 'Uyarılı' ? 'invalid' : 'missing']} />)}</Pie><Tooltip content={<CustomTooltip />} /><Legend wrapperStyle={{ color: isDarkMode ? '#ddd' : '#333' }} /></PieChart></ResponsiveContainer></div>
+            <div className="bg-white dark:bg-slate-800 p-6 rounded-lg shadow-sm border dark:border-slate-700 h-96"><h3 className="text-xl font-semibold mb-2 text-center text-slate-700 dark:text-slate-300">Materyal Türü Dağılımı</h3><ResponsiveContainer><PieChart><Pie data={summaryData.materialTypeData} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={100} labelLine={false} label={({cx,cy,midAngle,innerRadius,outerRadius,percent}) => { const r = innerRadius+(outerRadius-innerRadius)*0.5; const x=cx+r*Math.cos(-midAngle*Math.PI/180); const y=cy+r*Math.sin(-midAngle*Math.PI/180); return <text x={x} y={y} fill="white" textAnchor={x > cx ? 'start' : 'end'} dominantBaseline="central">{`${(percent*100).toFixed(0)}%`}</text>;}}>{summaryData.materialTypeData.map((e, i) => <Cell key={`cell-${i}`} fill={['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#AF19FF'][i % 5]} />)}</Pie><Tooltip content={<CustomTooltip />} /><Legend wrapperStyle={{ color: isDarkMode ? '#ddd' : '#333' }} /></PieChart></ResponsiveContainer></div>
+            <div className="bg-white dark:bg-slate-800 p-6 rounded-lg shadow-sm border dark:border-slate-700 h-96"><h3 className="text-xl font-semibold mb-2 text-center text-slate-700 dark:text-slate-300">Uyarı Türleri</h3><ResponsiveContainer><BarChart data={summaryData.warningBarData} layout="vertical" margin={{left: 100}}><CartesianGrid strokeDasharray="3 3" stroke={isDarkMode ? '#555' : '#ccc'} /><XAxis type="number" stroke={isDarkMode ? '#999' : '#666'} /><YAxis type="category" dataKey="name" width={100} tick={{ fontSize: 10, fill: isDarkMode ? '#ddd' : '#333' }} stroke={isDarkMode ? '#999' : '#666'} /><Tooltip content={<CustomTooltip />} /><Bar dataKey="Sayı">{summaryData.warningBarData.map((e, i) => <Cell key={`cell-${i}`} fill={WARNING_DEFINITIONS[Object.keys(WARNING_DEFINITIONS).find(k => WARNING_DEFINITIONS[k].text === e.name)]?.color || '#8884d8'} />)}</Bar></BarChart></ResponsiveContainer></div>
+            {summaryData.locationMismatchData.length > 0 && <div className="bg-white dark:bg-slate-800 p-6 rounded-lg shadow-sm border dark:border-slate-700 h-96 lg:col-span-2 xl:col-span-3"><h3 className="text-xl font-semibold mb-2 text-center text-slate-700 dark:text-slate-300">Konum Uyuşmazlığı Olan Raflar</h3><ResponsiveContainer><BarChart data={summaryData.locationMismatchData} margin={{bottom: 50}}><CartesianGrid strokeDasharray="3 3" stroke={isDarkMode ? '#555' : '#ccc'} /><XAxis dataKey="name" angle={-45} textAnchor="end" interval={0} height={60} tick={{fill: isDarkMode ? '#ddd' : '#333' }} /><YAxis allowDecimals={false} tick={{fill: isDarkMode ? '#ddd' : '#333' }}/><Tooltip content={<CustomTooltip />} /><Bar dataKey="Sayı" fill="#FAD7A0" /></BarChart></ResponsiveContainer></div>}
+        </div>
+        <div className="mt-10">
+            <h2 className="text-3xl font-bold mb-6 text-slate-800 dark:text-slate-200">Raporlar</h2>
+            <div className="space-y-4">
+                {REPORTS_CONFIG.map(report => (
+                    <div key={report.id} className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg p-4 transition-shadow hover:shadow-md">
+                        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                            <div className="flex items-center gap-4 flex-grow">
+                                <div className="text-slate-600 dark:text-slate-400 flex-shrink-0 w-6 h-6">{report.icon}</div>
+                                <div>
+                                    <h4 className="font-bold text-slate-800 dark:text-slate-200">{report.title}</h4>
+                                    <p className="text-sm text-slate-500 dark:text-slate-400">Format: {report.format}</p>
+                                </div>
+                            </div>
+                            <div className="flex-shrink-0 mt-2 sm:mt-0">
+                                <button onClick={report.generator} disabled={!isXlsxReady} className="flex items-center gap-2 bg-slate-700 text-white font-semibold px-4 py-2 rounded-md hover:bg-slate-800 disabled:bg-slate-400 transition-colors">{ICONS.download} İndir</button>
+                            </div>
+                        </div>
+                        <div className="mt-3 pt-3 border-t border-slate-200 dark:border-slate-700 text-sm text-slate-600 dark:text-slate-400 space-y-2">
+                            <p>{report.description}</p>
+                            {report.notes && <ul className="list-disc list-inside text-xs text-slate-500 dark:text-slate-500 space-y-1">{report.notes.map((note,i) => <li key={i}>{note}</li>)}</ul>}
+                            {report.links && <div className="flex flex-col items-start gap-1">{report.links.map((link,i) => <a key={i} href={link.url} target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline text-xs">{link.text}</a>)}</div>}
+                        </div>
+                    </div>
+                ))}
+            </div>
+        </div>
+    </div>
+);
 
 export default function App() {
     const isXlsxReady = useScript('https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js', 'XLSX');
@@ -910,78 +1094,16 @@ export default function App() {
         </header>
     );
 
-    const renderStartScreen = () => (
-        <div className="w-full">
-            <h1 className="text-3xl font-bold text-slate-800 dark:text-slate-200 mb-2">Hoş Geldiniz</h1>
-            <p className="text-slate-600 dark:text-slate-400 mb-8">Yeni bir sayım başlatın veya kayıtlı bir oturuma devam edin.</p>
-            <div className="space-y-8">
-                <div className="bg-white dark:bg-slate-800 p-6 rounded-lg shadow-sm border dark:border-slate-700">
-                    <h2 className="text-2xl font-semibold mb-4 text-slate-700 dark:text-slate-300">Yeni Sayım Başlat</h2>
-                    {error && <div className="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 rounded mb-4" role="alert"><p>{error}</p></div>}
-                    <div className="flex flex-col sm:flex-row gap-2">
-                        <input type="text" value={sessionNameInput} onChange={e => {setSessionNameInput(e.target.value); setError('')}} onKeyDown={(e) => e.key === 'Enter' && startNewSession()} placeholder="Sayım için bir isim girin..." className="flex-grow p-3 border border-slate-300 rounded-md shadow-sm focus:ring-slate-500 focus:border-slate-500 dark:bg-slate-700 dark:border-slate-600 dark:text-white" />
-                        <button onClick={startNewSession} className="bg-slate-700 text-white font-bold py-3 px-6 rounded-md hover:bg-slate-800 transition-colors">Başlat</button>
-                    </div>
-                </div>
-                <div className="bg-white dark:bg-slate-800 p-6 rounded-lg shadow-sm border dark:border-slate-700">
-                    <h2 className="text-2xl font-semibold mb-4 text-slate-700 dark:text-slate-300">Kayıtlı Oturumlar</h2>
-                    {Object.keys(sessions).length > 0 ? <ul className="space-y-3 max-h-60 overflow-y-auto pr-2">{Object.values(sessions).sort((a,b) => new Date(b.lastUpdated) - new Date(a.lastUpdated)).map(session => <li key={session.name} className="flex flex-col sm:flex-row items-center justify-between p-3 bg-slate-50 dark:bg-slate-700/50 rounded-lg border dark:border-slate-600"><div><p className="font-bold text-slate-800 dark:text-slate-200">{session.name}</p><p className="text-sm text-slate-500 dark:text-slate-400">{new Date(session.lastUpdated).toLocaleString('tr-TR')} - {session.items.length} kayıt</p></div><div className="flex gap-2 mt-2 sm:mt-0"><button onClick={() => loadSession(session.name)} className="px-4 py-2 text-sm bg-green-600 text-white rounded hover:bg-green-700">Yükle</button><button onClick={() => deleteSession(session.name)} className="px-4 py-2 text-sm bg-red-600 text-white rounded hover:bg-red-700">Sil</button></div></li>)}</ul> : <p className="text-slate-500 dark:text-slate-400">Kayıtlı oturum bulunamadı.</p>}
-                </div>
-            </div>
-        </div>
-    );
-
-    const renderSetupScreen = () => <div className="max-w-3xl mx-auto w-full p-8 bg-white dark:bg-slate-800 rounded-lg shadow-sm space-y-6 border dark:border-slate-700">
-        <h1 className="text-3xl font-bold text-slate-800 dark:text-slate-200">Sayım Kurulumu: "{currentSessionName}"</h1>{error && <div className="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 rounded" role="alert"><p>{error}</p></div>}<div className="space-y-4"><div><label htmlFor="library-select" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Kütüphanenizi Seçin</label><div className="flex gap-2"><select id="library-select" value={selectedLibrary} onChange={(e) => setSelectedLibrary(e.target.value)} className="w-full p-3 border border-slate-300 rounded-md shadow-sm dark:bg-slate-700 dark:border-slate-600 dark:text-white"><option value="">-- Kütüphane Seçiniz --</option>{Object.entries(combinedLibraries).map(([code, name]) => <option key={code} value={code}>{name}</option>)}</select><button onClick={()=> setAddDataModal({isOpen: true, type: 'library'})} className="px-3 bg-slate-200 dark:bg-slate-600 rounded-md hover:bg-slate-300 dark:hover:bg-slate-500">Yeni Ekle</button></div></div><div><label htmlFor="location-select" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Bölüm/Materyalin Yeri (Opsiyonel)</label><div className="flex gap-2"><select id="location-select" value={selectedLocation} onChange={(e) => setSelectedLocation(e.target.value)} className="w-full p-3 border border-slate-300 rounded-md shadow-sm dark:bg-slate-700 dark:border-slate-600 dark:text-white"><option value="">-- Tüm Lokasyonlar --</option>{Object.entries(combinedLocations).map(([code, name]) => <option key={code} value={code}>{name}</option>)}</select><button onClick={()=> setAddDataModal({isOpen: true, type: 'location'})} className="px-3 bg-slate-200 dark:bg-slate-600 rounded-md hover:bg-slate-300 dark:hover:bg-slate-500">Yeni Ekle</button></div><p className="text-xs text-slate-500 dark:text-slate-400 mt-1">Yer seçimi yaparsanız, sayım yaptığınız yerde olmayan materyallerle ilgili uyarı verilecektir.</p></div></div><div><h3 className="text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Koha'dan Aldığınız Sayım İçin Hazırlanmış Dosya (.xlsx)</h3><FileUploader onFileAccepted={handleExcelUpload} title={kohaData.length > 0 ? `${kohaData.length} kayıt yüklendi.` : "Dosyayı buraya sürükleyin veya seçmek için tıklayın"} disabled={!isXlsxReady || isLoading} accept={{'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': ['.xlsx'], 'application/vnd.ms-excel': ['.xls']}}><svg xmlns="http://www.w3.org/2000/svg" className="mx-auto h-12 w-12 text-green-700" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" /></svg></FileUploader></div><button onClick={() => { if(selectedLibrary && kohaData.length > 0) setPage('scan'); else setError("Sayıma başlamak için Kütüphane seçmeli ve Excel dosyası yüklemelisiniz."); }} disabled={!selectedLibrary || kohaData.length === 0 || isLoading || !isXlsxReady} className="w-full bg-slate-700 text-white font-bold py-3 px-4 rounded-md hover:bg-slate-800 disabled:bg-slate-400">Sayıma Devam Et</button>
-    </div>;
-
-    const renderScanScreen = () => {
-        const bulkUploadTitle = "Toplu barkod(12 veya 13 haneli) içeren not defteri(.txt) veya Excel(.xlsx) dosyası yüklemek için tıklayın";
-        const bulkUploadAccept = {
-            'text/plain': ['.txt'],
-            'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': ['.xlsx'],
-            'application/vnd.ms-excel': ['.xls']
-        };
-
-        return (<>{isCameraOpen && isQrCodeReady && isCameraAllowed && <RobustBarcodeScanner onClose={() => setIsCameraOpen(false)} onScan={handleCameraScan} isPaused={warningModal.isOpen} />} <div className="flex flex-col md:flex-row h-full bg-slate-50 dark:bg-slate-900">
-            <div className="w-full md:w-1/3 lg:w-1/4 p-4 bg-white dark:bg-slate-800 border-r dark:border-slate-700 flex flex-col"><div className="flex-grow space-y-4"><h2 className="text-xl font-bold text-slate-800 dark:text-slate-200">Sayım: {currentSessionName}</h2><div className="text-sm text-slate-600 dark:text-slate-400"><p><span className="font-semibold">Kütüphane:</span> {combinedLibraries[selectedLibrary]}</p><p><span className="font-semibold">Lokasyon:</span> {selectedLocation ? combinedLocations[selectedLocation] : 'Tümü'}</p></div>
-            <button onClick={() => setIsCameraOpen(true)} disabled={!isQrCodeReady || !isCameraAllowed} className="w-full flex items-center justify-center gap-2 p-2 bg-slate-700 text-white rounded-md hover:bg-slate-800 disabled:bg-slate-400 disabled:cursor-not-allowed">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
-                Kamera İle Barkod Okutma
-            </button>
-            {!isCameraAllowed && (
-                <div className="mt-2 text-xs text-center text-red-800 bg-red-100 p-2 rounded-lg border border-red-200">
-                    <p className="font-semibold">
-                        <a href="#" onClick={(e) => { e.preventDefault(); localStorage.removeItem('cameraPermissionChoiceMade'); localStorage.removeItem('cameraPermissionStatus'); window.location.reload(); }} className="underline hover:text-red-900">
-                           Kamera İzni Vermek İçin Tıklayın.
-                        </a>
-                    </p>
-                    <p className="font-bold mt-1">Not: Tüm işlemler sıfırlanacaktır.</p>
-                </div>
-            )}
-        <form onSubmit={handleManualEntry} className="space-y-2"><label htmlFor="barcode-input" className="font-semibold text-slate-700 dark:text-slate-300">Barkod Okut/Gir:</label><input id="barcode-input" type="tel" value={barcodeInput} onChange={handleBarcodeInput} placeholder="Barkodu okutun veya elle girin" className="w-full p-2 border border-slate-300 rounded-md dark:bg-slate-700 dark:border-slate-600 dark:text-white" autoFocus /><button type="submit" className="w-full bg-slate-600 text-white p-2 rounded-md hover:bg-slate-700">Ekle</button></form>{lastScanned && <div className={`p-3 rounded-md border-l-4 ${lastScanned.isValid ? 'bg-green-100 border-green-500 dark:bg-green-900/50 dark:border-green-600' : 'bg-red-100 border-red-500 dark:bg-red-900/50 dark:border-red-600'}`}><p className="font-bold text-slate-800 dark:text-slate-200">{lastScanned.barcode}</p><p className="text-sm text-slate-600 dark:text-slate-400">{lastScanned.data?.['ESER ADI'] || 'Eser bilgisi bulunamadı'}</p>{lastScanned.warnings.map(w => <p key={w.id} style={{color: w.color}} className="text-sm font-semibold">{w.text}</p>)}</div>}</div><div className="mt-4 space-y-2">
-            <div>
-                <label className="font-semibold text-slate-700 dark:text-slate-300">Toplu Yükleme (.txt/.xlsx):</label>
-                <FileUploader onFileAccepted={handleBulkUpload} title={bulkUploadTitle} accept={bulkUploadAccept} disabled={isBulkLoading} />
-            </div>
-            <button onClick={() => setPage('summary')} disabled={scannedItems.length === 0 || isBulkLoading} className="w-full bg-green-600 text-white font-bold py-3 px-4 rounded-md hover:bg-green-700 disabled:bg-green-400 disabled:cursor-not-allowed">Özeti ve Raporları Gör</button></div></div><div className="w-full md:w-2/3 lg:w-3/4 p-4 flex flex-col"><h3 className="text-lg font-bold text-slate-800 dark:text-slate-200 mb-2">Okutulan Materyaller ({filteredScannedItems.length} / {scannedItems.length})</h3><div className="flex flex-col sm:flex-row gap-2 mb-2"><input type="text" placeholder="Barkod veya eserde ara..." value={searchTerm} onChange={e => setSearchTerm(e.target.value)} className="flex-grow p-2 border border-slate-300 rounded-md dark:bg-slate-700 dark:border-slate-600 dark:text-white" /><select value={warningFilter} onChange={e => setWarningFilter(e.target.value)} className="p-2 border border-slate-300 rounded-md dark:bg-slate-700 dark:border-slate-600 dark:text-white"><option value="all">Tümünü Göster</option>{Object.values(WARNING_DEFINITIONS).filter(w => w.id !== 'duplicate').map(w => <option key={w.id} value={w.id}>{w.text}</option>)}</select></div><div className="flex-grow overflow-y-auto space-y-2 pr-2">{filteredScannedItems.map((item) => <div key={item.timestamp} className={`p-2 rounded-md border dark:border-slate-700 flex items-center justify-between gap-2 ${item.isValid ? 'bg-white dark:bg-slate-800' : 'bg-yellow-50 dark:bg-yellow-900/50'}`}><div className="flex-grow"><p className="font-mono text-slate-800 dark:text-slate-300">{item.barcode}</p><p className="text-xs text-slate-600 dark:text-slate-400">{item.data?.['ESER ADI'] || 'Bilinmeyen Eser'}</p></div><div className="flex items-center gap-2 flex-shrink-0"><div className="flex flex-wrap justify-end gap-1">{item.warnings.map(w => <span key={w.id} style={{backgroundColor: w.color, color: '#fff'}} className="px-2 py-1 text-xs font-semibold rounded-full">{w.text}</span>)}{item.isValid && <span className="px-2 py-1 text-xs font-semibold text-green-800 bg-green-200 dark:text-green-200 dark:bg-green-800/50 rounded-full">Temiz</span>}</div><button onClick={() => handleDeleteItem(item.timestamp)} className="p-1 rounded-full text-slate-400 hover:bg-red-100 hover:text-red-600 dark:hover:bg-red-900/50 dark:hover:text-red-400" title="Bu kaydı sil"><svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" /></svg></button></div></div>)}</div></div>
-        </div></>);
-    }
-
-    const renderSummaryScreen = () => <div className="w-full">
-        <div className="flex justify-between items-start mb-6"><h1 className="text-3xl font-bold text-slate-800 dark:text-slate-200">Sayım Özeti: {currentSessionName}</h1></div><div className="bg-white dark:bg-slate-800 p-6 rounded-lg shadow-sm border dark:border-slate-700 mb-8"><div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 text-center"><div className="bg-blue-100 dark:bg-blue-900/50 p-4 rounded-lg"><p className="text-2xl font-bold text-blue-800 dark:text-blue-300">{summaryData.totalScanned}</p><p className="dark:text-slate-300">Toplam Okutulan</p></div><div className="bg-green-100 dark:bg-green-900/50 p-4 rounded-lg"><p className="text-2xl font-bold text-green-800 dark:text-green-300">{summaryData.valid}</p><p className="dark:text-slate-300">Geçerli (Temiz)</p></div><div className="bg-yellow-100 dark:bg-yellow-900/50 p-4 rounded-lg"><p className="text-2xl font-bold text-yellow-800 dark:text-yellow-300">{summaryData.invalid}</p><p className="dark:text-slate-300">Hatalı/Uyarılı</p></div><div className="bg-slate-200 dark:bg-slate-700 p-4 rounded-lg"><p className="text-2xl font-bold text-slate-800 dark:text-slate-200">{summaryData.notScannedCount}</p><p className="dark:text-slate-300">Eksik</p></div><div className="bg-indigo-100 dark:bg-indigo-900/50 p-4 rounded-lg"><p className="text-2xl font-bold text-indigo-800 dark:text-indigo-300">{summaryData.scanSpeed}</p><p className="dark:text-slate-300">Materyal / dk</p></div></div></div><div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-8 mb-8"><div className="bg-white dark:bg-slate-800 p-6 rounded-lg shadow-sm border dark:border-slate-700 h-96"><h3 className="text-xl font-semibold mb-2 text-center text-slate-700 dark:text-slate-300">Genel Durum</h3><ResponsiveContainer><PieChart><Pie data={summaryData.pieData} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={100} label={{ fill: isDarkMode ? '#ddd' : '#333' }}>{summaryData.pieData.map((entry, i) => <Cell key={`cell-${i}`} fill={PIE_CHART_COLORS[entry.name === 'Geçerli' ? 'valid' : entry.name === 'Uyarılı' ? 'invalid' : 'missing']} />)}</Pie><Tooltip content={<CustomTooltip />} /><Legend wrapperStyle={{ color: isDarkMode ? '#ddd' : '#333' }} /></PieChart></ResponsiveContainer></div><div className="bg-white dark:bg-slate-800 p-6 rounded-lg shadow-sm border dark:border-slate-700 h-96"><h3 className="text-xl font-semibold mb-2 text-center text-slate-700 dark:text-slate-300">Materyal Türü Dağılımı</h3><ResponsiveContainer><PieChart><Pie data={summaryData.materialTypeData} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={100} labelLine={false} label={({cx,cy,midAngle,innerRadius,outerRadius,percent}) => { const r = innerRadius+(outerRadius-innerRadius)*0.5; const x=cx+r*Math.cos(-midAngle*Math.PI/180); const y=cy+r*Math.sin(-midAngle*Math.PI/180); return <text x={x} y={y} fill="white" textAnchor={x > cx ? 'start' : 'end'} dominantBaseline="central">{`${(percent*100).toFixed(0)}%`}</text>;}}>{summaryData.materialTypeData.map((e, i) => <Cell key={`cell-${i}`} fill={['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#AF19FF'][i % 5]} />)}</Pie><Tooltip content={<CustomTooltip />} /><Legend wrapperStyle={{ color: isDarkMode ? '#ddd' : '#333' }} /></PieChart></ResponsiveContainer></div><div className="bg-white dark:bg-slate-800 p-6 rounded-lg shadow-sm border dark:border-slate-700 h-96"><h3 className="text-xl font-semibold mb-2 text-center text-slate-700 dark:text-slate-300">Uyarı Türleri</h3><ResponsiveContainer><BarChart data={summaryData.warningBarData} layout="vertical" margin={{left: 100}}><CartesianGrid strokeDasharray="3 3" stroke={isDarkMode ? '#555' : '#ccc'} /><XAxis type="number" stroke={isDarkMode ? '#999' : '#666'} /><YAxis type="category" dataKey="name" width={100} tick={{ fontSize: 10, fill: isDarkMode ? '#ddd' : '#333' }} stroke={isDarkMode ? '#999' : '#666'} /><Tooltip content={<CustomTooltip />} /><Bar dataKey="Sayı">{summaryData.warningBarData.map((e, i) => <Cell key={`cell-${i}`} fill={WARNING_DEFINITIONS[Object.keys(WARNING_DEFINITIONS).find(k => WARNING_DEFINITIONS[k].text === e.name)]?.color || '#8884d8'} />)}</Bar></BarChart></ResponsiveContainer></div>{summaryData.locationMismatchData.length > 0 && <div className="bg-white dark:bg-slate-800 p-6 rounded-lg shadow-sm border dark:border-slate-700 h-96 lg:col-span-2 xl:col-span-3"><h3 className="text-xl font-semibold mb-2 text-center text-slate-700 dark:text-slate-300">Konum Uyuşmazlığı Olan Raflar</h3><ResponsiveContainer><BarChart data={summaryData.locationMismatchData} margin={{bottom: 50}}><CartesianGrid strokeDasharray="3 3" stroke={isDarkMode ? '#555' : '#ccc'} /><XAxis dataKey="name" angle={-45} textAnchor="end" interval={0} height={60} tick={{fill: isDarkMode ? '#ddd' : '#333' }} /><YAxis allowDecimals={false} tick={{fill: isDarkMode ? '#ddd' : '#333' }}/><Tooltip content={<CustomTooltip />} /><Bar dataKey="Sayı" fill="#FAD7A0" /></BarChart></ResponsiveContainer></div>}</div><div className="mt-10"><h2 className="text-3xl font-bold mb-6 text-slate-800 dark:text-slate-200">Raporlar</h2><div className="space-y-4">{REPORTS_CONFIG.map(report => <div key={report.id} className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg p-4 transition-shadow hover:shadow-md"><div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4"><div className="flex items-center gap-4 flex-grow"><div className="text-slate-600 dark:text-slate-400 flex-shrink-0 w-6 h-6">{report.icon}</div><div><h4 className="font-bold text-slate-800 dark:text-slate-200">{report.title}</h4><p className="text-sm text-slate-500 dark:text-slate-400">Format: {report.format}</p></div></div><div className="flex-shrink-0 mt-2 sm:mt-0"><button onClick={report.generator} disabled={!isXlsxReady} className="flex items-center gap-2 bg-slate-700 text-white font-semibold px-4 py-2 rounded-md hover:bg-slate-800 disabled:bg-slate-400 transition-colors">{ICONS.download} İndir</button></div></div><div className="mt-3 pt-3 border-t border-slate-200 dark:border-slate-700 text-sm text-slate-600 dark:text-slate-400 space-y-2"><p>{report.description}</p>{report.notes && <ul className="list-disc list-inside text-xs text-slate-500 dark:text-slate-500 space-y-1">{report.notes.map((note,i) => <li key={i}>{note}</li>)}</ul>}{report.links && <div className="flex flex-col items-start gap-1">{report.links.map((link,i) => <a key={i} href={link.url} target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline text-xs">{link.text}</a>)}</div>}</div></div>)}</div></div>
-    </div>;
-
     const renderPageContent = () => {
         switch (page) {
             case 'start':
-                return renderStartScreen();
+                return <StartScreen sessions={sessions} sessionNameInput={sessionNameInput} setSessionNameInput={setSessionNameInput} startNewSession={startNewSession} error={error} setError={setError} loadSession={loadSession} deleteSession={deleteSession} />;
             case 'setup':
-                return renderSetupScreen();
+                return <SetupScreen {...{ currentSessionName, error, selectedLibrary, setSelectedLibrary, combinedLibraries, setAddDataModal, selectedLocation, setSelectedLocation, combinedLocations, kohaData, handleExcelUpload, isXlsxReady, isLoading, setPage, setError }} />;
             case 'summary':
-                return renderSummaryScreen();
+                return <SummaryScreen {...{ currentSessionName, summaryData, isDarkMode, REPORTS_CONFIG, isXlsxReady }} />;
             case 'scan':
-                return renderScanScreen();
+                return <ScanScreen {...{ isCameraOpen, isQrCodeReady, isCameraAllowed, setIsCameraOpen, handleCameraScan, warningModal, currentSessionName, combinedLibraries, selectedLibrary, combinedLocations, selectedLocation, barcodeInput, handleBarcodeInput, handleManualEntry, lastScanned, handleBulkUpload, isBulkLoading, setPage, scannedItems, filteredScannedItems, searchTerm, setSearchTerm, warningFilter, setWarningFilter, handleDeleteItem }} />;
             default:
                 return null;
         }
@@ -1026,7 +1148,7 @@ export default function App() {
                         <PermissionScreen onDecision={handlePermissionDecision} />
                     ) : page === 'scan' ? (
                         <div className="h-full">
-                            {renderScanScreen()}
+                            {renderPageContent()}
                         </div>
                     ) : (
                         <div className="w-full p-4 sm:p-6 md:p-8">
