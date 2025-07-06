@@ -454,7 +454,12 @@ export default function App() {
     const [searchTerm, setSearchTerm] = useState('');
     const [warningFilter, setWarningFilter] = useState('all');
     const [isMuted, setIsMuted] = useState(false);
-    const [isDarkMode, setIsDarkMode] = useState(false);
+    const [isDarkMode, setIsDarkMode] = useState(() => {
+        if (typeof window !== 'undefined') {
+            return localStorage.getItem('isDarkMode') === 'true';
+        }
+        return false;
+    });
     const [installPrompt, setInstallPrompt] = useState(null);
     
     const processedBarcodesRef = useRef(new Set());
@@ -488,8 +493,7 @@ export default function App() {
     useEffect(() => {
         const savedMute = localStorage.getItem('isMuted') === 'true';
         setIsMuted(savedMute);
-        const savedDarkMode = localStorage.getItem('isDarkMode') === 'true';
-        setIsDarkMode(savedDarkMode);
+        // Dark mode is now initialized directly in useState
     }, []);
 
     // Apply dark mode class and save to localStorage
