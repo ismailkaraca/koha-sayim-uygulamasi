@@ -150,7 +150,7 @@ const WARNING_DEFINITIONS = {
 };
 const PIE_CHART_COLORS = { valid: '#2ECC71', invalid: '#E74C3C', missing: '#95A5A6' };
 const ICONS = {
-    download: <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>,
+    download: <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>,
     writeOff: <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/><path d="m9.5 14.5 5-5"/><path d="m14.5 14.5-5-5"/></svg>,
     missing: <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" x2="6" y1="6" y2="18"/><line x1="6" x2="18" y1="6" y2="18"/></svg>,
     all: <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/></svg>,
@@ -165,6 +165,7 @@ const ICONS = {
     soundOn: <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>,
     soundOff: <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M11 5 6 9H2v6h4l5 4V5Z"/><path d="M22 9 12 19"/></svg>,
     share: <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>,
+    install: <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="8 17 12 21 16 17"/><line x1="12" y1="12" x2="12" y2="21"/><path d="M20.88 18.09A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.29"/></svg>,
 };
 
 // --- Utilities & Components ---
@@ -286,7 +287,7 @@ const PermissionScreen = ({ onDecision }) => {
 };
 
 // --- Sidebar Component ---
-const Sidebar = ({ page, setPage, currentSessionName, selectedLibrary, kohaData, scannedItems, isMuted, setIsMuted, isDarkMode, setIsDarkMode, isMobileMenuOpen, setMobileMenuOpen, onShare }) => {
+const Sidebar = ({ page, setPage, currentSessionName, selectedLibrary, kohaData, scannedItems, isMuted, setIsMuted, isDarkMode, setIsDarkMode, isMobileMenuOpen, setMobileMenuOpen, onShare, onInstall, installPrompt }) => {
     const navItems = [
         { id: 'start', label: 'Yeni Sayım', disabled: false },
         { id: 'setup', label: 'Kurulum', disabled: !currentSessionName },
@@ -351,10 +352,15 @@ const Sidebar = ({ page, setPage, currentSessionName, selectedLibrary, kohaData,
                     <button onClick={onShare} className="p-2 rounded-full text-slate-500 hover:bg-slate-200 dark:text-slate-400 dark:hover:bg-slate-700" title="Uygulamayı Paylaş">
                         {ICONS.share}
                     </button>
+                    {installPrompt && (
+                         <button onClick={onInstall} className="p-2 rounded-full text-slate-500 hover:bg-slate-200 dark:text-slate-400 dark:hover:bg-slate-700" title="Uygulamayı Yükle">
+                            {ICONS.install}
+                        </button>
+                    )}
                 </div>
                 <div className="p-3 border-t border-slate-200 dark:border-slate-700 text-[11px] text-slate-500 dark:text-slate-400 space-y-2 text-center">
                     <p>Geliştirici: <a href="https://ismailkaraca.com.tr" target="_blank" rel="noopener noreferrer" className="underline hover:text-slate-700 dark:hover:text-slate-200">İsmail KARACA</a></p>
-                    <a href="https://ismailkaraca.com.tr/kutuphanesayimuygulamasihakkinda" target="_blank" rel="noopener noreferrer" className="underline hover:text-slate-700 dark:hover:text-slate-200 block mt-1">
+                    <a href="https://www.ismailkaraca.com.tr/sayim.html" target="_blank" rel="noopener noreferrer" className="underline hover:text-slate-700 dark:hover:text-slate-200 block mt-1">
                         Uygulama kullanımı, teknik dokümantasyon ve sistem mimarisi hakkında daha fazla bilgi için tıklayın.
                     </a>
                     <p className="mt-2 pt-2 border-t border-slate-200 dark:border-slate-600">© 2025 Kütüphane Sayım Uygulaması. Tüm hakları saklıdır.</p>
@@ -449,9 +455,34 @@ export default function App() {
     const [warningFilter, setWarningFilter] = useState('all');
     const [isMuted, setIsMuted] = useState(false);
     const [isDarkMode, setIsDarkMode] = useState(false);
+    const [installPrompt, setInstallPrompt] = useState(null);
     
     const processedBarcodesRef = useRef(new Set());
     const manualInputDebounceRef = useRef(null);
+
+    useEffect(() => {
+        const handleBeforeInstallPrompt = (e) => {
+            e.preventDefault();
+            setInstallPrompt(e);
+        };
+        window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+        return () => {
+            window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+        };
+    }, []);
+
+    const handleInstallClick = () => {
+        if (!installPrompt) return;
+        installPrompt.prompt();
+        installPrompt.userChoice.then((choiceResult) => {
+            if (choiceResult.outcome === 'accepted') {
+                console.log('Kullanıcı uygulamayı yükledi');
+            } else {
+                console.log('Kullanıcı yükleme istemini reddetti');
+            }
+            setInstallPrompt(null);
+        });
+    };
 
     // Load settings from localStorage on initial mount
     useEffect(() => {
@@ -971,6 +1002,8 @@ export default function App() {
               isMobileMenuOpen={isMobileMenuOpen}
               setMobileMenuOpen={setMobileMenuOpen}
               onShare={() => setIsShareModalOpen(true)}
+              onInstall={handleInstallClick}
+              installPrompt={installPrompt}
             />
             
             <div className="md:ml-64 flex flex-col min-h-screen">
