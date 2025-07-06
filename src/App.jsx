@@ -609,11 +609,15 @@ export default function App() {
     const startNewSession = () => {
         if (!sessionNameInput) { setError("Lütfen yeni sayım için bir isim girin."); return; }
         if (sessions[sessionNameInput]) { setError("Bu isimde bir sayım zaten mevcut. Farklı bir isim seçin."); return; }
-        const newSession = { name: sessionNameInput, library: '', location: '', items: [], lastUpdated: new Date().toISOString() };
+        const newSession = { 
+            name: sessionNameInput, 
+            library: selectedLibrary, 
+            location: selectedLocation, 
+            items: [], 
+            lastUpdated: new Date().toISOString() 
+        };
         setSessions({...sessions, [sessionNameInput]: newSession});
         setCurrentSessionName(sessionNameInput);
-        setSelectedLibrary('');
-        setSelectedLocation('');
         setScannedItems([]);
         setLastScanned(null);
         processedBarcodesRef.current.clear();
@@ -910,7 +914,7 @@ export default function App() {
         <div className="w-full">
             <h1 className="text-3xl font-bold text-slate-800 dark:text-slate-200 mb-2">Hoş Geldiniz</h1>
             <p className="text-slate-600 dark:text-slate-400 mb-8">Yeni bir sayım başlatın veya kayıtlı bir oturuma devam edin.</p>
-            <div className="grid md:grid-cols-2 gap-8">
+            <div className="space-y-8">
                 <div className="bg-white dark:bg-slate-800 p-6 rounded-lg shadow-sm border dark:border-slate-700">
                     <h2 className="text-2xl font-semibold mb-4 text-slate-700 dark:text-slate-300">Yeni Sayım Başlat</h2>
                     {error && <div className="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 rounded mb-4" role="alert"><p>{error}</p></div>}
