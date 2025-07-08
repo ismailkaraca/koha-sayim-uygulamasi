@@ -337,17 +337,26 @@ const Sidebar = ({ page, setPage, currentSessionName, selectedLibrary, kohaData,
                         </button>
                     ))}
                 </nav>
-                <div className="p-4 border-t border-slate-200 flex justify-around items-center">
-                    <button onClick={() => setIsMuted(!isMuted)} className="p-2 rounded-full text-slate-500 hover:bg-slate-200" title={isMuted ? "Sesi Aç" : "Sesi Kapat"}>
-                        {isMuted ? ICONS.soundOff : ICONS.soundOn}
-                    </button>
-                    <button onClick={onShare} className="p-2 rounded-full text-slate-500 hover:bg-slate-200" title="Uygulamayı Paylaş">
-                        {ICONS.share}
-                    </button>
-                    {installPrompt && (
-                         <button onClick={onInstall} className="p-2 rounded-full text-slate-500 hover:bg-slate-200" title="Uygulamayı Yükle">
-                            {ICONS.install}
+                <div className="p-4 border-t border-slate-200 flex justify-around items-center text-center">
+                    <div className="flex flex-col items-center">
+                        <button onClick={() => setIsMuted(!isMuted)} className="p-2 rounded-full text-slate-500 hover:bg-slate-200" title={isMuted ? "Sesi Aç" : "Sesi Kapat"}>
+                            {isMuted ? ICONS.soundOff : ICONS.soundOn}
                         </button>
+                        <span className="text-xs text-slate-500 mt-1">{isMuted ? "Sesi Aç" : "Sesi Kapat"}</span>
+                    </div>
+                    <div className="flex flex-col items-center">
+                        <button onClick={onShare} className="p-2 rounded-full text-slate-500 hover:bg-slate-200" title="Uygulamayı Paylaş">
+                            {ICONS.share}
+                        </button>
+                        <span className="text-xs text-slate-500 mt-1">Paylaş</span>
+                    </div>
+                    {installPrompt && (
+                        <div className="flex flex-col items-center">
+                            <button onClick={onInstall} className="p-2 rounded-full text-slate-500 hover:bg-slate-200" title="Uygulamayı Yükle">
+                                {ICONS.install}
+                            </button>
+                            <span className="text-xs text-slate-500 mt-1">Yükle</span>
+                        </div>
                     )}
                 </div>
                 <div className="p-3 border-t border-slate-200 text-[11px] text-slate-500 space-y-2 text-center">
