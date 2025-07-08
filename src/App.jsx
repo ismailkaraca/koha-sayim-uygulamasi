@@ -288,7 +288,7 @@ const PermissionScreen = ({ onDecision }) => {
 const Sidebar = ({ page, setPage, currentSessionName, selectedLibrary, kohaData, scannedItems, isMuted, setIsMuted, isMobileMenuOpen, setMobileMenuOpen, onShare, onInstall, installPrompt }) => {
     const navItems = [
         { id: 'start', label: 'Yeni Sayım', disabled: false },
-        { id: 'setup', label: 'Kurulum', disabled: !currentSessionName },
+        { id: 'pre-reports', label: 'Ön Raporlar', disabled: !currentSessionName || kohaData.length === 0 },
         { id: 'scan', label: 'Sayım', disabled: !selectedLibrary || kohaData.length === 0 },
         { id: 'summary', label: 'Özet & Raporlar', disabled: !selectedLibrary || kohaData.length === 0 || scannedItems.length === 0 }
     ];
@@ -423,7 +423,7 @@ const ShareModal = ({ isOpen, onClose }) => {
     );
 };
 
-const StartScreen = ({ sessions, sessionNameInput, setSessionNameInput, startNewSession, error, setError, loadSession, deleteSession }) => (
+const StartScreen = ({ sessions, sessionNameInput, setSessionNameInput, startNewSession, error, setError, loadSession, deleteSession, selectedLibrary, setSelectedLibrary, combinedLibraries, setAddDataModal, selectedLocation, setSelectedLocation, combinedLocations, kohaData, handleExcelUpload, isXlsxReady, isLoading }) => (
     <div className="w-full">
         <h1 className="text-3xl font-bold text-slate-800 mb-2">Hoş Geldiniz</h1>
         <p className="text-slate-600 mb-8">Yeni bir sayım başlatın veya kayıtlı bir oturuma devam edin.</p>
@@ -431,9 +431,34 @@ const StartScreen = ({ sessions, sessionNameInput, setSessionNameInput, startNew
             <div className="bg-white p-6 rounded-lg shadow-sm border">
                 <h2 className="text-2xl font-semibold mb-4 text-slate-700">Yeni Sayım Başlat</h2>
                 {error && <div className="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 rounded mb-4" role="alert"><p>{error}</p></div>}
-                <div className="flex flex-col sm:flex-row gap-2">
-                    <input type="text" value={sessionNameInput} onChange={e => {setSessionNameInput(e.target.value); setError('')}} onKeyDown={(e) => e.key === 'Enter' && startNewSession()} placeholder="Sayım için bir isim girin..." className="flex-grow p-3 border border-slate-300 rounded-md shadow-sm focus:ring-slate-500 focus:border-slate-500" />
-                    <button onClick={startNewSession} className="bg-slate-700 text-white font-bold py-3 px-6 rounded-md hover:bg-slate-800 transition-colors">Başlat</button>
+                <div className="space-y-4">
+                     <input type="text" value={sessionNameInput} onChange={e => {setSessionNameInput(e.target.value); setError('')}} placeholder="Sayım için bir isim girin..." className="w-full p-3 border border-slate-300 rounded-md shadow-sm focus:ring-slate-500 focus:border-slate-500" />
+                    <div>
+                        <label htmlFor="library-select" className="block text-sm font-medium text-slate-700 mb-1">Kütüphanenizi Seçin</label>
+                        <div className="flex gap-2">
+                            <select id="library-select" value={selectedLibrary} onChange={(e) => setSelectedLibrary(e.target.value)} className="w-full p-3 border border-slate-300 rounded-md shadow-sm">
+                                <option value="">-- Kütüphane Seçiniz --</option>
+                                {Object.entries(combinedLibraries).map(([code, name]) => <option key={code} value={code}>{name}</option>)}
+                            </select>
+                            <button onClick={()=> setAddDataModal({isOpen: true, type: 'library'})} className="px-3 bg-slate-200 rounded-md hover:bg-slate-300">Yeni Ekle</button>
+                        </div>
+                    </div>
+                    <div>
+                        <label htmlFor="location-select" className="block text-sm font-medium text-slate-700 mb-1">Bölüm/Materyalin Yeri (Opsiyonel)</label>
+                        <div className="flex gap-2">
+                            <select id="location-select" value={selectedLocation} onChange={(e) => setSelectedLocation(e.target.value)} className="w-full p-3 border border-slate-300 rounded-md shadow-sm">
+                                <option value="">-- Tüm Lokasyonlar --</option>
+                                {Object.entries(combinedLocations).map(([code, name]) => <option key={code} value={code}>{name}</option>)}
+                            </select>
+                            <button onClick={()=> setAddDataModal({isOpen: true, type: 'location'})} className="px-3 bg-slate-200 rounded-md hover:bg-slate-300">Yeni Ekle</button>
+                        </div>
+                        <p className="text-xs text-slate-500 mt-1">Yer seçimi yaparsanız, sayım yaptığınız yerde olmayan materyallerle ilgili uyarı verilecektir.</p>
+                    </div>
+                    <div>
+                        <h3 className="text-sm font-medium text-slate-700 mb-1">Koha'dan Aldığınız Sayım İçin Hazırlanmış Dosya (.xlsx)</h3>
+                        <FileUploader onFileAccepted={handleExcelUpload} title={kohaData.length > 0 ? `${kohaData.length} kayıt yüklendi.` : "Dosyayı buraya sürükleyin veya seçmek için tıklayın"} disabled={!isXlsxReady || isLoading} accept={{'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': ['.xlsx'], 'application/vnd.ms-excel': ['.xls']}}><svg xmlns="http://www.w3.org/2000/svg" className="mx-auto h-12 w-12 text-green-700" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" /></svg></FileUploader>
+                    </div>
+                    <button onClick={startNewSession} disabled={!sessionNameInput || !selectedLibrary || kohaData.length === 0} className="w-full font-bold py-3 px-4 rounded-md transition-colors bg-green-600 text-white hover:bg-green-700 disabled:bg-slate-400">Sayıma Başla</button>
                 </div>
             </div>
             <div className="bg-white p-6 rounded-lg shadow-sm border">
@@ -467,57 +492,24 @@ const ReportCard = ({ report, isXlsxReady }) => (
 );
 
 
-const SetupScreen = ({ currentSessionName, error, selectedLibrary, setSelectedLibrary, combinedLibraries, setAddDataModal, selectedLocation, setSelectedLocation, combinedLocations, kohaData, handleExcelUpload, isXlsxReady, isLoading, setPage, setError, preAnalysisReports }) => (
+const PreReportsScreen = ({ currentSessionName, error, setPage, preAnalysisReports, isXlsxReady }) => (
     <div className="max-w-3xl mx-auto w-full p-8 bg-white rounded-lg shadow-sm space-y-6 border">
-        <h1 className="text-3xl font-bold text-slate-800">Sayım Kurulumu: "{currentSessionName}"</h1>
+        <h1 className="text-3xl font-bold text-slate-800">Ön Raporlar: "{currentSessionName}"</h1>
         {error && <div className="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 rounded" role="alert"><p>{error}</p></div>}
-        <div className="space-y-4">
-            <div>
-                <label htmlFor="library-select" className="block text-sm font-medium text-slate-700 mb-1">Kütüphanenizi Seçin</label>
-                <div className="flex gap-2">
-                    <select id="library-select" value={selectedLibrary} onChange={(e) => setSelectedLibrary(e.target.value)} className="w-full p-3 border border-slate-300 rounded-md shadow-sm">
-                        <option value="">-- Kütüphane Seçiniz --</option>
-                        {Object.entries(combinedLibraries).map(([code, name]) => <option key={code} value={code}>{name}</option>)}
-                    </select>
-                    <button onClick={()=> setAddDataModal({isOpen: true, type: 'library'})} className="px-3 bg-slate-200 rounded-md hover:bg-slate-300">Yeni Ekle</button>
-                </div>
-            </div>
-            <div>
-                <label htmlFor="location-select" className="block text-sm font-medium text-slate-700 mb-1">Bölüm/Materyalin Yeri (Opsiyonel)</label>
-                <div className="flex gap-2">
-                    <select id="location-select" value={selectedLocation} onChange={(e) => setSelectedLocation(e.target.value)} className="w-full p-3 border border-slate-300 rounded-md shadow-sm">
-                        <option value="">-- Tüm Lokasyonlar --</option>
-                        {Object.entries(combinedLocations).map(([code, name]) => <option key={code} value={code}>{name}</option>)}
-                    </select>
-                    <button onClick={()=> setAddDataModal({isOpen: true, type: 'location'})} className="px-3 bg-slate-200 rounded-md hover:bg-slate-300">Yeni Ekle</button>
-                </div>
-                <p className="text-xs text-slate-500 mt-1">Yer seçimi yaparsanız, sayım yaptığınız yerde olmayan materyallerle ilgili uyarı verilecektir.</p>
-            </div>
-        </div>
-        <div>
-            <h3 className="text-sm font-medium text-slate-700 mb-1">Koha'dan Aldığınız Sayım İçin Hazırlanmış Dosya (.xlsx)</h3>
-            <FileUploader onFileAccepted={handleExcelUpload} title={kohaData.length > 0 ? `${kohaData.length} kayıt yüklendi.` : "Dosyayı buraya sürükleyin veya seçmek için tıklayın"} disabled={!isXlsxReady || isLoading} accept={{'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': ['.xlsx'], 'application/vnd.ms-excel': ['.xls']}}><svg xmlns="http://www.w3.org/2000/svg" className="mx-auto h-12 w-12 text-green-700" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" /></svg></FileUploader>
-        </div>
-        
         <button 
-            onClick={() => { if(selectedLibrary && kohaData.length > 0) setPage('scan'); else setError("Sayıma başlamak için Kütüphane seçmeli ve Excel dosyası yüklemelisiniz."); }} 
-            disabled={!selectedLibrary || kohaData.length === 0 || isLoading || !isXlsxReady} 
-            className={`w-full font-bold py-3 px-4 rounded-md transition-colors ${kohaData.length > 0 ? 'bg-green-600 text-white hover:bg-green-700' : 'bg-slate-700 text-white hover:bg-slate-800'} disabled:bg-slate-400`}
+            onClick={() => setPage('scan')}
+            className="w-full font-bold py-3 px-4 rounded-md transition-colors bg-green-600 text-white hover:bg-green-700"
         >
             Sayıma Devam Et
         </button>
-
-        {kohaData.length > 0 && (
-            <div className="mt-6 pt-6 border-t">
-                <h3 className="text-2xl font-semibold mb-4 text-slate-700">Dosya Ön Analiz Raporları</h3>
-                <p className="text-sm text-slate-500 mb-4">Bu raporlar, yüklediğiniz dosyaya göre oluşturulmuştur ve sayım işleminden bağımsızdır. Koleksiyonunuzun mevcut durumu hakkında ön bilgi sağlarlar.</p>
-                <div className="space-y-4">
-                    {preAnalysisReports.map(report => (
-                        <ReportCard key={report.id} report={report} isXlsxReady={isXlsxReady} />
-                    ))}
-                </div>
+        <div className="mt-6 pt-6 border-t">
+            <p className="text-sm text-slate-500 mb-4">Bu raporlar, yüklediğiniz dosyaya göre oluşturulmuştur ve sayım işleminden bağımsızdır. Koleksiyonunuzun mevcut durumu hakkında ön bilgi sağlarlar.</p>
+            <div className="space-y-4">
+                {preAnalysisReports.map(report => (
+                    <ReportCard key={report.id} report={report} isXlsxReady={isXlsxReady} />
+                ))}
             </div>
-        )}
+        </div>
     </div>
 );
 
@@ -697,7 +689,7 @@ export default function App() {
     const isXlsxReady = useScript('https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js', 'XLSX');
     const isQrCodeReady = useScript('https://unpkg.com/html5-qrcode', 'Html5Qrcode');
     
-    const [page, setPage] = useState('permission'); // 'permission', 'start', 'setup', 'scan', 'summary'
+    const [page, setPage] = useState('permission'); // 'permission', 'start', 'pre-reports', 'scan', 'summary'
     const [isMobileMenuOpen, setMobileMenuOpen] = useState(false);
     const [isCameraAllowed, setIsCameraAllowed] = useState(false);
     const [sessions, setSessions] = useState({});
@@ -838,21 +830,30 @@ export default function App() {
     
     useEffect(() => {
         if (currentSessionName) {
-            setSessions(prevSessions => {
-                const sessionData = { name: currentSessionName, library: selectedLibrary, location: selectedLocation, items: scannedItems, lastUpdated: new Date().toISOString() };
-                const newSessions = { ...prevSessions, [currentSessionName]: sessionData };
-                if (JSON.stringify(prevSessions[currentSessionName]) !== JSON.stringify(sessionData)) {
-                    try {
-                        localStorage.setItem('kohaInventorySessions', JSON.stringify(newSessions));
-                    } catch (e) {
-                         console.error("Oturum kaydedilemedi:", e);
-                         setError("Oturum kaydedilemedi. Tarayıcı depolama alanı dolu olabilir.");
-                    }
-                }
-                return newSessions;
-            });
+            const sessionToSave = {
+                name: currentSessionName,
+                library: selectedLibrary,
+                location: selectedLocation,
+                items: scannedItems,
+                lastUpdated: new Date().toISOString()
+            };
+
+            try {
+                // Don't stringify kohaData if it's large, handle re-upload on load
+                sessionToSave.kohaData = JSON.stringify(kohaData);
+                localStorage.setItem(`koha_session_${currentSessionName}`, JSON.stringify(sessionToSave));
+            } catch (e) {
+                console.error("Oturum kaydedilemedi (veri büyük olabilir):", e);
+                setError("Oturum verisi çok büyük olduğu için kaydedilemedi. Lütfen sayfayı yenilemeyin.");
+                // Save without kohaData as a fallback
+                delete sessionToSave.kohaData;
+                localStorage.setItem(`koha_session_${currentSessionName}`, JSON.stringify(sessionToSave));
+            }
+
+            // Update the sessions list
+            setSessions(prev => ({...prev, [currentSessionName]: {name: currentSessionName, items: scannedItems, lastUpdated: new Date().toISOString()}}));
         }
-    }, [currentSessionName, selectedLibrary, selectedLocation, scannedItems]);
+    }, [currentSessionName, selectedLibrary, selectedLocation, scannedItems, kohaData]);
 
     const handlePermissionDecision = (allow) => {
         setIsCameraAllowed(allow);
@@ -862,47 +863,49 @@ export default function App() {
     const startNewSession = () => {
         if (!sessionNameInput) { setError("Lütfen yeni sayım için bir isim girin."); return; }
         if (sessions[sessionNameInput]) { setError("Bu isimde bir sayım zaten mevcut. Farklı bir isim seçin."); return; }
-        const newSession = { 
-            name: sessionNameInput, 
-            library: '', 
-            location: '', 
-            items: [], 
-            lastUpdated: new Date().toISOString() 
-        };
-        setSessions({...sessions, [sessionNameInput]: newSession});
+        
         setCurrentSessionName(sessionNameInput);
         setScannedItems([]);
-        setKohaData([]);
-        setKohaDataMap(new Map());
         setLastScanned(null);
         processedBarcodesRef.current.clear();
         setError('');
-        setPage('setup');
+        setPage('scan');
     };
     
     const loadSession = (sessionName) => {
-        const session = sessions[sessionName];
-        if (session) {
+        const sessionString = localStorage.getItem(`koha_session_${sessionName}`);
+        if (sessionString) {
+            const session = JSON.parse(sessionString);
             setCurrentSessionName(session.name);
             setSelectedLibrary(session.library);
             setSelectedLocation(session.location);
-            const items = session.items || [];
-            setScannedItems(items);
-            processedBarcodesRef.current = new Set(items.map(i => i.barcode));
-            setLastScanned(items.length > 0 ? items[0] : null);
+            setScannedItems(session.items || []);
+            processedBarcodesRef.current = new Set((session.items || []).map(i => i.barcode));
+            setLastScanned((session.items || []).length > 0 ? session.items[0] : null);
             setError('');
 
-            // Oturum yüklendiğinde Koha verisi yoksa, kullanıcıyı setup'a yönlendir.
-            // Eğer varsa, doğrudan sayıma devam edebilir. Bu senaryo için koha verisini de kaydetmek gerekebilir.
-            // Şimdilik basit tutalım: her oturum yüklemede excel istenir.
-            setKohaData([]);
-            setKohaDataMap(new Map());
-            setPage('setup');
-            setError("Kayıtlı oturum yüklendi. Lütfen devam etmek için ilgili Koha Excel dosyasını yükleyin.");
+            if (session.kohaData) {
+                 try {
+                    const parsedData = JSON.parse(session.kohaData);
+                    setKohaData(parsedData);
+                    setKohaDataMap(new Map(parsedData.map(item => [String(item.BARKOD), item])));
+                    setPage('pre-reports');
+                } catch (e) {
+                    setError("Kayıtlı oturum verisi bozuk. Lütfen Excel dosyasını tekrar yükleyin.");
+                    setKohaData([]);
+                    setKohaDataMap(new Map());
+                    setPage('start'); // Go back to start to re-upload
+                }
+            } else {
+                setError("Bu oturum için kayıtlı veri bulunamadı. Lütfen devam etmek için ilgili Koha Excel dosyasını yükleyin.");
+                setKohaData([]);
+                setKohaDataMap(new Map());
+                setPage('start'); // Go back to start to re-upload
+            }
         }
     };
 
-    const deleteSession = (sessionName) => { setConfirmationModal({ isOpen: true, message: `"${sessionName}" isimli sayımı silmek istediğinizden emin misiniz? Bu işlem geri alınamaz.`, onConfirm: () => { const newSessions = { ...sessions }; delete newSessions[sessionName]; setSessions(newSessions); localStorage.setItem('kohaInventorySessions', JSON.stringify(newSessions)); } }); };
+    const deleteSession = (sessionName) => { setConfirmationModal({ isOpen: true, message: `"${sessionName}" isimli sayımı silmek istediğinizden emin misiniz? Bu işlem geri alınamaz.`, onConfirm: () => { const newSessions = { ...sessions }; delete newSessions[sessionName]; setSessions(newSessions); localStorage.removeItem(`koha_session_${sessionName}`); } }); };
     
     const handleAddCustomData = (type, code, name) => {
         if (type === 'library') {
@@ -1215,7 +1218,7 @@ export default function App() {
     // --- Render Functions ---
     const pageTitles = {
         start: 'Yeni Sayım',
-        setup: 'Kurulum',
+        'pre-reports': 'Ön Raporlar',
         scan: 'Sayım',
         summary: 'Özet & Raporlar',
         permission: 'Kamera İzni'
@@ -1234,9 +1237,9 @@ export default function App() {
     const renderPageContent = () => {
         switch (page) {
             case 'start':
-                return <StartScreen sessions={sessions} sessionNameInput={sessionNameInput} setSessionNameInput={setSessionNameInput} startNewSession={startNewSession} error={error} setError={setError} loadSession={loadSession} deleteSession={deleteSession} />;
-            case 'setup':
-                return <SetupScreen {...{ currentSessionName, error, selectedLibrary, setSelectedLibrary, combinedLibraries, setAddDataModal, selectedLocation, setSelectedLocation, combinedLocations, kohaData, handleExcelUpload, isXlsxReady, isLoading, setPage, setError, preAnalysisReports: PRE_ANALYSIS_REPORTS_CONFIG }} />;
+                return <StartScreen sessions={sessions} sessionNameInput={sessionNameInput} setSessionNameInput={setSessionNameInput} startNewSession={startNewSession} error={error} setError={setError} loadSession={loadSession} deleteSession={deleteSession} selectedLibrary={selectedLibrary} setSelectedLibrary={setSelectedLibrary} combinedLibraries={combinedLibraries} setAddDataModal={setAddDataModal} selectedLocation={selectedLocation} setSelectedLocation={setSelectedLocation} combinedLocations={combinedLocations} kohaData={kohaData} handleExcelUpload={handleExcelUpload} isXlsxReady={isXlsxReady} isLoading={isLoading} />;
+            case 'pre-reports':
+                return <PreReportsScreen {...{ currentSessionName, error, setPage, preAnalysisReports: PRE_ANALYSIS_REPORTS_CONFIG, isXlsxReady }} />;
             case 'summary':
                 return <SummaryScreen {...{ currentSessionName, summaryData, preAnalysisReports: PRE_ANALYSIS_REPORTS_CONFIG, postScanReports: POST_SCAN_REPORTS_CONFIG, isXlsxReady }} />;
             case 'scan':
@@ -1295,3 +1298,4 @@ export default function App() {
         </div>
     );
 }
+
