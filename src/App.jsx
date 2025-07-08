@@ -432,7 +432,7 @@ const StartScreen = ({ sessions, sessionNameInput, setSessionNameInput, startNew
                 <h2 className="text-2xl font-semibold mb-4 text-slate-700">Yeni Sayım Başlat</h2>
                 {error && <div className="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 rounded mb-4" role="alert"><p>{error}</p></div>}
                 <div className="space-y-4">
-                     <input type="text" value={sessionNameInput} onChange={e => {setSessionNameInput(e.target.value); setError('')}} placeholder="Sayım için bir isim girin..." className="w-full p-3 border border-slate-300 rounded-md shadow-sm focus:ring-slate-500 focus:border-slate-500" />
+                     <input type="text" value={sessionNameInput} onChange={e => {setSessionNameInput(e.target.value); setError('')}} placeholder="Yeni sayım için bir isim girin (örn: Yetişkin Bölümü)" className="w-full p-3 border border-slate-300 rounded-md shadow-sm focus:ring-slate-500 focus:border-slate-500" />
                     <div>
                         <label htmlFor="library-select" className="block text-sm font-medium text-slate-700 mb-1">Kütüphanenizi Seçin</label>
                         <div className="flex gap-2">
@@ -552,7 +552,10 @@ const ScanScreen = ({ isCameraOpen, isQrCodeReady, isCameraAllowed, setIsCameraO
                             <button type="submit" className="w-full bg-slate-600 text-white p-2 rounded-md hover:bg-slate-700">Ekle</button>
                         </form>
                         {lastScanned && <div className={`p-3 rounded-md border-l-4 ${lastScanned.isValid ? 'bg-green-100 border-green-500' : 'bg-yellow-100 border-yellow-500'}`}><p className="font-bold text-slate-800">{lastScanned.barcode}</p><p className="text-sm text-slate-600">{lastScanned.data?.['ESER ADI'] || 'Eser bilgisi bulunamadı'}</p>{lastScanned.warnings.map(w => <p key={w.id} style={{color: w.color}} className="text-sm font-semibold">{w.message || w.text}</p>)}</div>}
-                        <button onClick={() => setPage('summary')} disabled={scannedItems.length === 0 || isBulkLoading} className="w-full bg-green-600 text-white font-bold py-3 px-4 rounded-md hover:bg-green-700 disabled:bg-green-400 disabled:cursor-not-allowed mt-4">Özeti ve Raporları Gör</button>
+                        <div className="mt-4">
+                            <button onClick={() => setPage('summary')} disabled={scannedItems.length === 0 || isBulkLoading} className="w-full bg-green-600 text-white font-bold py-3 px-4 rounded-md hover:bg-green-700 disabled:bg-green-400 disabled:cursor-not-allowed">Sayımı Bitir</button>
+                            <p className="text-xs text-slate-500 text-center mt-2">Özet grafikler ve raporlar görünecektir. Sayım ekranına tekrar dönüş yapabilirsiniz.</p>
+                        </div>
                     </div>
                     <div className="mt-4 space-y-2">
                         <div>
@@ -722,6 +725,7 @@ export default function App() {
     const manualInputDebounceRef = useRef(null);
 
     useEffect(() => {
+        document.documentElement.lang = 'tr';
         const handleBeforeInstallPrompt = (e) => {
             e.preventDefault();
             setInstallPrompt(e);
@@ -869,7 +873,7 @@ export default function App() {
         setLastScanned(null);
         processedBarcodesRef.current.clear();
         setError('');
-        setPage('scan');
+        setPage('pre-reports');
     };
     
     const loadSession = (sessionName) => {
@@ -1298,4 +1302,3 @@ export default function App() {
         </div>
     );
 }
-
