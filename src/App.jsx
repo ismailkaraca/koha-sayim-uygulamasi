@@ -1247,7 +1247,7 @@ export default function App() {
     };
     
     return (
-        <div className="bg-slate-100 min-h-screen font-sans">
+        <div className="font-sans">
             {isBulkLoading && <FullScreenLoader text="Toplu Barkodlar Yükleniyor... Lütfen Bekleyiniz" />}
             {isLoading && <FullScreenLoader text="Koha dosyası okunuyor, lütfen bekleyin..." />}
             <WarningModal isOpen={warningModal.isOpen} onClose={() => setWarningModal({ isOpen: false, title: '', warnings: [], barcode: null })} {...warningModal} />
@@ -1271,7 +1271,7 @@ export default function App() {
               installPrompt={installPrompt}
             />
             
-            <div className="md:ml-64 flex flex-col min-h-screen">
+            <div className="md:ml-64 flex flex-col min-h-screen bg-slate-100">
                  {page !== 'permission' && (
                     <MobileHeader
                         onMenuClick={() => setMobileMenuOpen(true)}
