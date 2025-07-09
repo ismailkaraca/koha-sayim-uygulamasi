@@ -553,7 +553,7 @@ const ScanScreen = ({ isCameraOpen, isQrCodeReady, isCameraAllowed, setIsCameraO
                         </form>
                         {lastScanned && <div className={`p-3 rounded-md border-l-4 ${lastScanned.isValid ? 'bg-green-100 border-green-500' : 'bg-yellow-100 border-yellow-500'}`}><p className="font-bold text-slate-800">{lastScanned.barcode}</p><p className="text-sm text-slate-600">{lastScanned.data?.['ESER ADI'] || 'Eser bilgisi bulunamadı'}</p>{lastScanned.warnings.map(w => <p key={w.id} style={{color: w.color}} className="text-sm font-semibold">{w.message || w.text}</p>)}</div>}
                         <div className="mt-4">
-                            <button onClick={() => setPage('summary')} disabled={scannedItems.length === 0 || isBulkLoading} className="w-full bg-green-600 text-white font-bold py-3 px-4 rounded-md hover:bg-green-700 disabled:bg-green-400 disabled:cursor-not-allowed">Sayımı Bitir</button>
+                            <button onClick={() => setPage('update-on-loan')} disabled={scannedItems.length === 0 || isBulkLoading} className="w-full bg-green-600 text-white font-bold py-3 px-4 rounded-md hover:bg-green-700 disabled:bg-green-400 disabled:cursor-not-allowed">Sayımı Bitir</button>
                             <p className="text-xs text-slate-500 text-center mt-2">"Sayımı Bitir"e tıkladığınızda; özet grafikler ve raporlar görüntülenir. Daha sonra menüden "Sayım" ekranına tekrar dönüş yapabilirsiniz.</p>
                         </div>
                     </div>
@@ -602,6 +602,32 @@ const ScanScreen = ({ isCameraOpen, isQrCodeReady, isCameraAllowed, setIsCameraO
         </>
     );
 };
+
+const UpdateOnLoanScreen = ({ handleOnLoanUpload, setPage, isXlsxReady, isLoading }) => (
+    <div className="max-w-3xl mx-auto w-full p-8 bg-white rounded-lg shadow-sm space-y-6 border">
+        <h1 className="text-3xl font-bold text-slate-800">Güncel Ödünç Verilmiş Materyalleri Yükle</h1>
+        <p className="text-slate-600">
+            Eğer sayım sırasında ödünç verme işlemi yapıldıysa, Koha'dan alacağınız güncel ödünç verilmiş materyallerin listesini (sadece barkodları içeren .txt veya .xlsx) buraya yükleyerek eksik listesinin daha doğru oluşturulmasını sağlayabilirsiniz.
+        </p>
+        <FileUploader 
+            onFileAccepted={handleOnLoanUpload} 
+            title="Güncel ödünç listesini buraya sürükleyin veya seçmek için tıklayın" 
+            disabled={!isXlsxReady || isLoading} 
+            accept={{'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': ['.xlsx'], 'application/vnd.ms-excel': ['.xls'], 'text/plain': ['.txt']}}
+        >
+            <svg xmlns="http://www.w3.org/2000/svg" className="mx-auto h-12 w-12 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 16a4 4 0 01-4-4V7a4 4 0 014-4h10a4 4 0 014 4v5m-4 4h-5m5-4l-5 4m0 0l-5-4m5 4v-7" /></svg>
+        </FileUploader>
+        <div className="flex flex-col sm:flex-row gap-4 mt-4">
+             <button 
+                onClick={() => setPage('summary')}
+                className="w-full font-bold py-3 px-4 rounded-md transition-colors bg-slate-600 text-white hover:bg-slate-700"
+            >
+                Bu Adımı Atla ve Raporları Gör
+            </button>
+        </div>
+    </div>
+);
+
 
 const SummaryScreen = ({ currentSessionName, summaryData, preAnalysisReports, postScanReports, isXlsxReady }) => {
     const renderLegendWithCount = (value, entry) => {
@@ -720,6 +746,7 @@ export default function App() {
     const [warningFilter, setWarningFilter] = useState('all');
     const [isMuted, setIsMuted] = useState(false);
     const [installPrompt, setInstallPrompt] = useState(null);
+    const [isNavigatingToSummary, setIsNavigatingToSummary] = useState(false);
     
     const processedBarcodesRef = useRef(new Set());
     const manualInputDebounceRef = useRef(null);
@@ -1162,6 +1189,81 @@ export default function App() {
         }
     };
 
+    const handleOnLoanUpload = (file) => {
+        if (!file) return;
+        setIsBulkLoading(true);
+        setError('');
+        const reader = new FileReader();
+        const fileExtension = file.name.split('.').pop().toLowerCase();
+
+        reader.onload = (e) => {
+            try {
+                let barcodes = [];
+                if (fileExtension === 'txt') {
+                    barcodes = e.target.result.split(/\r?\n/).filter(line => line.trim() !== '');
+                } else if (fileExtension === 'xlsx' || fileExtension === 'xls') {
+                    if (!isXlsxReady) {
+                        setError("Excel kütüphanesi henüz hazır değil. Lütfen birkaç saniye sonra tekrar deneyin.");
+                        setIsBulkLoading(false);
+                        return;
+                    }
+                    const data = new Uint8Array(e.target.result);
+                    const workbook = window.XLSX.read(data, { type: 'array' });
+                    const sheetName = workbook.SheetNames[0];
+                    const worksheet = workbook.Sheets[sheetName];
+                    const json = window.XLSX.utils.sheet_to_json(worksheet, { header: 1 });
+                    barcodes = json.map(row => row[0]).filter(barcode => barcode !== null && barcode !== undefined && String(barcode).trim() !== '');
+                }
+                
+                const uploadedBarcodes = new Set(barcodes.map(b => String(b).trim().replace(/[^0-9]/g, '')).filter(Boolean));
+
+                const newScanResults = Array.from(uploadedBarcodes).map(barcode => {
+                    const itemData = kohaDataMap.get(barcode);
+                    processedBarcodesRef.current.add(barcode); // Ensure it's marked as processed
+                    return {
+                        barcode: barcode,
+                        isValid: false,
+                        warnings: [WARNING_DEFINITIONS.onLoan], // Always set the warning to "onLoan"
+                        data: itemData,
+                        timestamp: new Date().toISOString()
+                    };
+                });
+
+                setScannedItems(prevItems => {
+                    // Remove any previous scans of the same barcodes from the list
+                    const otherItems = prevItems.filter(item => !uploadedBarcodes.has(item.barcode));
+                    // Add the new 'onLoan' scans to the front of the list
+                    return [...newScanResults, ...otherItems];
+                });
+
+
+            } catch (err) {
+                setError(`Güncel ödünç listesi işlenirken hata: ${err.message}`);
+            } finally {
+                setIsBulkLoading(false);
+                setIsNavigatingToSummary(true);
+                setTimeout(() => {
+                    setPage('summary');
+                    setIsNavigatingToSummary(false);
+                }, 1500);
+            }
+        };
+        reader.onerror = () => {
+            setError("Dosya okuma başarısız oldu.");
+            setIsBulkLoading(false);
+        };
+
+        if (fileExtension === 'txt') {
+            reader.readAsText(file);
+        } else if (fileExtension === 'xlsx' || fileExtension === 'xls') {
+            reader.readAsArrayBuffer(file);
+        } else {
+            setError("Lütfen geçerli bir .txt veya .xlsx dosyası yükleyin.");
+            setIsBulkLoading(false);
+        }
+    };
+
+
     const filteredScannedItems = useMemo(() => scannedItems.filter(item => (searchTerm ? (item.barcode.includes(searchTerm) || String(item.data?.['ESER ADI'] || '').toLowerCase().includes(searchTerm.toLowerCase())) : true) && (warningFilter === 'all' ? true : item.warnings.some(w => w.id === warningFilter))), [scannedItems, searchTerm, warningFilter]);
 
     // --- Report Generation ---
@@ -1224,6 +1326,7 @@ export default function App() {
         start: 'Yeni Sayım',
         'pre-reports': 'Ön Raporlar',
         scan: 'Sayım',
+        'update-on-loan': 'Güncel Ödünçleri Yükle',
         summary: 'Özet & Raporlar',
         permission: 'Kamera İzni'
     };
@@ -1231,7 +1334,7 @@ export default function App() {
     const MobileHeader = ({ onMenuClick, pageTitle }) => (
         <header className="md:hidden bg-white shadow-md p-4 flex items-center justify-between sticky top-0 z-20">
             <button onClick={onMenuClick} className="p-2 text-slate-600">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
             </button>
             <h2 className="text-lg font-bold text-slate-800">{pageTitle}</h2>
             <div className="w-8"></div> {/* Spacer to balance the title */}
@@ -1244,6 +1347,8 @@ export default function App() {
                 return <StartScreen sessions={sessions} sessionNameInput={sessionNameInput} setSessionNameInput={setSessionNameInput} startNewSession={startNewSession} error={error} setError={setError} loadSession={loadSession} deleteSession={deleteSession} selectedLibrary={selectedLibrary} setSelectedLibrary={setSelectedLibrary} combinedLibraries={combinedLibraries} setAddDataModal={setAddDataModal} selectedLocation={selectedLocation} setSelectedLocation={setSelectedLocation} combinedLocations={combinedLocations} kohaData={kohaData} handleExcelUpload={handleExcelUpload} isXlsxReady={isXlsxReady} isLoading={isLoading} />;
             case 'pre-reports':
                 return <PreReportsScreen {...{ currentSessionName, error, setPage, preAnalysisReports: PRE_ANALYSIS_REPORTS_CONFIG, isXlsxReady }} />;
+            case 'update-on-loan':
+                return <UpdateOnLoanScreen {...{ handleOnLoanUpload, setPage, isXlsxReady, isLoading: isBulkLoading || isNavigatingToSummary }} />;
             case 'summary':
                 return <SummaryScreen {...{ currentSessionName, summaryData, preAnalysisReports: PRE_ANALYSIS_REPORTS_CONFIG, postScanReports: POST_SCAN_REPORTS_CONFIG, isXlsxReady }} />;
             case 'scan':
@@ -1255,6 +1360,7 @@ export default function App() {
     
     return (
         <div className="font-sans">
+            {isNavigatingToSummary && <FullScreenLoader text="Özet & Raporlar Ekranına Geçiliyor..." />}
             {isBulkLoading && <FullScreenLoader text="Toplu Barkodlar Yükleniyor... Lütfen Bekleyiniz" />}
             {isLoading && <FullScreenLoader text="Koha dosyası okunuyor, lütfen bekleyin..." />}
             <WarningModal isOpen={warningModal.isOpen} onClose={() => setWarningModal({ isOpen: false, title: '', warnings: [], barcode: null })} {...warningModal} />
