@@ -752,7 +752,9 @@ export default function App() {
     const manualInputDebounceRef = useRef(null);
 
     useEffect(() => {
+        // Tarayıcının sayfayı otomatik olarak çevirmeye çalışmasını önlemek için dil etiketini 'tr' olarak ayarla
         document.documentElement.lang = 'tr';
+        
         const handleBeforeInstallPrompt = (e) => {
             e.preventDefault();
             setInstallPrompt(e);
@@ -815,26 +817,6 @@ export default function App() {
             console.error("Ses çalınamadı:", e);
         }
     }, [isMuted]);
-
-    // Ybug Entegrasyonu
-    useEffect(() => {
-        if (window.ybug_settings) return; // Zaten eklenmişse tekrar ekleme
-        window.ybug_settings = {"id":"bj4wjkqsyg165gqnpjmy"};
-        const ybug = document.createElement('script');
-        ybug.type = 'text/javascript';
-        ybug.async = true;
-        ybug.src = 'https://widget.ybug.io/button/'+window.ybug_settings.id+'.js';
-        const s = document.getElementsByTagName('script')[0];
-        s.parentNode.insertBefore(ybug, s);
-
-        return () => {
-            const ybugButton = document.getElementById('ybug-button-container');
-            if (ybugButton) {
-                ybugButton.remove();
-            }
-            delete window.ybug_settings;
-        }
-    }, []);
 
     useEffect(() => {
         try {
