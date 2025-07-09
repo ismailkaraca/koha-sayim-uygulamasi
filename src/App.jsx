@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react'
 import { useDropzone } from 'react-dropzone';
 import { PieChart, Pie, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, Cell, LabelList, LineChart, Line } from 'recharts';
 import * as Tone from 'tone';
+import * as htmlToImage from 'html-to-image';
 
 // --- Custom Hooks & Libraries ---
 const useScript = (url, globalVarName) => {
@@ -442,6 +443,9 @@ const StartScreen = ({ sessions, sessionNameInput, setSessionNameInput, startNew
                             </select>
                             <button onClick={()=> setAddDataModal({isOpen: true, type: 'library'})} className="px-3 bg-slate-200 rounded-md hover:bg-slate-300">Yeni Ekle</button>
                         </div>
+                         <div className="text-right">
+                            <a href="https://www.ismailkaraca.com.tr/kutuphanekod.html" target="_blank" rel="noopener noreferrer" className="text-xs text-blue-600 hover:underline mt-1 inline-block">Kütüphane Kod ve İsim Listesi için tıklayınız.</a>
+                         </div>
                     </div>
                     <div>
                         <label htmlFor="location-select" className="block text-sm font-medium text-slate-700 mb-1">Bölüm/Materyalin Yeri (Opsiyonel)</label>
@@ -453,9 +457,15 @@ const StartScreen = ({ sessions, sessionNameInput, setSessionNameInput, startNew
                             <button onClick={()=> setAddDataModal({isOpen: true, type: 'location'})} className="px-3 bg-slate-200 rounded-md hover:bg-slate-300">Yeni Ekle</button>
                         </div>
                         <p className="text-xs text-slate-500 mt-1">Yer seçimi yaparsanız, sayım yaptığınız yerde olmayan materyallerle ilgili uyarı verilecektir.</p>
+                        <div className="text-right">
+                            <a href="https://www.ismailkaraca.com.tr/bolumkod.html" target="_blank" rel="noopener noreferrer" className="text-xs text-blue-600 hover:underline mt-1 inline-block">Bölüm Kod ve İsim Listesi için tıklayınız.</a>
+                        </div>
                     </div>
                     <div>
-                        <h3 className="text-sm font-medium text-slate-700 mb-1">Koha'dan Aldığınız Sayım İçin Hazırlanmış Dosya (.xlsx)</h3>
+                        <div className="flex justify-between items-center mb-2">
+                           <h3 className="text-sm font-medium text-slate-700">Koha'dan Aldığınız Sayım İçin Hazırlanmış Dosya (.xlsx)</h3>
+                           <a href="https://www.ismailkaraca.com.tr/sayimdosyasi.html" target="_blank" rel="noopener noreferrer" className="px-2 py-1 text-xs bg-blue-600 text-white font-semibold rounded-md hover:bg-blue-700 transition-colors">Sayım için materyal dosyasını indirmek için tıklayınız.</a>
+                        </div>
                         <FileUploader onFileAccepted={handleExcelUpload} title={kohaData.length > 0 ? `${kohaData.length} kayıt yüklendi.` : "Dosyayı buraya sürükleyin veya seçmek için tıklayın"} disabled={!isXlsxReady || isLoading} accept={{'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': ['.xlsx'], 'application/vnd.ms-excel': ['.xls']}}><svg xmlns="http://www.w3.org/2000/svg" className="mx-auto h-12 w-12 text-green-700" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" /></svg></FileUploader>
                     </div>
                     <button onClick={startNewSession} disabled={!sessionNameInput || !selectedLibrary || kohaData.length === 0} className="w-full font-bold py-3 px-4 rounded-md transition-colors bg-green-600 text-white hover:bg-green-700 disabled:bg-slate-400">Sayıma Başla</button>
@@ -606,9 +616,10 @@ const ScanScreen = ({ isCameraOpen, isQrCodeReady, isCameraAllowed, setIsCameraO
 const UpdateOnLoanScreen = ({ handleOnLoanUpload, setPage, isXlsxReady, isLoading }) => (
     <div className="max-w-3xl mx-auto w-full p-8 bg-white rounded-lg shadow-sm space-y-6 border">
         <h1 className="text-3xl font-bold text-slate-800">Güncel Ödünç Verilmiş Materyalleri Yükle</h1>
-        <p className="text-slate-600">
+        <p className="text-slate-600 mb-4">
             Eğer sayım sırasında ödünç verme işlemi yapıldıysa, Koha'dan alacağınız güncel ödünç verilmiş materyallerin listesini (sadece barkodları içeren .txt veya .xlsx) buraya yükleyerek eksik listesinin daha doğru oluşturulmasını sağlayabilirsiniz.
         </p>
+        <a href="https://www.ismailkaraca.com.tr/gulcelodunc.html" target="_blank" rel="noopener noreferrer" className="w-full mb-2 inline-block text-center px-4 py-2 bg-blue-600 text-white font-semibold rounded-md hover:bg-blue-700 transition-colors">Güncel Ödünç Listesi indirmek için tıklayınız</a>
         <FileUploader 
             onFileAccepted={handleOnLoanUpload} 
             title="Güncel ödünç listesini buraya sürükleyin veya seçmek için tıklayın" 
@@ -630,6 +641,50 @@ const UpdateOnLoanScreen = ({ handleOnLoanUpload, setPage, isXlsxReady, isLoadin
 
 
 const SummaryScreen = ({ currentSessionName, summaryData, preAnalysisReports, postScanReports, isXlsxReady }) => {
+    const generalStatusRef = useRef(null);
+    const materialTypeRef = useRef(null);
+    const materialStatusRef = useRef(null);
+    const warningBarRef = useRef(null);
+    const scanProgressRef = useRef(null);
+    const topErrorRef = useRef(null);
+    const locationStatusRef = useRef(null);
+
+    const downloadChart = useCallback((ref, fileName) => {
+        if (ref.current === null) {
+            console.error("Grafik referansı bulunamadı.");
+            return;
+        }
+        htmlToImage.toPng(ref.current, { backgroundColor: '#ffffff', pixelRatio: 2 })
+            .then((dataUrl) => {
+                const link = document.createElement('a');
+                link.download = fileName;
+                link.href = dataUrl;
+                link.click();
+            })
+            .catch((err) => {
+                console.error('Grafik indirilemedi!', err);
+            });
+    }, []);
+
+    const downloadAllCharts = async () => {
+        const charts = [
+            { ref: generalStatusRef, name: `genel_durum_${currentSessionName}.png` },
+            { ref: materialTypeRef, name: `materyal_turu_${currentSessionName}.png` },
+            { ref: materialStatusRef, name: `materyal_statusu_${currentSessionName}.png` },
+            { ref: warningBarRef, name: `uyari_turleri_${currentSessionName}.png` },
+            { ref: scanProgressRef, name: `sayim_ilerlemesi_${currentSessionName}.png` },
+            { ref: topErrorRef, name: `hata_veren_lokasyonlar_${currentSessionName}.png` },
+            { ref: locationStatusRef, name: `lokasyon_durumu_${currentSessionName}.png` },
+        ];
+
+        for (const chart of charts) {
+            await new Promise(resolve => {
+                downloadChart(chart.ref, chart.name);
+                setTimeout(resolve, 500); // download prompt'ları arasında kısa bir bekleme
+            });
+        }
+    };
+
     const renderLegendWithCount = (value, entry) => {
         const { color } = entry;
         return <span style={{ color }}>{value} ({entry.payload.value})</span>;
@@ -642,7 +697,7 @@ const SummaryScreen = ({ currentSessionName, summaryData, preAnalysisReports, po
         const y = cy + radius * Math.sin(-midAngle * RADIAN);
         return (
             <text x={x} y={y} fill="white" textAnchor="middle" dominantBaseline="central" fontWeight="bold">
-                {value}
+                {value > 0 ? value : ''}
             </text>
         );
     };
@@ -651,9 +706,26 @@ const SummaryScreen = ({ currentSessionName, summaryData, preAnalysisReports, po
         return <div className="text-center p-10">Raporları görmek için lütfen sayıma başlayın.</div>;
     }
 
+    const ChartContainer = ({ chartRef, title, children, fileName }) => (
+        <div ref={chartRef} className="bg-white p-6 rounded-lg shadow-sm border h-96 flex flex-col">
+            <div className="flex justify-between items-center mb-2">
+                <h3 className="text-xl font-semibold text-center text-slate-700 flex-1">{title}</h3>
+                <button onClick={() => downloadChart(chartRef, fileName)} title="Grafiği İndir" className="p-1 text-slate-500 hover:bg-slate-200 rounded-full">
+                    {ICONS.download}
+                </button>
+            </div>
+            <ResponsiveContainer>{children}</ResponsiveContainer>
+        </div>
+    );
+
     return (
         <div className="w-full">
-            <div className="flex justify-between items-start mb-6"><h1 className="text-3xl font-bold text-slate-800">Sayım Özeti: {currentSessionName}</h1></div>
+            <div className="flex justify-between items-start mb-6">
+                <h1 className="text-3xl font-bold text-slate-800">Sayım Özeti: {currentSessionName}</h1>
+                <button onClick={downloadAllCharts} className="flex items-center gap-2 bg-green-600 text-white font-semibold px-4 py-2 rounded-md hover:bg-green-700 transition-colors">
+                    {ICONS.download} Tüm Grafikleri İndir
+                </button>
+            </div>
             <div className="bg-white p-6 rounded-lg shadow-sm border mb-8">
                 <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 text-center">
                     <div className="bg-blue-100 p-4 rounded-lg"><p className="text-2xl font-bold text-blue-800">{summaryData.totalScanned}</p><p>Toplam Okutulan</p></div>
@@ -665,17 +737,34 @@ const SummaryScreen = ({ currentSessionName, summaryData, preAnalysisReports, po
                  <p className="text-xs text-center mt-4 text-slate-500">Not: "Geçerli", "Hatalı/Uyarılı" ve "Eksik" sayıları, sadece materyal statüsü "Eser Koleksiyonda" olanlar üzerinden hesaplanmıştır.</p>
             </div>
             <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-4 gap-8 mb-8">
-                <div className="bg-white p-6 rounded-lg shadow-sm border h-96"><h3 className="text-xl font-semibold mb-2 text-center text-slate-700">Genel Durum (Aktif Koleksiyon)</h3><ResponsiveContainer><PieChart><Pie data={summaryData.pieData} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={100} labelLine={false} label={renderPieLabel}>{summaryData.pieData.map((entry, i) => <Cell key={`cell-${i}`} fill={PIE_CHART_COLORS[entry.name === 'Geçerli' ? 'valid' : entry.name === 'Uyarılı' ? 'invalid' : 'missing']} />)}</Pie><Tooltip content={<CustomTooltip />} /><Legend formatter={renderLegendWithCount} /></PieChart></ResponsiveContainer></div>
-                <div className="bg-white p-6 rounded-lg shadow-sm border h-96"><h3 className="text-xl font-semibold mb-2 text-center text-slate-700">Materyal Türü (Aktif Koleksiyon)</h3><ResponsiveContainer><PieChart><Pie data={summaryData.materialTypeData} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={100}>{summaryData.materialTypeData.map((e, i) => <Cell key={`cell-${i}`} fill={['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#AF19FF'][i % 5]} />)}</Pie><Tooltip content={<CustomTooltip />} /><Legend formatter={renderLegendWithCount} /></PieChart></ResponsiveContainer></div>
-                <div className="bg-white p-6 rounded-lg shadow-sm border h-96"><h3 className="text-xl font-semibold mb-2 text-center text-slate-700">Materyal Statüsü (Tüm Liste)</h3><ResponsiveContainer><PieChart><Pie data={summaryData.materialStatusPieData} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={100}>{summaryData.materialStatusPieData.map((e, i) => <Cell key={`cell-${i}`} fill={['#3498DB', '#E74C3C', '#9B59B6', '#F1C40F'][i % 4]} />)}</Pie><Tooltip content={<CustomTooltip />} /><Legend formatter={renderLegendWithCount} /></PieChart></ResponsiveContainer></div>
-                <div className="bg-white p-6 rounded-lg shadow-sm border h-96"><h3 className="text-xl font-semibold mb-2 text-center text-slate-700">Uyarı Türleri (Tüm Okutulanlar)</h3><ResponsiveContainer><BarChart data={summaryData.warningBarData} layout="vertical" margin={{left: 100}}><CartesianGrid strokeDasharray="3 3" stroke={'#ccc'} /><XAxis type="number" stroke={'#666'} /><YAxis type="category" dataKey="name" width={100} tick={{ fontSize: 10, fill: '#333' }} stroke={'#666'} /><Tooltip content={<CustomTooltip />} /><Bar dataKey="Sayı">{summaryData.warningBarData.map((e, i) => <Cell key={`cell-${i}`} fill={WARNING_DEFINITIONS[Object.keys(WARNING_DEFINITIONS).find(k => WARNING_DEFINITIONS[k].text === e.name)]?.color || '#8884d8'} />)}<LabelList dataKey="Sayı" position="right" style={{ fill: '#333' }} /></Bar></BarChart></ResponsiveContainer></div>
+                <ChartContainer chartRef={generalStatusRef} title="Genel Durum (Aktif Koleksiyon)" fileName={`genel_durum_${currentSessionName}.png`}>
+                    <PieChart><Pie data={summaryData.pieData} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={100} labelLine={false} label={renderPieLabel}>{summaryData.pieData.map((entry, i) => <Cell key={`cell-${i}`} fill={PIE_CHART_COLORS[entry.name === 'Geçerli' ? 'valid' : entry.name === 'Uyarılı' ? 'invalid' : 'missing']} />)}</Pie><Tooltip content={<CustomTooltip />} /><Legend formatter={renderLegendWithCount} /></PieChart>
+                </ChartContainer>
+                <ChartContainer chartRef={materialTypeRef} title="Materyal Türü (Aktif Koleksiyon)" fileName={`materyal_turu_${currentSessionName}.png`}>
+                     <PieChart><Pie data={summaryData.materialTypeData} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={100}>{summaryData.materialTypeData.map((e, i) => <Cell key={`cell-${i}`} fill={['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#AF19FF'][i % 5]} />)}</Pie><Tooltip content={<CustomTooltip />} /><Legend formatter={renderLegendWithCount} /></PieChart>
+                </ChartContainer>
+                <ChartContainer chartRef={materialStatusRef} title="Materyal Statüsü (Tüm Liste)" fileName={`materyal_statusu_${currentSessionName}.png`}>
+                    <PieChart><Pie data={summaryData.materialStatusPieData} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={100}>{summaryData.materialStatusPieData.map((e, i) => <Cell key={`cell-${i}`} fill={['#3498DB', '#E74C3C', '#9B59B6', '#F1C40F'][i % 4]} />)}</Pie><Tooltip content={<CustomTooltip />} /><Legend formatter={renderLegendWithCount} /></PieChart>
+                </ChartContainer>
+                <ChartContainer chartRef={warningBarRef} title="Uyarı Türleri (Tüm Okutulanlar)" fileName={`uyari_turleri_${currentSessionName}.png`}>
+                    <BarChart data={summaryData.warningBarData} layout="vertical" margin={{left: 100}}><CartesianGrid strokeDasharray="3 3" stroke={'#ccc'} /><XAxis type="number" stroke={'#666'} /><YAxis type="category" dataKey="name" width={100} tick={{ fontSize: 10, fill: '#333' }} stroke={'#666'} /><Tooltip content={<CustomTooltip />} /><Bar dataKey="Sayı">{summaryData.warningBarData.map((e, i) => <Cell key={`cell-${i}`} fill={WARNING_DEFINITIONS[Object.keys(WARNING_DEFINITIONS).find(k => WARNING_DEFINITIONS[k].text === e.name)]?.color || '#8884d8'} />)}<LabelList dataKey="Sayı" position="right" style={{ fill: '#333' }} /></Bar></BarChart>
+                </ChartContainer>
             </div>
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
-                 <div className="bg-white p-6 rounded-lg shadow-sm border h-96"><h3 className="text-xl font-semibold mb-2 text-center text-slate-700">Sayım İlerleme Grafiği</h3><ResponsiveContainer><LineChart data={summaryData.scanProgressData}><CartesianGrid strokeDasharray="3 3" /><XAxis dataKey="time" /><YAxis /><Tooltip /><Legend /><Line type="monotone" dataKey="Okutulan Sayısı" stroke="#8884d8" activeDot={{ r: 8 }} /></LineChart></ResponsiveContainer></div>
-                 <div className="bg-white p-6 rounded-lg shadow-sm border h-96"><h3 className="text-xl font-semibold mb-2 text-center text-slate-700">En Çok Hata Veren Raf/Lokasyon</h3><ResponsiveContainer><BarChart layout="vertical" data={summaryData.topErrorLocationsData} margin={{ top: 20, right: 30, left: 100, bottom: 5 }}><CartesianGrid strokeDasharray="3 3" /><XAxis type="number" /><YAxis type="category" dataKey="name" /><Tooltip /><Legend /><Bar dataKey="Hata Sayısı" fill="#E74C3C"><LabelList dataKey="Hata Sayısı" position="right" style={{ fill: '#333' }} /></Bar></BarChart></ResponsiveContainer></div>
+                 <ChartContainer chartRef={scanProgressRef} title="Sayım İlerleme Grafiği" fileName={`sayim_ilerlemesi_${currentSessionName}.png`}>
+                    <LineChart data={summaryData.scanProgressData}><CartesianGrid strokeDasharray="3 3" /><XAxis dataKey="time" /><YAxis /><Tooltip /><Legend /><Line type="monotone" dataKey="Okutulan Sayısı" stroke="#8884d8" activeDot={{ r: 8 }} /></LineChart>
+                 </ChartContainer>
+                 <ChartContainer chartRef={topErrorRef} title="En Çok Hata Veren Raf/Lokasyon" fileName={`hata_veren_lokasyonlar_${currentSessionName}.png`}>
+                    <BarChart layout="vertical" data={summaryData.topErrorLocationsData} margin={{ top: 20, right: 30, left: 100, bottom: 5 }}><CartesianGrid strokeDasharray="3 3" /><XAxis type="number" /><YAxis type="category" dataKey="name" /><Tooltip /><Legend /><Bar dataKey="Hata Sayısı" fill="#E74C3C"><LabelList dataKey="Hata Sayısı" position="right" style={{ fill: '#333' }} /></Bar></BarChart>
+                 </ChartContainer>
             </div>
-             <div className="bg-white p-6 rounded-lg shadow-sm border h-[500px] mb-8">
-                <h3 className="text-xl font-semibold mb-2 text-center text-slate-700">Lokasyon Bazında Sayım Durumu (Aktif Koleksiyon)</h3>
+             <div ref={locationStatusRef} className="bg-white p-6 rounded-lg shadow-sm border h-[500px] mb-8 flex flex-col">
+                 <div className="flex justify-between items-center mb-2">
+                    <h3 className="text-xl font-semibold text-center text-slate-700 flex-1">Lokasyon Bazında Sayım Durumu (Aktif Koleksiyon)</h3>
+                    <button onClick={() => downloadChart(locationStatusRef, `lokasyon_durumu_${currentSessionName}.png`)} title="Grafiği İndir" className="p-1 text-slate-500 hover:bg-slate-200 rounded-full">
+                        {ICONS.download}
+                    </button>
+                </div>
                 <ResponsiveContainer>
                     <BarChart data={summaryData.locationStatusData} margin={{ top: 20, right: 30, left: 20, bottom: 70 }}>
                         <CartesianGrid strokeDasharray="3 3" />
@@ -1301,7 +1390,17 @@ export default function App() {
         { id: 'locationMismatch', title: 'Yer Uyumsuzları (Okutulanlar)', format: '.xlsx', icon: ICONS.location, description: 'Sayım sırasında, başlangıçta seçilen lokasyon dışında bir yerde okutulan materyaller.', generator: () => { const data = scannedItems.filter(i => i.warnings.some(w => w.id === 'locationMismatch')).map(i => i.data); downloadXlsx(data, `sayim_sonucu_yer_uyumsuz_${currentSessionName}.xlsx`); } },
     ], [kohaData, scannedItems, currentSessionName, selectedLibrary, isXlsxReady, combinedLibraries]);
 
-    const summaryData = useMemo(() => { if (scannedItems.length === 0 && kohaData.length === 0) return null; const materialStatusCounts = kohaData.reduce((acc, item) => { const status = item['MATERYAL STATÜSÜ'] || 'Bilinmeyen'; acc[status] = (acc[status] || 0) + 1; return acc; }, {}); const materialStatusPieData = Object.entries(materialStatusCounts).map(([name, value]) => ({ name, value })); const warningCounts = scannedItems.flatMap(item => item.warnings).reduce((acc, warning) => { acc[warning.id] = (acc[warning.id] || 0) + 1; return acc; }, {}); const warningBarData = Object.entries(warningCounts).map(([id, count]) => ({ name: WARNING_DEFINITIONS[id]?.text || id, Sayı: count })); const scanProgress = scannedItems.reduce((acc, item) => { const hour = new Date(item.timestamp).getHours().toString().padStart(2, '0') + ':00'; acc[hour] = (acc[hour] || 0) + 1; return acc; }, {}); const scanProgressData = Object.entries(scanProgress).map(([time, count]) => ({ time, 'Okutulan Sayısı': count })).sort((a,b) => a.time.localeCompare(b.time)); const topErrorLocations = scannedItems.filter(i => i.warnings.length > 0).reduce((acc, item) => { const loc = item.data?.['MATERYALİN YERİ'] || 'Bilinmeyen'; acc[loc] = (acc[loc] || 0) + 1; return acc; }, {}); const topErrorLocationsData = Object.entries(topErrorLocations).map(([name, count]) => ({ name, 'Hata Sayısı': count })).sort((a, b) => b['Hata Sayısı'] - a['Hata Sayısı']).slice(0, 10); let scanSpeed = 0; if(scannedItems.length > 1){ const firstScanTime = new Date(scannedItems[scannedItems.length - 1].timestamp).getTime(); const lastScanTime = new Date(scannedItems[0].timestamp).getTime(); const durationMinutes = (lastScanTime - firstScanTime) / (1000 * 60); scanSpeed = durationMinutes > 0 ? Math.round(scannedItems.length / durationMinutes) : "∞"; } const activeKohaData = kohaData.filter(item => String(item['MATERYAL STATÜSÜ']) === '0'); const activeScannedItems = scannedItems.filter(item => item.data && String(item.data['MATERYAL STATÜSÜ']) === '0'); const uniqueActiveScannedItems = [...new Map(activeScannedItems.map(item => [item.barcode, item])).values()]; const valid = uniqueActiveScannedItems.filter(item => item.isValid).length; const invalid = uniqueActiveScannedItems.length - valid; const activeKohaBarcodes = new Set(activeKohaData.map(item => String(item.BARKOD))); const activeScannedBarcodes = new Set(uniqueActiveScannedItems.map(item => item.barcode)); const notScannedCount = [...activeKohaBarcodes].filter(b => !activeScannedBarcodes.has(b)).length; const pieData = [ { name: 'Geçerli', value: valid }, { name: 'Uyarılı', value: invalid }, { name: 'Eksik', value: notScannedCount } ]; const materialTypes = uniqueActiveScannedItems.reduce((acc, item) => { const type = item.data?.['MATERYAL TÜRÜ'] || 'Bilinmeyen'; acc[type] = (acc[type] || 0) + 1; return acc; }, {}); const materialTypeData = Object.entries(materialTypes).map(([name, value]) => ({name, value})); const locationStatus = {}; activeKohaData.forEach(item => { const loc = item['MATERYALİN YERİ'] || 'Bilinmeyen'; if(!locationStatus[loc]) locationStatus[loc] = { 'Geçerli': 0, 'Uyarılı': 0, 'Eksik': 0 }; }); uniqueActiveScannedItems.forEach(item => { const loc = item.data?.['MATERYALİN YERİ'] || 'Bilinmeyen'; if(!locationStatus[loc]) locationStatus[loc] = { 'Geçerli': 0, 'Uyarılı': 0, 'Eksik': 0 }; if(item.isValid) locationStatus[loc]['Geçerli']++; else locationStatus[loc]['Uyarılı']++; }); const scannedActiveKohaBarcodes = new Set(uniqueActiveScannedItems.map(i => i.barcode)); activeKohaData.forEach(item => { const loc = item['MATERYALİN YERİ'] || 'Bilinmeyen'; if(!scannedActiveKohaBarcodes.has(String(item.BARKOD))) { locationStatus[loc]['Eksik']++; } }); const locationStatusData = Object.entries(locationStatus).map(([name, data]) => ({ name, ...data })); return { totalScanned: scannedItems.length, valid, invalid, notScannedCount, scanSpeed, pieData, warningBarData, materialTypeData, scanProgressData, locationStatusData, topErrorLocationsData, materialStatusPieData }; }, [scannedItems, kohaData]);
+    const summaryData = useMemo(() => {
+        if (scannedItems.length === 0 && kohaData.length === 0) return null;
+        const STATUS_MAP = { '0': 'Eser Koleksiyonda', '1': 'Düşüm Yapıldı', '2': 'Devir Yapıldı' };
+        const materialStatusCounts = kohaData.reduce((acc, item) => {
+            const statusCode = String(item['MATERYAL STATÜSÜ']);
+            const statusName = STATUS_MAP[statusCode] || `Bilinmeyen Statü (${statusCode})`;
+            acc[statusName] = (acc[statusName] || 0) + 1;
+            return acc;
+        }, {});
+        const materialStatusPieData = Object.entries(materialStatusCounts).map(([name, value]) => ({ name, value }));
+        const warningCounts = scannedItems.flatMap(item => item.warnings).reduce((acc, warning) => { acc[warning.id] = (acc[warning.id] || 0) + 1; return acc; }, {}); const warningBarData = Object.entries(warningCounts).map(([id, count]) => ({ name: WARNING_DEFINITIONS[id]?.text || id, Sayı: count })); const scanProgress = scannedItems.reduce((acc, item) => { const hour = new Date(item.timestamp).getHours().toString().padStart(2, '0') + ':00'; acc[hour] = (acc[hour] || 0) + 1; return acc; }, {}); const scanProgressData = Object.entries(scanProgress).map(([time, count]) => ({ time, 'Okutulan Sayısı': count })).sort((a,b) => a.time.localeCompare(b.time)); const topErrorLocations = scannedItems.filter(i => i.warnings.length > 0).reduce((acc, item) => { const loc = item.data?.['MATERYALİN YERİ'] || 'Bilinmeyen'; acc[loc] = (acc[loc] || 0) + 1; return acc; }, {}); const topErrorLocationsData = Object.entries(topErrorLocations).map(([name, count]) => ({ name, 'Hata Sayısı': count })).sort((a, b) => b['Hata Sayısı'] - a['Hata Sayısı']).slice(0, 10); let scanSpeed = 0; if(scannedItems.length > 1){ const firstScanTime = new Date(scannedItems[scannedItems.length - 1].timestamp).getTime(); const lastScanTime = new Date(scannedItems[0].timestamp).getTime(); const durationMinutes = (lastScanTime - firstScanTime) / (1000 * 60); scanSpeed = durationMinutes > 0 ? Math.round(scannedItems.length / durationMinutes) : "∞"; } const activeKohaData = kohaData.filter(item => String(item['MATERYAL STATÜSÜ']) === '0'); const activeScannedItems = scannedItems.filter(item => item.data && String(item.data['MATERYAL STATÜSÜ']) === '0'); const uniqueActiveScannedItems = [...new Map(activeScannedItems.map(item => [item.barcode, item])).values()]; const valid = uniqueActiveScannedItems.filter(item => item.isValid).length; const invalid = uniqueActiveScannedItems.length - valid; const activeKohaBarcodes = new Set(activeKohaData.map(item => String(item.BARKOD))); const activeScannedBarcodes = new Set(uniqueActiveScannedItems.map(item => item.barcode)); const notScannedCount = [...activeKohaBarcodes].filter(b => !activeScannedBarcodes.has(b)).length; const pieData = [ { name: 'Geçerli', value: valid }, { name: 'Uyarılı', value: invalid }, { name: 'Eksik', value: notScannedCount } ]; const materialTypes = uniqueActiveScannedItems.reduce((acc, item) => { const type = item.data?.['MATERYAL TÜRÜ'] || 'Bilinmeyen'; acc[type] = (acc[type] || 0) + 1; return acc; }, {}); const materialTypeData = Object.entries(materialTypes).map(([name, value]) => ({name, value})); const locationStatus = {}; activeKohaData.forEach(item => { const loc = item['MATERYALİN YERİ'] || 'Bilinmeyen'; if(!locationStatus[loc]) locationStatus[loc] = { 'Geçerli': 0, 'Uyarılı': 0, 'Eksik': 0 }; }); uniqueActiveScannedItems.forEach(item => { const loc = item.data?.['MATERYALİN YERİ'] || 'Bilinmeyen'; if(!locationStatus[loc]) locationStatus[loc] = { 'Geçerli': 0, 'Uyarılı': 0, 'Eksik': 0 }; if(item.isValid) locationStatus[loc]['Geçerli']++; else locationStatus[loc]['Uyarılı']++; }); const scannedActiveKohaBarcodes = new Set(uniqueActiveScannedItems.map(i => i.barcode)); activeKohaData.forEach(item => { const loc = item['MATERYALİN YERİ'] || 'Bilinmeyen'; if(!scannedActiveKohaBarcodes.has(String(item.BARKOD))) { locationStatus[loc]['Eksik']++; } }); const locationStatusData = Object.entries(locationStatus).map(([name, data]) => ({ name, ...data })); return { totalScanned: scannedItems.length, valid, invalid, notScannedCount, scanSpeed, pieData, warningBarData, materialTypeData, scanProgressData, locationStatusData, topErrorLocationsData, materialStatusPieData }; }, [scannedItems, kohaData]);
     
     // --- Render Functions ---
     const pageTitles = {
