@@ -136,7 +136,7 @@ const RobustBarcodeScanner = ({ onScan, onClose, isPaused }) => {
 
 // --- Data Constants & Icons ---
 const INITIAL_LIBRARIES = [
-   ["12", "ADANA İL HALK KÜTÜPHANESİ"],
+ ["12", "ADANA İL HALK KÜTÜPHANESİ"],
 ["1530", "ADANA Adalet Halk Kütüphanesi"],
 ["1317", "ADANA Aladağ İlçe Halk Kütüphanesi"],
 ["113", "ADANA Ceyhan İlçe Halk Kütüphanesi"],
