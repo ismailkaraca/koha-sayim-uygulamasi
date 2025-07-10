@@ -136,7 +136,7 @@ const RobustBarcodeScanner = ({ onScan, onClose, isPaused }) => {
 
 // --- Data Constants & Icons ---
 const INITIAL_LIBRARIES = [
- ["12", "ADANA İL HALK KÜTÜPHANESİ"],
+   ["12", "ADANA İL HALK KÜTÜPHANESİ"],
 ["1530", "ADANA Adalet Halk Kütüphanesi"],
 ["1317", "ADANA Aladağ İlçe Halk Kütüphanesi"],
 ["113", "ADANA Ceyhan İlçe Halk Kütüphanesi"],
@@ -1597,14 +1597,24 @@ const WarningModal = ({ isOpen, onClose, title, warnings, barcode }) => { const 
 const ConfirmationModal = ({ isOpen, onClose, message, onConfirm }) => { if (!isOpen) return null; const handleConfirm = () => { onConfirm(); onClose(); }; return <Modal isOpen={isOpen} onClose={onClose}><div className="p-6 text-center"><h3 className="text-lg font-medium text-slate-800 mb-4">{message}</h3><div className="flex justify-center gap-4"><button onClick={onClose} className="px-6 py-2 rounded-md bg-slate-200 text-slate-800 hover:bg-slate-300 font-semibold">Hayır</button><button onClick={handleConfirm} className="px-6 py-2 rounded-md bg-red-600 text-white hover:bg-red-700 font-semibold">Evet, Sil</button></div></div></Modal>; };
 const AddDataModal = ({ isOpen, onClose, onAdd, type }) => { const [code, setCode] = useState(''); const [name, setName] = useState(''); const handleAdd = () => { if(code && name) { onAdd(type, code, name); onClose(); setCode(''); setName(''); } }; return <Modal isOpen={isOpen} onClose={onClose}><div className="p-5"><h3 className="text-lg font-bold mb-4">Yeni {type === 'library' ? 'Kütüphane' : 'Lokasyon'} Ekle</h3><div className="space-y-4"><input type="text" value={code} onChange={e => setCode(e.target.value)} placeholder="Kod" className="w-full p-2 border border-slate-300 rounded-md" /><input type="text" value={name} onChange={e => setName(e.target.value)} placeholder="İsim" className="w-full p-2 border border-slate-300 rounded-md" /></div><div className="flex justify-end gap-2 mt-4"><button onClick={onClose} className="px-4 py-2 rounded-md bg-slate-200">İptal</button><button onClick={handleAdd} className="px-4 py-2 rounded-md bg-blue-600 text-white">Ekle</button></div></div></Modal>; };
 
-const FullScreenLoader = ({ text }) => (
-    <div className="fixed inset-0 bg-black bg-opacity-60 z-50 flex flex-col justify-center items-center">
-        <div className="flex items-center justify-center space-x-3 p-6 bg-white rounded-lg shadow-xl">
-            <svg className="animate-spin h-8 w-8 text-slate-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-            </svg>
-            <span className="text-xl text-slate-700 font-semibold">{text}</span>
+const FullScreenLoader = ({ text, progress }) => (
+    <div className="fixed inset-0 bg-black bg-opacity-60 z-50 flex flex-col justify-center items-center p-4">
+        <div className="flex flex-col items-center justify-center p-6 bg-white rounded-lg shadow-xl w-full max-w-md">
+            <div className="flex items-center space-x-3">
+                <svg className="animate-spin h-8 w-8 text-slate-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                <span className="text-xl text-slate-700 font-semibold">{text}</span>
+            </div>
+            {progress && (
+                <div className="w-full mt-4">
+                    <div className="w-full bg-gray-200 rounded-full h-2.5">
+                        <div className="bg-blue-600 h-2.5 rounded-full" style={{ width: `${(progress.current / progress.total) * 100}%` }}></div>
+                    </div>
+                    <p className="text-center text-sm text-slate-600 mt-2">{`${progress.current} / ${progress.total}`}</p>
+                </div>
+            )}
         </div>
     </div>
 );
@@ -2259,6 +2269,7 @@ export default function App() {
     const [isMuted, setIsMuted] = useState(false);
     const [installPrompt, setInstallPrompt] = useState(null);
     const [isNavigatingToSummary, setIsNavigatingToSummary] = useState(false);
+    const [bulkProgress, setBulkProgress] = useState(null);
     
     const processedBarcodesRef = useRef(new Set());
     const manualInputDebounceRef = useRef(null);
@@ -2647,10 +2658,109 @@ export default function App() {
 
     const handleManualEntry = (e) => { e.preventDefault(); if (barcodeInput) { if (manualInputDebounceRef.current) clearTimeout(manualInputDebounceRef.current); processBarcode(barcodeInput); setBarcodeInput(''); } };
 
+    const processBarcodesInBatches = (barcodes, onLoan = false) => {
+        setIsBulkLoading(true);
+        setBulkProgress({ current: 0, total: barcodes.length });
+        
+        let currentIndex = 0;
+        const batchSize = 500;
+        let allNewScans = [];
+
+        const processNextBatch = () => {
+            const batch = barcodes.slice(currentIndex, currentIndex + batchSize);
+            if (batch.length === 0) {
+                setScannedItems(prev => [...allNewScans, ...prev]);
+                setIsBulkLoading(false);
+                setBulkProgress(null);
+                 if (onLoan) {
+                    setIsNavigatingToSummary(true);
+                    setTimeout(() => {
+                        setPage('summary');
+                        setIsNavigatingToSummary(false);
+                    }, 1500);
+                }
+                return;
+            }
+
+            const batchScans = [];
+            for (const barcode of batch) {
+                const rawBarcode = String(barcode).trim();
+                if (!rawBarcode || !selectedLibrary) continue;
+
+                let originalBarcode = rawBarcode.replace(/[^0-9]/g, '');
+                let normalizedBarcode = originalBarcode;
+                let wasAutoCompleted = false;
+                const expectedPrefix = String(parseInt(selectedLibrary, 10) + 1000);
+
+                if (normalizedBarcode.length >= 13) { normalizedBarcode = normalizedBarcode.slice(0, 12); }
+                if(normalizedBarcode.length < 12 && normalizedBarcode.length > 0) {
+                    wasAutoCompleted = true; 
+                    normalizedBarcode = expectedPrefix + originalBarcode.padStart(12 - expectedPrefix.length, '0');
+                }
+                
+                if (onLoan) {
+                     const itemData = kohaDataMap.get(normalizedBarcode);
+                     processedBarcodesRef.current.add(normalizedBarcode);
+                     batchScans.push({
+                        barcode: normalizedBarcode,
+                        isValid: false,
+                        warnings: [WARNING_DEFINITIONS.onLoan],
+                        data: itemData,
+                        timestamp: new Date().toISOString()
+                    });
+                    continue;
+                }
+
+                if (processedBarcodesRef.current.has(normalizedBarcode)) continue;
+                
+                processedBarcodesRef.current.add(normalizedBarcode);
+                
+                const itemData = kohaDataMap.get(normalizedBarcode);
+                const warnings = [];
+
+                if (itemData) {
+                    if (String(itemData['KÜTÜPHANE KODU'] || '') !== selectedLibrary) {
+                        const wrongLibCode = itemData['KÜTÜPHANE KODU'];
+                        const wrongLibName = combinedLibraries.get(wrongLibCode) || `Bilinmeyen Kod: ${wrongLibCode}`;
+                        warnings.push({ ...WARNING_DEFINITIONS.wrongLibrary, message: `Farklı Kütüphane (${wrongLibName})`, libraryName: wrongLibName });
+                    }
+                    if (selectedLocation && String(itemData['MATERYALİN YERİ KODU'] || '') !== selectedLocation) warnings.push(WARNING_DEFINITIONS.locationMismatch);
+                    const loanEligibilityCode = String(itemData['ÖDÜNÇ VERİLEBİLİRLİK KODU']);
+                    if (!['0', '2'].includes(loanEligibilityCode)) {
+                         const loanStatusText = itemData['ÖDÜNÇ VERİLEBİLİRLİK DURUMU'] || 'Bilinmiyor';
+                         warnings.push({ ...WARNING_DEFINITIONS.notLoanable, message: `Ödünç Verilemez (${loanStatusText})` });
+                    }
+                    if (String(itemData['MATERYAL STATÜSÜ']) !== '0') warnings.push(WARNING_DEFINITIONS.notInCollection);
+                    if (itemData['İADE EDİLMESİ GEREKEN TARİH']) warnings.push(WARNING_DEFINITIONS.onLoan);
+                } else {
+                     warnings.push(wasAutoCompleted ? WARNING_DEFINITIONS.autoCompletedNotFound : WARNING_DEFINITIONS.deleted);
+                }
+
+                const scanResult = { barcode: normalizedBarcode, isValid: warnings.length === 0, hasWarnings: warnings.length > 0, warnings, data: itemData, timestamp: new Date().toISOString() };
+                batchScans.push(scanResult);
+            }
+            
+            if (onLoan) {
+                const uploadedBarcodes = new Set(batch.map(b => String(b).trim().replace(/[^0-9]/g, '')).filter(Boolean));
+                setScannedItems(prevItems => {
+                    const otherItems = prevItems.filter(item => !uploadedBarcodes.has(item.barcode));
+                    return [...batchScans, ...otherItems];
+                });
+            } else {
+                 allNewScans.push(...batchScans);
+            }
+
+            currentIndex += batch.length;
+            setBulkProgress({ current: currentIndex, total: barcodes.length });
+            
+            setTimeout(processNextBatch, 20);
+        };
+
+        processNextBatch();
+    };
+
     const handleBulkUpload = (file) => {
         if (!file) return;
-        setIsBulkLoading(true);
-        setError('');
         const reader = new FileReader();
         const fileExtension = file.name.split('.').pop().toLowerCase();
 
@@ -2661,8 +2771,7 @@ export default function App() {
                     barcodes = e.target.result.split(/\r?\n/).filter(line => line.trim() !== '');
                 } else if (fileExtension === 'xlsx' || fileExtension === 'xls') {
                     if (!isXlsxReady) {
-                        setError("Excel kütüphanesi henüz hazır değil. Lütfen birkaç saniye sonra tekrar deneyin.");
-                        setIsBulkLoading(false);
+                        setError("Excel kütüphanesi henüz hazır değil.");
                         return;
                     }
                     const data = new Uint8Array(e.target.result);
@@ -2672,45 +2781,34 @@ export default function App() {
                     const json = window.XLSX.utils.sheet_to_json(worksheet, { header: 1 });
                     barcodes = json.map(row => row[0]).filter(barcode => barcode !== null && barcode !== undefined && String(barcode).trim() !== '');
                 }
-                barcodes.forEach(b => processBarcode(b, true)); // Pass true for isBulk
+                processBarcodesInBatches(barcodes, false);
             } catch (err) {
                 setError(`Toplu yükleme sırasında hata: ${err.message}`);
-            } finally {
                 setIsBulkLoading(false);
             }
         };
-
         reader.onerror = () => {
             setError("Dosya okuma başarısız oldu.");
             setIsBulkLoading(false);
         };
 
-        if (fileExtension === 'txt') {
-            reader.readAsText(file);
-        } else if (fileExtension === 'xlsx' || fileExtension === 'xls') {
-            reader.readAsArrayBuffer(file);
-        } else {
-            setError("Lütfen geçerli bir .txt veya .xlsx dosyası yükleyin.");
-            setIsBulkLoading(false);
-        }
+        if (fileExtension === 'txt') reader.readAsText(file);
+        else if (fileExtension === 'xlsx' || fileExtension === 'xls') reader.readAsArrayBuffer(file);
+        else setError("Lütfen geçerli bir .txt veya .xlsx dosyası yükleyin.");
     };
 
     const handleOnLoanUpload = (file) => {
         if (!file) return;
-        setIsBulkLoading(true);
-        setError('');
         const reader = new FileReader();
         const fileExtension = file.name.split('.').pop().toLowerCase();
-
         reader.onload = (e) => {
             try {
                 let barcodes = [];
                 if (fileExtension === 'txt') {
                     barcodes = e.target.result.split(/\r?\n/).filter(line => line.trim() !== '');
                 } else if (fileExtension === 'xlsx' || fileExtension === 'xls') {
-                    if (!isXlsxReady) {
-                        setError("Excel kütüphanesi henüz hazır değil. Lütfen birkaç saniye sonra tekrar deneyin.");
-                        setIsBulkLoading(false);
+                     if (!isXlsxReady) {
+                        setError("Excel kütüphanesi henüz hazır değil.");
                         return;
                     }
                     const data = new Uint8Array(e.target.result);
@@ -2720,53 +2818,20 @@ export default function App() {
                     const json = window.XLSX.utils.sheet_to_json(worksheet, { header: 1 });
                     barcodes = json.map(row => row[0]).filter(barcode => barcode !== null && barcode !== undefined && String(barcode).trim() !== '');
                 }
-                
-                const uploadedBarcodes = new Set(barcodes.map(b => String(b).trim().replace(/[^0-9]/g, '')).filter(Boolean));
-
-                const newScanResults = Array.from(uploadedBarcodes).map(barcode => {
-                    const itemData = kohaDataMap.get(barcode);
-                    processedBarcodesRef.current.add(barcode); // Ensure it's marked as processed
-                    return {
-                        barcode: barcode,
-                        isValid: false,
-                        warnings: [WARNING_DEFINITIONS.onLoan], // Always set the warning to "onLoan"
-                        data: itemData,
-                        timestamp: new Date().toISOString()
-                    };
-                });
-
-                setScannedItems(prevItems => {
-                    // Remove any previous scans of the same barcodes from the list
-                    const otherItems = prevItems.filter(item => !uploadedBarcodes.has(item.barcode));
-                    // Add the new 'onLoan' scans to the front of the list
-                    return [...newScanResults, ...otherItems];
-                });
-
-
+                processBarcodesInBatches(barcodes, true);
             } catch (err) {
-                setError(`Güncel ödünç listesi işlenirken hata: ${err.message}`);
-            } finally {
-                setIsBulkLoading(false);
-                setIsNavigatingToSummary(true);
-                setTimeout(() => {
-                    setPage('summary');
-                    setIsNavigatingToSummary(false);
-                }, 1500);
+                 setError(`Güncel ödünç listesi işlenirken hata: ${err.message}`);
+                 setIsBulkLoading(false);
             }
         };
-        reader.onerror = () => {
+         reader.onerror = () => {
             setError("Dosya okuma başarısız oldu.");
             setIsBulkLoading(false);
         };
 
-        if (fileExtension === 'txt') {
-            reader.readAsText(file);
-        } else if (fileExtension === 'xlsx' || fileExtension === 'xls') {
-            reader.readAsArrayBuffer(file);
-        } else {
-            setError("Lütfen geçerli bir .txt veya .xlsx dosyası yükleyin.");
-            setIsBulkLoading(false);
-        }
+        if (fileExtension === 'txt') reader.readAsText(file);
+        else if (fileExtension === 'xlsx' || fileExtension === 'xls') reader.readAsArrayBuffer(file);
+        else setError("Lütfen geçerli bir .txt veya .xlsx dosyası yükleyin.");
     };
 
 
@@ -2876,8 +2941,8 @@ export default function App() {
     
     return (
         <div className="font-sans">
+            {isBulkLoading && <FullScreenLoader text="Toplu Barkodlar İşleniyor..." progress={bulkProgress} />}
             {isNavigatingToSummary && <FullScreenLoader text="Özet & Raporlar Ekranına Geçiliyor..." />}
-            {isBulkLoading && <FullScreenLoader text="Toplu Barkodlar Yükleniyor... Lütfen Bekleyiniz" />}
             {isLoading && <FullScreenLoader text="Koha dosyası okunuyor, lütfen bekleyin..." />}
             <WarningModal isOpen={warningModal.isOpen} onClose={() => setWarningModal({ isOpen: false, title: '', warnings: [], barcode: null })} {...warningModal} />
             <ConfirmationModal isOpen={confirmationModal.isOpen} onClose={() => setConfirmationModal({ isOpen: false, message: '', onConfirm: () => {} })} {...confirmationModal} />
