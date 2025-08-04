@@ -1197,7 +1197,7 @@ export default function App() {
                  warnings.push(WARNING_DEFINITIONS.notLoanable);
             }
             if (String(itemData['MATERYAL STATÜSÜ KODU']) !== '0') warnings.push(WARNING_DEFINITIONS.notInCollection);
-            if (String(itemData['ÖDÜNÇTE Mİ']) === '1') warnings.push(WARNING_DEFINITIONS.onLoan);
+            if (String(itemData['odunc']) === '1') warnings.push(WARNING_DEFINITIONS.onLoan);
         } else {
              warnings.push(wasAutoCompleted ? WARNING_DEFINITIONS.autoCompletedNotFound : WARNING_DEFINITIONS.deleted);
         }
@@ -1426,7 +1426,7 @@ export default function App() {
             icon: ICONS.onLoan, 
             description: 'Koha verisine göre halihazırda bir okuyucunun üzerinde ödünçte görünen materyaller.', 
             generator: () => { 
-                const data = kohaData.filter(i => String(i['ÖDÜNÇTE Mİ']) === '1'); 
+                const data = kohaData.filter(i => String(i['odunc']) === '1'); 
                 downloadXlsx(data, `on_analiz_oduncteki_materyaller_${currentSessionName}.xlsx`); 
             } 
         },
