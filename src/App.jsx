@@ -185,7 +185,7 @@ const INITIAL_LOCATIONS = [
 const WARNING_DEFINITIONS = { 
     invalidStructure: { id: 'invalidStructure', text: 'Yapıya Uygun Olmayan', color: '#E74C3C', sound: 'A#3', message: 'Okutulan barkod gerekli yapıyla eşleşmiyor.' }, 
     locationMismatch: { id: 'locationMismatch', text: 'Konum Farklı', color: '#FAD7A0', sound: 'C4', message: 'Okutulan materyal seçilen lokasyonda bulunmuyor.' }, 
-    notLoanable: { id: 'notLoanable', text: 'Ödünç Verilemez', color: '#F08080', sound: 'E5', message: "Materyalin ödünç verilebilirlik durumu 'Ödünç Verilebilir' değil." }, 
+    notLoanable: { id: 'notLoanable', text: 'Ödünç Verilemez', color: '#F08080', sound: 'E5', message: "Materyalin ödünç verilebilirlik durumu uygun değil." }, 
     notInCollection: { id: 'notInCollection', text: 'Düşüm/Devir', color: '#A9C9F5', sound: 'G4', message: 'Materyal koleksiyonda değil (düşüm veya devir yapılmış).' }, 
     onLoan: { id: 'onLoan', text: 'Okuyucuda', color: '#F7B38D', sound: 'C4', message: 'Materyal şu anda ödünçte ve iade edilmesi gerekiyor.' }, 
     wrongLibrary: { id: 'wrongLibrary', text: 'Farklı Kütüphane', color: '#C7AED9', sound: 'C4', message: 'Materyal sizin kütüphanenize ait değil.' }, 
@@ -605,7 +605,7 @@ const ScanScreen = ({ isCameraOpen, isQrCodeReady, isCameraAllowed, setIsCameraO
                             <input id="barcode-input" type="tel" value={barcodeInput} onChange={handleBarcodeInput} placeholder="Barkodu okutun veya elle girin" className="w-full p-2 border border-slate-300 rounded-md" autoFocus />
                             <button type="submit" className="w-full bg-slate-600 text-white p-2 rounded-md hover:bg-slate-700">Ekle</button>
                         </form>
-                        {lastScanned && <div className={`p-3 rounded-md border-l-4 ${lastScanned.isValid ? 'bg-green-100 border-green-500' : 'bg-yellow-100 border-yellow-500'}`}><p className="font-mono text-slate-800">{lastScanned.barcode}</p><p className="text-sm text-slate-600">{lastScanned.data?.['ESER ADI'] || 'Eser bilgisi bulunamadı'}</p>{lastScanned.warnings.map(w => <p key={w.id} style={{color: w.color}} className="text-sm font-semibold">{w.message || w.text}</p>)}</div>}
+                        {lastScanned && <div className={`p-3 rounded-md border-l-4 ${lastScanned.isValid ? 'bg-green-100 border-green-500' : 'bg-yellow-100 border-yellow-500'}`}><p className="font-bold text-slate-800">{lastScanned.barcode}</p><p className="text-sm text-slate-600">{lastScanned.data?.['eser_adi'] || 'Eser bilgisi bulunamadı'}</p>{lastScanned.warnings.map(w => <p key={w.id} style={{color: w.color}} className="text-sm font-semibold">{w.message || w.text}</p>)}</div>}
                         <div className="mt-4">
                             <button onClick={() => setPage('update-on-loan')} disabled={scannedItems.length === 0 || isBulkLoading} className="w-full bg-green-600 text-white font-bold py-3 px-4 rounded-md hover:bg-green-700 disabled:bg-green-400 disabled:cursor-not-allowed">Sayımı Bitir</button>
                             <p className="text-xs text-slate-500 text-center mt-2">"Sayımı Bitir"e tıkladığınızda; özet grafikler ve raporlar görüntülenir. Daha sonra menüden "Sayım" ekranına tekrar dönüş yapabilirsiniz.</p>
@@ -633,15 +633,15 @@ const ScanScreen = ({ isCameraOpen, isQrCodeReady, isCameraAllowed, setIsCameraO
                         </select>
                     </div>
                     <div className="flex-grow overflow-y-auto space-y-2 pr-2">
-                        {filteredScannedItems.map((item) => (
-                            <div key={item.timestamp} className={`p-2 rounded-md border flex items-center justify-between gap-2 ${item.isValid ? 'bg-white' : 'bg-yellow-50'}`}>
+                        {filteredScannedItems.map((item, index) => (
+                            <div key={`${item.timestamp}-${index}`} className={`p-2 rounded-md border flex items-center justify-between gap-2 ${item.isValid ? 'bg-white' : 'bg-yellow-50'}`}>
                                 <div className="flex-grow">
                                     <p className="font-mono text-slate-800">{item.barcode}</p>
-                                    <p className="text-xs text-slate-600">{item.data?.['ESER ADI'] || 'Bilinmeyen Eser'}</p>
+                                    <p className="text-xs text-slate-600">{item.data?.['eser_adi'] || 'Bilinmeyen Eser'}</p>
                                 </div>
                                 <div className="flex items-center gap-2 flex-shrink-0">
                                     <div className="flex flex-wrap justify-end gap-1">
-                                        {item.warnings.map(w => <span key={w.id + item.timestamp} style={{backgroundColor: w.color, color: '#fff'}} className="px-2 py-1 text-xs font-semibold rounded-full">{w.message || w.text}</span>)}
+                                        {item.warnings.map(w => <span key={`${w.id}-${item.timestamp}-${index}`} style={{backgroundColor: w.color, color: '#fff'}} className="px-2 py-1 text-xs font-semibold rounded-full">{w.message || w.text}</span>)}
                                         {item.isValid && <span className="px-2 py-1 text-xs font-semibold text-green-800 bg-green-200 rounded-full">Temiz</span>}
                                     </div>
                                     <button onClick={() => handleDeleteItem(item.timestamp)} className="p-1 rounded-full text-slate-400 hover:bg-red-100 hover:text-red-600" title="Bu kaydı sil">
@@ -684,9 +684,8 @@ const UpdateOnLoanScreen = ({ handleOnLoanUpload, setPage, isXlsxReady, isLoadin
 );
 
 
-const SummaryScreen = ({ currentSessionName, summaryData, preAnalysisReports, postScanReports, isXlsxReady, isHtmlToImageReady, combinedLocations }) => {
+const SummaryScreen = ({ currentSessionName, summaryData, preAnalysisReports, postScanReports, isXlsxReady, isHtmlToImageReady }) => {
     const generalStatusRef = useRef(null);
-    const materialTypeRef = useRef(null);
     const materialStatusRef = useRef(null);
     const warningBarRef = useRef(null);
     const scanProgressRef = useRef(null);
@@ -714,7 +713,6 @@ const SummaryScreen = ({ currentSessionName, summaryData, preAnalysisReports, po
     const downloadAllCharts = async () => {
         const charts = [
             { ref: generalStatusRef, name: `genel_durum_${currentSessionName}.png` },
-            { ref: materialTypeRef, name: `materyal_turu_${currentSessionName}.png` },
             { ref: materialStatusRef, name: `materyal_statusu_${currentSessionName}.png` },
             { ref: warningBarRef, name: `uyari_turleri_${currentSessionName}.png` },
             { ref: scanProgressRef, name: `sayim_ilerlemesi_${currentSessionName}.png` },
@@ -723,10 +721,12 @@ const SummaryScreen = ({ currentSessionName, summaryData, preAnalysisReports, po
         ];
 
         for (const chart of charts) {
-            await new Promise(resolve => {
-                downloadChart(chart.ref, chart.name);
-                setTimeout(resolve, 500); // download prompt'ları arasında kısa bir bekleme
-            });
+            if (chart.ref.current) { // Sadece mevcut olan grafikleri indir
+                await new Promise(resolve => {
+                    downloadChart(chart.ref, chart.name);
+                    setTimeout(resolve, 500); // download prompt'ları arasında kısa bir bekleme
+                });
+            }
         }
     };
 
@@ -779,14 +779,11 @@ const SummaryScreen = ({ currentSessionName, summaryData, preAnalysisReports, po
                     <div className="bg-slate-200 p-4 rounded-lg"><p className="text-2xl font-bold text-slate-800">{summaryData.notScannedCount}</p><p>Eksik</p></div>
                     <div className="bg-indigo-100 p-4 rounded-lg"><p className="text-2xl font-bold text-indigo-800">{summaryData.scanSpeed}</p><p>Materyal / dk</p></div>
                 </div>
-                 <p className="text-xs text-center mt-4 text-slate-500">Not: "Geçerli", "Hatalı/Uyarılı" ve "Eksik" sayıları, sadece materyal statüsü "Eser Koleksiyonda" olanlar üzerinden hesaplanmıştır.</p>
+                 <p className="text-xs text-center mt-4 text-slate-500">Not: "Geçerli", "Hatalı/Uyarılı" ve "Eksik" sayıları, sadece materyal statüsü "0" (Eser Koleksiyonda) olanlar üzerinden hesaplanmıştır.</p>
             </div>
-            <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-4 gap-8 mb-8">
+            <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-8 mb-8">
                 <ChartContainer chartRef={generalStatusRef} title="Genel Durum (Aktif Koleksiyon)" fileName={`genel_durum_${currentSessionName}.png`}>
                     <PieChart><Pie data={summaryData.pieData} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={100} labelLine={false} label={renderPieLabel}>{summaryData.pieData.map((entry, i) => <Cell key={`cell-${i}`} fill={PIE_CHART_COLORS[entry.name === 'Geçerli' ? 'valid' : entry.name === 'Uyarılı' ? 'invalid' : 'missing']} />)}</Pie><Tooltip content={<CustomTooltip />} /><Legend formatter={renderLegendWithCount} /></PieChart>
-                </ChartContainer>
-                <ChartContainer chartRef={materialTypeRef} title="Materyal Türü (Aktif Koleksiyon)" fileName={`materyal_turu_${currentSessionName}.png`}>
-                     <PieChart><Pie data={summaryData.materialTypeData} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={100}>{summaryData.materialTypeData.map((e, i) => <Cell key={`cell-${i}`} fill={['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#AF19FF'][i % 5]} />)}</Pie><Tooltip content={<CustomTooltip />} /><Legend formatter={renderLegendWithCount} /></PieChart>
                 </ChartContainer>
                 <ChartContainer chartRef={materialStatusRef} title="Materyal Statüsü (Tüm Liste)" fileName={`materyal_statusu_${currentSessionName}.png`}>
                     <PieChart><Pie data={summaryData.materialStatusPieData} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={100}>{summaryData.materialStatusPieData.map((e, i) => <Cell key={`cell-${i}`} fill={['#3498DB', '#E74C3C', '#9B59B6', '#F1C40F'][i % 4]} />)}</Pie><Tooltip content={<CustomTooltip />} /><Legend formatter={renderLegendWithCount} /></PieChart>
@@ -799,13 +796,13 @@ const SummaryScreen = ({ currentSessionName, summaryData, preAnalysisReports, po
                  <ChartContainer chartRef={scanProgressRef} title="Sayım İlerleme Grafiği" fileName={`sayim_ilerlemesi_${currentSessionName}.png`}>
                     <LineChart data={summaryData.scanProgressData}><CartesianGrid strokeDasharray="3 3" /><XAxis dataKey="time" /><YAxis /><Tooltip /><Legend /><Line type="monotone" dataKey="Okutulan Sayısı" stroke="#8884d8" activeDot={{ r: 8 }} /></LineChart>
                  </ChartContainer>
-                 <ChartContainer chartRef={topErrorRef} title="En Çok Hata Veren Raf/Lokasyon Kodu" fileName={`hata_veren_lokasyonlar_${currentSessionName}.png`}>
+                 <ChartContainer chartRef={topErrorRef} title="En Çok Hata Veren Raf/Lokasyon" fileName={`hata_veren_lokasyonlar_${currentSessionName}.png`}>
                     <BarChart layout="vertical" data={summaryData.topErrorLocationsData} margin={{ top: 20, right: 30, left: 100, bottom: 5 }}><CartesianGrid strokeDasharray="3 3" /><XAxis type="number" /><YAxis type="category" dataKey="name" /><Tooltip /><Legend /><Bar dataKey="Hata Sayısı" fill="#E74C3C"><LabelList dataKey="Hata Sayısı" position="right" style={{ fill: '#333' }} /></Bar></BarChart>
                  </ChartContainer>
             </div>
              <div ref={locationStatusRef} className="bg-white p-6 rounded-lg shadow-sm border h-[500px] mb-8 flex flex-col">
                  <div className="flex justify-between items-center mb-2">
-                    <h3 className="text-xl font-semibold text-center text-slate-700 flex-1">Lokasyon Kodu Bazında Sayım Durumu (Aktif Koleksiyon)</h3>
+                    <h3 className="text-xl font-semibold text-center text-slate-700 flex-1">Lokasyon Bazında Sayım Durumu (Aktif Koleksiyon)</h3>
                     <button onClick={() => downloadChart(locationStatusRef, `lokasyon_durumu_${currentSessionName}.png`)} disabled={!isHtmlToImageReady} title="Grafiği İndir" className="p-1 text-slate-500 hover:bg-slate-200 rounded-full disabled:opacity-50">
                         {ICONS.download}
                     </button>
@@ -1036,7 +1033,7 @@ export default function App() {
                  try {
                     const parsedData = JSON.parse(session.kohaData);
                     setKohaData(parsedData);
-                    setKohaDataMap(new Map(parsedData.map(item => [String(item.BARKOD), item])));
+                    setKohaDataMap(new Map(parsedData.map(item => [String(item.barkod), item])));
                     setPage('pre-reports');
                 } catch (e) {
                     setError("Kayıtlı oturum verisi bozuk. Lütfen Excel dosyasını tekrar yükleyin.");
@@ -1096,30 +1093,10 @@ export default function App() {
                 const sheetName = workbook.SheetNames[0];
                 const worksheet = workbook.Sheets[sheetName];
                 const json = window.XLSX.utils.sheet_to_json(worksheet);
-
-                const processedJson = json.map(item => {
-                    const barcode = String(item.BARKOD || '');
-                    let libraryCode = null;
-                    if (barcode.length >= 4) {
-                        const prefix = parseInt(barcode.substring(0, 4), 10);
-                        if (!isNaN(prefix)) {
-                            libraryCode = String(prefix - 1000);
-                        }
-                    }
-                    return { ...item, 'KÜTÜPHANE KODU': libraryCode };
-                });
-
-                if (processedJson.length === 0 || !processedJson[0].hasOwnProperty('BARKOD') || !processedJson[0].hasOwnProperty('MATERYAL STATÜSÜ KODU')) {
-                    throw new Error("Yüklenen dosyada 'BARKOD' veya 'MATERYAL STATÜSÜ KODU' sütunları bulunamadı.");
-                }
-
-                setKohaData(processedJson);
-                setKohaDataMap(new Map(processedJson.map(item => [String(item.BARKOD), item])));
-            } catch (err) { 
-                setError(`Dosya okunurken bir hata oluştu: ${err.message}`); 
-            } finally { 
-                setIsLoading(false); 
-            }
+                if (json.length === 0 || !json[0].hasOwnProperty('barkod')) throw new Error("Yüklenen dosyada 'barkod' sütunu bulunamadı.");
+                setKohaData(json);
+                setKohaDataMap(new Map(json.map(item => [String(item.barkod), item])));
+            } catch (err) { setError(`Dosya okunurken bir hata oluştu: ${err.message}`); } finally { setIsLoading(false); }
         };
         reader.onerror = () => { setIsLoading(false); setError("Dosya okuma başarısız oldu."); }
         reader.readAsArrayBuffer(file);
@@ -1186,18 +1163,14 @@ export default function App() {
         const itemData = kohaDataMap.get(normalizedBarcode);
         const warnings = [];
         if (itemData) {
-            if (String(itemData['KÜTÜPHANE KODU'] || '') !== selectedLibrary) {
-                const wrongLibCode = itemData['KÜTÜPHANE KODU'];
-                const wrongLibName = combinedLibraries.get(wrongLibCode) || `Bilinmeyen Kod: ${wrongLibCode}`;
-                warnings.push({ ...WARNING_DEFINITIONS.wrongLibrary, message: `Farklı Kütüphane (${wrongLibName})`, libraryName: wrongLibName });
-            }
-            if (selectedLocation && String(itemData['MATERYALİN YERİ KODU'] || '') !== selectedLocation) warnings.push(WARNING_DEFINITIONS.locationMismatch);
-            const loanEligibilityCode = String(itemData['ÖDÜNÇ VERİLEBİLİRLİK KODU']);
+            // Kütüphane kodu kontrolü barkod ön ekinden yapıldığı için kaldırıldı.
+            if (selectedLocation && String(itemData['materyalin_yeri_kodu'] || '') !== selectedLocation) warnings.push(WARNING_DEFINITIONS.locationMismatch);
+            const loanEligibilityCode = String(itemData['odunc_verilebilirlik_kodu']);
             if (!['0', '2'].includes(loanEligibilityCode)) {
-                 warnings.push(WARNING_DEFINITIONS.notLoanable);
+                 warnings.push({ ...WARNING_DEFINITIONS.notLoanable, message: `Ödünç Verilemez` });
             }
-            if (String(itemData['MATERYAL STATÜSÜ KODU']) !== '0') warnings.push(WARNING_DEFINITIONS.notInCollection);
-            if (String(itemData['odunc']) === '1') warnings.push(WARNING_DEFINITIONS.onLoan);
+            if (String(itemData['materyal_statusu_kodu']) !== '0') warnings.push(WARNING_DEFINITIONS.notInCollection);
+            if (String(itemData['odunc_durumu']) === '1') warnings.push(WARNING_DEFINITIONS.onLoan);
         } else {
              warnings.push(wasAutoCompleted ? WARNING_DEFINITIONS.autoCompletedNotFound : WARNING_DEFINITIONS.deleted);
         }
@@ -1412,7 +1385,7 @@ export default function App() {
     };
 
 
-    const filteredScannedItems = useMemo(() => scannedItems.filter(item => (searchTerm ? (item.barcode.includes(searchTerm) || String(item.data?.['ESER ADI'] || '').toLowerCase().includes(searchTerm.toLowerCase())) : true) && (warningFilter === 'all' ? true : item.warnings.some(w => w.id === warningFilter))), [scannedItems, searchTerm, warningFilter]);
+    const filteredScannedItems = useMemo(() => scannedItems.filter(item => (searchTerm ? (item.barcode.includes(searchTerm) || String(item.data?.['eser_adi'] || '').toLowerCase().includes(searchTerm.toLowerCase())) : true) && (warningFilter === 'all' ? true : item.warnings.some(w => w.id === warningFilter))), [scannedItems, searchTerm, warningFilter]);
 
     // --- Report Generation ---
     const downloadTxt = (data, filename) => { const blob = new Blob([data], { type: 'text/plain;charset=utf-8' }); const url = URL.createObjectURL(blob); const link = document.createElement('a'); link.href = url; link.download = filename; document.body.appendChild(link); link.click(); document.body.removeChild(link); URL.revokeObjectURL(url); };
@@ -1426,7 +1399,7 @@ export default function App() {
             icon: ICONS.onLoan, 
             description: 'Koha verisine göre halihazırda bir okuyucunun üzerinde ödünçte görünen materyaller.', 
             generator: () => { 
-                const data = kohaData.filter(i => String(i['odunc']) === '1'); 
+                const data = kohaData.filter(i => String(i['odunc_durumu']) === '1'); 
                 downloadXlsx(data, `on_analiz_oduncteki_materyaller_${currentSessionName}.xlsx`); 
             } 
         },
@@ -1437,7 +1410,7 @@ export default function App() {
             icon: ICONS.status, 
             description: 'Koha verisine göre materyal statüsü "düşüm" veya "devir" gibi koleksiyon dışı bir durumu gösteren tüm materyaller.', 
             generator: () => { 
-                const data = kohaData.filter(i => String(i['MATERYAL STATÜSÜ KODU']) !== '0'); 
+                const data = kohaData.filter(i => String(i['materyal_statusu_kodu']) !== '0'); 
                 downloadXlsx(data, `on_analiz_dusum_devir_statulu_${currentSessionName}.xlsx`); 
             } 
         },
@@ -1448,7 +1421,7 @@ export default function App() {
             icon: ICONS.notLoanable, 
             description: 'Koha verisine göre Ödünç Verilebilirlik Durumu "Ödünç Verilebilir" Olmayan Tüm Materyaller.', 
             generator: () => { 
-                const data = kohaData.filter(i => !['0', '2'].includes(String(i['ÖDÜNÇ VERİLEBİLİRLİK KODU']))); 
+                const data = kohaData.filter(i => String(i['odunc_verilebilirlik_kodu']) !== '0'); 
                 downloadXlsx(data, `on_analiz_odunc_verilemeyenler_${currentSessionName}.xlsx`); 
             } 
         },
@@ -1456,12 +1429,12 @@ export default function App() {
 
 
     const POST_SCAN_REPORTS_CONFIG = useMemo(() => [
-        { id: 'writeOff', title: 'Düşüm İşlemi İçin Barkodlar (Eksikler)', format: '.txt', icon: ICONS.writeOff, description: "Bu dosya, Koha Materyal Düzeltme/Düşüm Modülü'ne yüklenerek materyallerin topluca düşümünü sağlar.", links: [{ text: 'Koha Düşüm Modülü', url: 'https://personel.ekutuphane.gov.tr/cgi-bin/koha/tools/batchMod.pl' }], notes: ['Sadece Müdür/Yönetici yetkisine sahip personel erişebilir.', 'Yetkisi olmayanlar koha@ktb.gov.tr adresinden talep edebilir.'], generator: () => { const scannedBarcodes = new Set(scannedItems.filter(i => !i.warnings.some(w => w.id === 'duplicate')).map(i => i.barcode)); const missingBarcodes = kohaData.filter(i => String(i['KÜTÜPHANE KODU']) === selectedLibrary && !scannedBarcodes.has(String(i.BARKOD))).map(i => String(i.BARKOD).slice(0, 12)); downloadTxt(missingBarcodes.join('\n'), `sayim_sonucu_dusum_icin_eksik_barkodlar_${currentSessionName}.txt`); } },
-        { id: 'missing', title: 'Eksik Materyaller', format: '.xlsx', icon: ICONS.missing, description: 'Sayım sırasında hiç okutulmamış olan, kütüphane koleksiyonuna ait materyallerin listesi.', generator: () => { const scannedBarcodes = new Set(scannedItems.filter(i => !i.warnings.some(w => w.id === 'duplicate')).map(i => i.barcode)); const missingItems = kohaData.filter(i => String(i['KÜTÜPHANE KODU']) === selectedLibrary && !scannedBarcodes.has(String(i.BARKOD))); downloadXlsx(missingItems, `sayim_sonucu_eksik_materyaller_${currentSessionName}.xlsx`); } },
-        { id: 'duplicateScans', title: 'Tekrar Okutulan Barkodlar', format: '.xlsx', icon: ICONS.all, description: 'Sayım sırasında birden fazla kez okutulan tüm barkodların listesi. Bu rapor, hem koleksiyon listesinde olan hem de olmayan tekrar okutulmuş barkodları içerir.', generator: () => { const barcodeCounts = scannedItems.reduce((acc, item) => { acc[item.barcode] = (acc[item.barcode] || 0) + 1; return acc; }, {}); const duplicates = Object.entries(barcodeCounts).filter(([, count]) => count > 1).map(([barcode, count]) => { const firstInstance = scannedItems.find(item => item.barcode === barcode); const itemData = firstInstance?.data; const wrongLibWarning = firstInstance.warnings.find(w => w.id === 'wrongLibrary'); return { 'Barkod': barcode, 'Tekrar Sayısı': count, 'Eser Adı': itemData?.['ESER ADI'] || 'Bilinmiyor', 'Farklı Kütüphane Adı': wrongLibWarning?.libraryName || '' }; }); downloadXlsx(duplicates, `sayim_sonucu_tekrar_okutulanlar_${currentSessionName}.xlsx`); } },
+        { id: 'writeOff', title: 'Düşüm İşlemi İçin Barkodlar (Eksikler)', format: '.txt', icon: ICONS.writeOff, description: "Bu dosya, Koha Materyal Düzeltme/Düşüm Modülü'ne yüklenerek materyallerin topluca düşümünü sağlar.", links: [{ text: 'Koha Düşüm Modülü', url: 'https://personel.ekutuphane.gov.tr/cgi-bin/koha/tools/batchMod.pl' }], notes: ['Sadece Müdür/Yönetici yetkisine sahip personel erişebilir.', 'Yetkisi olmayanlar koha@ktb.gov.tr adresinden talep edebilir.'], generator: () => { const scannedBarcodes = new Set(scannedItems.filter(i => !i.warnings.some(w => w.id === 'duplicate')).map(i => i.barcode)); const missingBarcodes = kohaData.filter(i => !scannedBarcodes.has(String(i.barkod))).map(i => String(i.barkod).slice(0, 12)); downloadTxt(missingBarcodes.join('\n'), `sayim_sonucu_dusum_icin_eksik_barkodlar_${currentSessionName}.txt`); } },
+        { id: 'missing', title: 'Eksik Materyaller', format: '.xlsx', icon: ICONS.missing, description: 'Sayım sırasında hiç okutulmamış olan, kütüphane koleksiyonuna ait materyallerin listesi.', generator: () => { const scannedBarcodes = new Set(scannedItems.filter(i => !i.warnings.some(w => w.id === 'duplicate')).map(i => i.barcode)); const missingItems = kohaData.filter(i => !scannedBarcodes.has(String(i.barkod))); downloadXlsx(missingItems, `sayim_sonucu_eksik_materyaller_${currentSessionName}.xlsx`); } },
+        { id: 'duplicateScans', title: 'Tekrar Okutulan Barkodlar', format: '.xlsx', icon: ICONS.all, description: 'Sayım sırasında birden fazla kez okutulan tüm barkodların listesi. Bu rapor, hem koleksiyon listesinde olan hem de olmayan tekrar okutulmuş barkodları içerir.', generator: () => { const barcodeCounts = scannedItems.reduce((acc, item) => { acc[item.barcode] = (acc[item.barcode] || 0) + 1; return acc; }, {}); const duplicates = Object.entries(barcodeCounts).filter(([, count]) => count > 1).map(([barcode, count]) => { const firstInstance = scannedItems.find(item => item.barcode === barcode); const itemData = firstInstance?.data; const wrongLibWarning = firstInstance.warnings.find(w => w.id === 'wrongLibrary'); return { 'Barkod': barcode, 'Tekrar Sayısı': count, 'Eser Adı': itemData?.['eser_adi'] || 'Bilinmiyor', 'Farklı Kütüphane Adı': wrongLibWarning?.libraryName || '' }; }); downloadXlsx(duplicates, `sayim_sonucu_tekrar_okutulanlar_${currentSessionName}.xlsx`); } },
         { id: 'invalidStructure', title: '❗ Yapıya Uygun Olmayan Barkodlar (Okutulanlar)', format: '.xlsx', icon: ICONS.status, description: 'Sayım sırasında okutulan ve barkod yapısı bilinen hiçbir kütüphane koduna uymayan barkodlar.', generator: () => { const data = scannedItems.filter(i => i.warnings.some(w => w.id === 'invalidStructure')).map(i => ({ Hatalı_Barkod: i.barcode })); downloadXlsx(data, `sayim_sonucu_yapiya_uygun_olmayanlar_${currentSessionName}.xlsx`); } },
         { id: 'deletedScanned', title: '❗ Listede Olmayan ve Sayımı Yapılan Barkodlar', format: '.xlsx', icon: ICONS.status, description: 'Sayım sırasında okutulan ancak Koha\'dan indirilen listede bulunamayan barkodlar (muhtemelen sistemden silinmiş veya hatalı girilmiş).', generator: () => { const data = scannedItems.filter(i => i.warnings.some(w => w.id === 'deleted' || w.id === 'autoCompletedNotFound')).map(i => ({ Barkod: i.barcode, 'Not': 'Okutuldu, listede bulunamadı' })); downloadXlsx(data, `sayim_sonucu_listede_olmayan_okutulanlar_${currentSessionName}.xlsx`); } },
-        { id: 'allResults', title: 'Tüm Sayım Sonuçları (Uyarılar Dahil)', format: '.xlsx', icon: ICONS.all, description: 'Sayım boyunca okutulan tüm materyallerin, aldıkları uyarılarla birlikte tam listesi.', generator: () => { const data = scannedItems.map(i => { const wrongLibWarning = i.warnings.find(w => w.id === 'wrongLibrary'); return { Barkod: i.barcode, 'Eser Adı': i.data?.['ESER ADI'] || '', Uyarılar: i.warnings.map(w => w.message || w.text).join(', ') || 'Temiz', 'Farklı Kütüphane Adı': wrongLibWarning?.libraryName || '', ...i.data }; }); downloadXlsx(data, `sayim_sonucu_tum_sonuclar_${currentSessionName}.xlsx`); } },
+        { id: 'allResults', title: 'Tüm Sayım Sonuçları (Uyarılar Dahil)', format: '.xlsx', icon: ICONS.all, description: 'Sayım boyunca okutulan tüm materyallerin, aldıkları uyarılarla birlikte tam listesi.', generator: () => { const data = scannedItems.map(i => { const wrongLibWarning = i.warnings.find(w => w.id === 'wrongLibrary'); return { Barkod: i.barcode, 'Eser Adı': i.data?.['eser_adi'] || '', Uyarılar: i.warnings.map(w => w.message || w.text).join(', ') || 'Temiz', 'Farklı Kütüphane Adı': wrongLibWarning?.libraryName || '', ...i.data }; }); downloadXlsx(data, `sayim_sonucu_tum_sonuclar_${currentSessionName}.xlsx`); } },
         { id: 'cleanList', title: 'Temiz Liste (Uyarısız Okutulanlar)', format: '.xlsx', icon: ICONS.clean, description: 'Sayım sırasında okutulan ve hiçbir uyarı almayan, durumu ve konumu doğru olan materyallerin listesi.', generator: () => { const data = scannedItems.filter(i => i.isValid).map(i => i.data); downloadXlsx(data, `sayim_sonucu_temiz_liste_${currentSessionName}.xlsx`); } },
         { id: 'wrongLibrary', title: 'Kütüphanenize Ait Olmayan ve Okutulan Barkodlar', format: '.xlsx', icon: ICONS.wrongLib, description: 'Sayım sırasında okutulan ancak sayım yapılan kütüphaneye ait olmayan (farklı şube koduna sahip) materyaller.', generator: () => { const data = scannedItems.filter(i => i.warnings.some(w => w.id === 'wrongLibrary')).map(i => { const wrongLibWarning = i.warnings.find(w => w.id === 'wrongLibrary'); return { 'Barkod': i.barcode, 'Ait Olduğu Kütüphane': wrongLibWarning?.libraryName || 'Bilinmiyor' }; }); downloadXlsx(data, `sayim_sonucu_kutuphane_disi_${currentSessionName}.xlsx`); } },
         { id: 'locationMismatch', title: 'Yer Uyumsuzları (Okutulanlar)', format: '.xlsx', icon: ICONS.location, description: 'Sayım sırasında, başlangıçta seçilen lokasyon dışında bir yerde okutulan materyaller.', generator: () => { const data = scannedItems.filter(i => i.warnings.some(w => w.id === 'locationMismatch')).map(i => i.data); downloadXlsx(data, `sayim_sonucu_yer_uyumsuz_${currentSessionName}.xlsx`); } },
@@ -1471,13 +1444,13 @@ export default function App() {
         if (scannedItems.length === 0 && kohaData.length === 0) return null;
         const STATUS_MAP = { '0': 'Eser Koleksiyonda', '1': 'Düşüm Yapıldı', '2': 'Devir Yapıldı' };
         const materialStatusCounts = kohaData.reduce((acc, item) => {
-            const statusCode = String(item['MATERYAL STATÜSÜ KODU']);
+            const statusCode = String(item['materyal_statusu_kodu']);
             const statusName = STATUS_MAP[statusCode] || `Bilinmeyen Statü (${statusCode})`;
             acc[statusName] = (acc[statusName] || 0) + 1;
             return acc;
         }, {});
         const materialStatusPieData = Object.entries(materialStatusCounts).map(([name, value]) => ({ name, value }));
-        const warningCounts = scannedItems.flatMap(item => item.warnings).reduce((acc, warning) => { acc[warning.id] = (acc[warning.id] || 0) + 1; return acc; }, {}); const warningBarData = Object.entries(warningCounts).map(([id, count]) => ({ name: WARNING_DEFINITIONS[id]?.text || id, Sayı: count })); const scanProgress = scannedItems.reduce((acc, item) => { const hour = new Date(item.timestamp).getHours().toString().padStart(2, '0') + ':00'; acc[hour] = (acc[hour] || 0) + 1; return acc; }, {}); const scanProgressData = Object.entries(scanProgress).map(([time, count]) => ({ time, 'Okutulan Sayısı': count })).sort((a,b) => a.time.localeCompare(b.time)); const topErrorLocations = scannedItems.filter(i => i.warnings.length > 0).reduce((acc, item) => { const locCode = item.data?.['MATERYALİN YERİ KODU'] || 'Bilinmeyen'; const locName = combinedLocations.get(locCode) || locCode; acc[locName] = (acc[locName] || 0) + 1; return acc; }, {}); const topErrorLocationsData = Object.entries(topErrorLocations).map(([name, count]) => ({ name, 'Hata Sayısı': count })).sort((a, b) => b['Hata Sayısı'] - a['Hata Sayısı']).slice(0, 10); let scanSpeed = 0; if(scannedItems.length > 1){ const firstScanTime = new Date(scannedItems[scannedItems.length - 1].timestamp).getTime(); const lastScanTime = new Date(scannedItems[0].timestamp).getTime(); const durationMinutes = (lastScanTime - firstScanTime) / (1000 * 60); scanSpeed = durationMinutes > 0 ? Math.round(scannedItems.length / durationMinutes) : "∞"; } const activeKohaData = kohaData.filter(item => String(item['MATERYAL STATÜSÜ KODU']) === '0'); const activeScannedItems = scannedItems.filter(item => item.data && String(item.data['MATERYAL STATÜSÜ KODU']) === '0'); const uniqueActiveScannedItems = [...new Map(activeScannedItems.map(item => [item.barcode, item])).values()]; const valid = uniqueActiveScannedItems.filter(item => item.isValid).length; const invalid = uniqueActiveScannedItems.length - valid; const activeKohaBarcodes = new Set(activeKohaData.map(item => String(item.BARKOD))); const activeScannedBarcodes = new Set(uniqueActiveScannedItems.map(item => item.barcode)); const notScannedCount = [...activeKohaBarcodes].filter(b => !activeScannedBarcodes.has(b)).length; const pieData = [ { name: 'Geçerli', value: valid }, { name: 'Uyarılı', value: invalid }, { name: 'Eksik', value: notScannedCount } ]; const materialTypes = uniqueActiveScannedItems.reduce((acc, item) => { const type = item.data?.['MATERYAL TÜRÜ'] || 'Bilinmeyen'; acc[type] = (acc[type] || 0) + 1; return acc; }, {}); const materialTypeData = Object.entries(materialTypes).map(([name, value]) => ({name, value})); const locationStatus = {}; activeKohaData.forEach(item => { const locCode = item['MATERYALİN YERİ KODU'] || 'Bilinmeyen'; const locName = combinedLocations.get(locCode) || locCode; if(!locationStatus[locName]) locationStatus[locName] = { 'Geçerli': 0, 'Uyarılı': 0, 'Eksik': 0 }; }); uniqueActiveScannedItems.forEach(item => { const locCode = item.data?.['MATERYALİN YERİ KODU'] || 'Bilinmeyen'; const locName = combinedLocations.get(locCode) || locCode; if(!locationStatus[locName]) locationStatus[locName] = { 'Geçerli': 0, 'Uyarılı': 0, 'Eksik': 0 }; if(item.isValid) locationStatus[locName]['Geçerli']++; else locationStatus[locName]['Uyarılı']++; }); const scannedActiveKohaBarcodes = new Set(uniqueActiveScannedItems.map(i => i.barcode)); activeKohaData.forEach(item => { const locCode = item['MATERYALİN YERİ KODU'] || 'Bilinmeyen'; const locName = combinedLocations.get(locCode) || locCode; if(!scannedActiveKohaBarcodes.has(String(item.BARKOD))) { locationStatus[locName]['Eksik']++; } }); const locationStatusData = Object.entries(locationStatus).map(([name, data]) => ({ name, ...data })); return { totalScanned: scannedItems.length, valid, invalid, notScannedCount, scanSpeed, pieData, warningBarData, materialTypeData, scanProgressData, locationStatusData, topErrorLocationsData, materialStatusPieData }; }, [scannedItems, kohaData, combinedLocations]);
+        const warningCounts = scannedItems.flatMap(item => item.warnings).reduce((acc, warning) => { acc[warning.id] = (acc[warning.id] || 0) + 1; return acc; }, {}); const warningBarData = Object.entries(warningCounts).map(([id, count]) => ({ name: WARNING_DEFINITIONS[id]?.text || id, Sayı: count })); const scanProgress = scannedItems.reduce((acc, item) => { const hour = new Date(item.timestamp).getHours().toString().padStart(2, '0') + ':00'; acc[hour] = (acc[hour] || 0) + 1; return acc; }, {}); const scanProgressData = Object.entries(scanProgress).map(([time, count]) => ({ time, 'Okutulan Sayısı': count })).sort((a,b) => a.time.localeCompare(b.time)); const topErrorLocations = scannedItems.filter(i => i.warnings.length > 0).reduce((acc, item) => { const loc = item.data?.['materyalin_yeri_kodu'] || 'Bilinmeyen'; acc[loc] = (acc[loc] || 0) + 1; return acc; }, {}); const topErrorLocationsData = Object.entries(topErrorLocations).map(([name, count]) => ({ name, 'Hata Sayısı': count })).sort((a, b) => b['Hata Sayısı'] - a['Hata Sayısı']).slice(0, 10); let scanSpeed = 0; if(scannedItems.length > 1){ const firstScanTime = new Date(scannedItems[scannedItems.length - 1].timestamp).getTime(); const lastScanTime = new Date(scannedItems[0].timestamp).getTime(); const durationMinutes = (lastScanTime - firstScanTime) / (1000 * 60); scanSpeed = durationMinutes > 0 ? Math.round(scannedItems.length / durationMinutes) : "∞"; } const activeKohaData = kohaData.filter(item => String(item['materyal_statusu_kodu']) === '0'); const activeScannedItems = scannedItems.filter(item => item.data && String(item.data['materyal_statusu_kodu']) === '0'); const uniqueActiveScannedItems = [...new Map(activeScannedItems.map(item => [item.barcode, item])).values()]; const valid = uniqueActiveScannedItems.filter(item => item.isValid).length; const invalid = uniqueActiveScannedItems.length - valid; const activeKohaBarcodes = new Set(activeKohaData.map(item => String(item.barkod))); const activeScannedBarcodes = new Set(uniqueActiveScannedItems.map(item => item.barcode)); const notScannedCount = [...activeKohaBarcodes].filter(b => !activeScannedBarcodes.has(b)).length; const pieData = [ { name: 'Geçerli', value: valid }, { name: 'Uyarılı', value: invalid }, { name: 'Eksik', value: notScannedCount } ]; const locationStatus = {}; activeKohaData.forEach(item => { const loc = item['materyalin_yeri_kodu'] || 'Bilinmeyen'; if(!locationStatus[loc]) locationStatus[loc] = { 'Geçerli': 0, 'Uyarılı': 0, 'Eksik': 0 }; }); uniqueActiveScannedItems.forEach(item => { const loc = item.data?.['materyalin_yeri_kodu'] || 'Bilinmeyen'; if(!locationStatus[loc]) locationStatus[loc] = { 'Geçerli': 0, 'Uyarılı': 0, 'Eksik': 0 }; if(item.isValid) locationStatus[loc]['Geçerli']++; else locationStatus[loc]['Uyarılı']++; }); const scannedActiveKohaBarcodes = new Set(uniqueActiveScannedItems.map(i => i.barcode)); activeKohaData.forEach(item => { const loc = item['materyalin_yeri_kodu'] || 'Bilinmeyen'; if(!scannedActiveKohaBarcodes.has(String(item.barkod))) { locationStatus[loc]['Eksik']++; } }); const locationStatusData = Object.entries(locationStatus).map(([name, data]) => ({ name, ...data })); return { totalScanned: scannedItems.length, valid, invalid, notScannedCount, scanSpeed, pieData, warningBarData, scanProgressData, locationStatusData, topErrorLocationsData, materialStatusPieData }; }, [scannedItems, kohaData]);
     
     // --- Render Functions ---
     const pageTitles = {
@@ -1492,7 +1465,7 @@ export default function App() {
     const MobileHeader = ({ onMenuClick, pageTitle }) => (
         <header className="md:hidden bg-white shadow-md p-4 flex items-center justify-between sticky top-0 z-20">
             <button onClick={onMenuClick} className="p-2 text-slate-600">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
             </button>
             <h2 className="text-lg font-bold text-slate-800">{pageTitle}</h2>
             <div className="w-8"></div> {/* Spacer to balance the title */}
@@ -1508,7 +1481,7 @@ export default function App() {
             case 'update-on-loan':
                 return <UpdateOnLoanScreen {...{ handleOnLoanUpload, setPage, isXlsxReady, isLoading: isBulkLoading || isNavigatingToSummary }} />;
             case 'summary':
-                return <SummaryScreen {...{ currentSessionName, summaryData, preAnalysisReports: PRE_ANALYSIS_REPORTS_CONFIG, postScanReports: POST_SCAN_REPORTS_CONFIG, isXlsxReady, isHtmlToImageReady, combinedLocations }} />;
+                return <SummaryScreen {...{ currentSessionName, summaryData, preAnalysisReports: PRE_ANALYSIS_REPORTS_CONFIG, postScanReports: POST_SCAN_REPORTS_CONFIG, isXlsxReady, isHtmlToImageReady }} />;
             case 'scan':
                 return <ScanScreen {...{ isCameraOpen, isQrCodeReady, isCameraAllowed, setIsCameraOpen, handleCameraScan, warningModal, currentSessionName, combinedLibraries, selectedLibrary, combinedLocations, selectedLocation, barcodeInput, handleBarcodeInput, handleManualEntry, lastScanned, handleBulkUpload, isBulkLoading, setPage, scannedItems, filteredScannedItems, searchTerm, setSearchTerm, warningFilter, setWarningFilter, handleDeleteItem, handleClearAllScans }} />;
             default:
