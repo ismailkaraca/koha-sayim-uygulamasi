@@ -148,11 +148,7 @@ const INITIAL_LIBRARIES = [
   ["1001","Ankara Sincan Törekent Halk  Kütüphanesi"]
 ];
 const INITIAL_LOCATIONS = [
-    ["AB", "Atatürk Bölümü"], ["AÖÖK", "Adnan Ötüken Özel Koleksiyonu"], ["BB", "Bebek Bölümü (0-3 Yaş)"],
-    ["D", "Depo"], ["DB", "Danışma Bölümü"], ["DG", "Diğer"], ["GB", "Gençlik Bölümü"], ["GK", "Gezici Kütüphane"],
-    ["IOK", "İlk Okuma Kitapları Bölümü"], ["KB", "Kataloglama Bölümü"], ["NE", "Nadir Eserler Bölümü"],
-    ["S", "Salon"], ["SB", "Sanat Bölümü"], ["SY", "Süreli Yayınlar Bölümü"], ["YB", "Yetişkin Bölümü"],
-    ["YDB", "Yabancı Diller Bölümü"], ["ÇB", "Çocuk Bölümü"]
+    ["YB", "Yetişkin Bölümü"], ["ÇB", "Çocuk Bölümü"]
 ];
 const WARNING_DEFINITIONS = { 
     invalidStructure: { id: 'invalidStructure', text: 'Yapıya Uygun Olmayan', color: '#E74C3C', sound: 'A#3', message: 'Okutulan barkod gerekli yapıyla eşleşmiyor.' }, 
