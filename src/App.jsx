@@ -145,19 +145,7 @@ const RobustBarcodeScanner = ({ onScan, onClose, isPaused }) => {
 // --- Data Constants & Icons ---
 // Initial data for libraries and locations, and definitions for warnings and icons.
 const INITIAL_LIBRARIES = [
-    ["12", "ADANA İL HALK KÜTÜPHANESİ"], ["1530", "Adana Adalet Halk Kütüphanesi"], ["1317", "Adana Aladağ İlçe Halk Kütüphanesi"],
-    ["113", "Adana Ceyhan İlçe Halk Kütüphanesi"], ["1310", "Adana Ceyhan Murat Göğebakan Kültür Merkezi Halk Kütüphanesi"],
-    ["670", "Adana Feke İlçe Halk Kütüphanesi"], ["760", "Adana İmamoğlu Remzi Oğuz Arık İlçe Halk Kütüphanesi"],
-    ["1200", "Adana Karacaoğlan Edebiyat Müze Kütüphanesi"], ["796", "Adana Karaisalı İlçe Halk Kütüphanesi"],
-    ["675", "Adana Kozan Gazi Halk Kütüphanesi"], ["114", "Adana Kozan Karacaoğlan İlçe Halk Kütüphanesi"],
-    ["1320", "Adana Kozan Özden Kültür Merkezi Halk Kütüphanesi"], ["956", "Adana Pozantı İlçe Halk Kütüphanesi"],
-    ["499", "Adana Saimbeyli Azmi Yazıcıoğlu İlçe Halk Kütüphanesi"], ["1588", "Adana Sarıçam Bebek ve Çocuk Kütüphanesi"],
-    ["1007", "Adana Sarıçam İlçe Halk Kütüphanesi"], ["763", "Adana Sarıçam İncirlik 100. Yıl Çocuk Kütüphanesi"],
-    ["557", "Adana Seyhan Çağdaş Çocuk Kütüphanesi"], ["1024", "Adana Seyhan Şakirpaşa Halk Kütüphanesi"],
-    ["995", "Adana Seyhan Yusuf Fırat Kotan İlçe Halk Kütüphanesi"], ["1071", "Adana Tufanbeyli İlçe Halk Kütüphanesi"],
-    ["1135", "Adana Yumurtalık İlçe Halk Kütüphanesi"], ["1139", "Adana Yüreğir Hacı Mehmet Sabancı İlçe Halk Kütüphanesi"],
-    ["1237", "Adana Yüreğir Kültür Merkezi Çocuk ve Gençlik Kütüphanesi"], ["13", "ADIYAMAN İL HALK KÜTÜPHANESİ"],
-    ["110", "DEMO KÜTÜPHANE"]
+  ["1001","Ankara Sincan Törekent Halk  Kütüphanesi"]
 ];
 const INITIAL_LOCATIONS = [
     ["AB", "Atatürk Bölümü"], ["AÖÖK", "Adnan Ötüken Özel Koleksiyonu"], ["BB", "Bebek Bölümü (0-3 Yaş)"],
