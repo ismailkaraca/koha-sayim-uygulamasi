@@ -625,6 +625,12 @@ const PreReportsScreen = ({ currentSessionName, error, setPage, preAnalysisRepor
                 ))}
             </div>
         </div>
+            <button 
+            onClick={() => setPage('scan')}
+            className="w-full font-bold py-3 px-4 rounded-md transition-colors bg-green-600 text-white hover:bg-green-700"
+        >
+            Sayıma Devam Et
+        </button>
     </div>
 );
 
