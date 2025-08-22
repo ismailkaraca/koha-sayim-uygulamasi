@@ -529,6 +529,23 @@ const ShareModal = ({ isOpen, onClose }) => {
     );
 };
 
+const InstallPopup = ({ onInstall, onDismiss }) => (
+    <div className="fixed bottom-4 left-1/2 -translate-x-1/2 w-11/12 max-w-md bg-slate-800 text-white p-4 rounded-lg shadow-2xl z-50 flex items-center gap-4">
+        <div className="flex-shrink-0">
+            {ICONS.install}
+        </div>
+        <div className="flex-grow">
+            <h4 className="font-bold">Uygulamayı Ana Ekrana Ekleyin</h4>
+            <p className="text-sm text-slate-300">Daha hızlı erişim ve çevrimdışı kullanım için yükleyin.</p>
+        </div>
+        <div className="flex-shrink-0 flex gap-2">
+             <button onClick={onDismiss} className="px-3 py-1 text-sm rounded-md hover:bg-slate-700">Kapat</button>
+             <button onClick={onInstall} className="px-4 py-2 text-sm font-bold bg-indigo-600 rounded-md hover:bg-indigo-700">Yükle</button>
+        </div>
+    </div>
+);
+
+
 const StartScreen = ({ sessions, sessionNameInput, setSessionNameInput, startNewSession, error, setError, loadSession, deleteSession, selectedLibrary, setSelectedLibrary, libraryOptions, setAddDataModal, selectedLocation, setSelectedLocation, locationOptions, kohaData, handleExcelUpload, isXlsxReady, isLoading }) => (
     <div className="w-full">
         <h1 className="text-3xl font-bold text-slate-800 mb-2">Hoş Geldiniz</h1>
@@ -625,7 +642,7 @@ const PreReportsScreen = ({ currentSessionName, error, setPage, preAnalysisRepor
                 ))}
             </div>
         </div>
-            <button 
+        <button 
             onClick={() => setPage('scan')}
             className="w-full font-bold py-3 px-4 rounded-md transition-colors bg-green-600 text-white hover:bg-green-700"
         >
@@ -949,6 +966,7 @@ export default function App() {
     const [warningFilter, setWarningFilter] = useState('all');
     const [isMuted, setIsMuted] = useState(false);
     const [installPrompt, setInstallPrompt] = useState(null);
+    const [showInstallPopup, setShowInstallPopup] = useState(false);
     const [isNavigatingToSummary, setIsNavigatingToSummary] = useState(false);
     const [isRestoringSession, setIsRestoringSession] = useState(false);
     
@@ -956,22 +974,113 @@ export default function App() {
     const manualInputDebounceRef = useRef(null);
 
     useEffect(() => {
-        // Set document language to prevent auto-translation issues
-        document.documentElement.lang = 'tr';
-        
-        // Handle PWA installation prompt
+        // --- PWA SETUP ---
+        // 1. Create and register the service worker
+        const serviceWorkerCode = `
+            const CACHE_NAME = 'koha-sayim-cache-v1';
+            const urlsToCache = [
+                '/',
+                'https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js',
+                'https://unpkg.com/html5-qrcode',
+                'https://cdnjs.cloudflare.com/ajax/libs/html-to-image/1.11.11/html-to-image.min.js',
+                'https://cdnjs.cloudflare.com/ajax/libs/tone/14.7.77/Tone.js'
+            ];
+
+            self.addEventListener('install', event => {
+                event.waitUntil(
+                    caches.open(CACHE_NAME)
+                        .then(cache => {
+                            console.log('Opened cache');
+                            return cache.addAll(urlsToCache);
+                        })
+                );
+            });
+
+            self.addEventListener('fetch', event => {
+                event.respondWith(
+                    caches.match(event.request)
+                        .then(response => {
+                            if (response) {
+                                return response;
+                            }
+                            return fetch(event.request);
+                        })
+                );
+            });
+
+            self.addEventListener('activate', event => {
+              const cacheWhitelist = [CACHE_NAME];
+              event.waitUntil(
+                caches.keys().then(cacheNames => {
+                  return Promise.all(
+                    cacheNames.map(cacheName => {
+                      if (cacheWhitelist.indexOf(cacheName) === -1) {
+                        return caches.delete(cacheName);
+                      }
+                    })
+                  );
+                })
+              );
+            });
+        `;
+        const swBlob = new Blob([serviceWorkerCode], { type: 'application/javascript' });
+        const swUrl = URL.createObjectURL(swBlob);
+
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register(swUrl)
+                .then(registration => console.log('Service Worker registered with scope:', registration.scope))
+                .catch(error => console.log('Service Worker registration failed:', error));
+        }
+
+        // 2. Create and link the manifest file
+        const manifest = {
+            "name": "Koha Sayım Uygulaması",
+            "short_name": "Koha Sayım",
+            "start_url": "https://koha-sayim-uygulamasi.vercel.app/",
+            "display": "standalone",
+            "background_color": "#f1f5f9",
+            "theme_color": "#1e293b",
+            "description": "Koha için geliştirilmiş barkod tabanlı sayım uygulaması.",
+            "icons": [
+                {
+                    "src": "/icon-192x192.png",
+                    "sizes": "192x192",
+                    "type": "image/png"
+                },
+                {
+                    "src": "/icon-512x512.png",
+                    "sizes": "512x512",
+                    "type": "image/png"
+                }
+            ]
+        };
+        const manifestBlob = new Blob([JSON.stringify(manifest)], { type: 'application/json' });
+        const manifestUrl = URL.createObjectURL(manifestBlob);
+        const link = document.createElement('link');
+        link.rel = 'manifest';
+        link.href = manifestUrl;
+        document.head.appendChild(link);
+
+        // --- PWA INSTALL PROMPT ---
         const handleBeforeInstallPrompt = (e) => {
             e.preventDefault();
             setInstallPrompt(e);
+            const dismissed = localStorage.getItem('installPopupDismissed');
+            if (!dismissed) {
+                setShowInstallPopup(true);
+            }
         };
         window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+
         return () => {
             window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+            document.head.removeChild(link);
         };
     }, []);
 
     const handleInstallClick = () => {
         if (!installPrompt) return;
+        setShowInstallPopup(false);
         installPrompt.prompt();
         installPrompt.userChoice.then((choiceResult) => {
             if (choiceResult.outcome === 'accepted') {
@@ -982,6 +1091,12 @@ export default function App() {
             setInstallPrompt(null);
         });
     };
+    
+    const handleDismissInstallPopup = () => {
+        setShowInstallPopup(false);
+        localStorage.setItem('installPopupDismissed', 'true');
+    };
+
 
     // Load settings from localStorage on initial mount
     useEffect(() => {
@@ -1194,7 +1309,7 @@ export default function App() {
         const optionsMap = new Map(INITIAL_LOCATIONS);
         Object.entries(customLibraries).forEach(([code, name]) => optionsMap.set(code, name));
         return Array.from(optionsMap.entries());
-    }, [customLocations]);
+    }, [customLibraries]);
 
     const combinedLibraries = useMemo(() => new Map(libraryOptions), [libraryOptions]);
     const combinedLocations = useMemo(() => new Map(locationOptions), [locationOptions]);
@@ -1656,6 +1771,7 @@ export default function App() {
             <ConfirmationModal isOpen={confirmationModal.isOpen} onClose={() => setConfirmationModal({ isOpen: false, message: '', onConfirm: () => {} })} {...confirmationModal} />
             <AddDataModal isOpen={addDataModal.isOpen} onClose={() => setAddDataModal({isOpen: false, type: ''})} onAdd={handleAddCustomData} type={addDataModal.type} />
             <ShareModal isOpen={isShareModalOpen} onClose={() => setIsShareModalOpen(false)} />
+            {installPrompt && showInstallPopup && <InstallPopup onInstall={handleInstallClick} onDismiss={handleDismissInstallPopup} />}
             
             <Sidebar
               page={page}
