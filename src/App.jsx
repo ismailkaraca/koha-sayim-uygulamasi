@@ -944,6 +944,7 @@ export default function App() {
     const [isMuted, setIsMuted] = useState(false);
     const [installPrompt, setInstallPrompt] = useState(null);
     const [isNavigatingToSummary, setIsNavigatingToSummary] = useState(false);
+    const [isRestoringSession, setIsRestoringSession] = useState(false);
     
     const processedBarcodesRef = useRef(new Set());
     const manualInputDebounceRef = useRef(null);
@@ -1032,6 +1033,7 @@ export default function App() {
             setKohaDataMap(new Map());
             setError(`"${sessionName}" oturumu yüklendi. Devam etmek için lütfen ilgili Koha sayım dosyasını (.xlsx) tekrar yükleyin.`);
             setPage('start'); // Go back to start to re-upload
+            setIsRestoringSession(true);
         }
     }, []);
 
@@ -1184,7 +1186,7 @@ export default function App() {
 
     const locationOptions = useMemo(() => {
         const optionsMap = new Map(INITIAL_LOCATIONS);
-        Object.entries(customLocations).forEach(([code, name]) => optionsMap.set(code, name));
+        Object.entries(customLibraries).forEach(([code, name]) => optionsMap.set(code, name));
         return Array.from(optionsMap.entries());
     }, [customLocations]);
 
@@ -1206,6 +1208,11 @@ export default function App() {
                 if (json.length === 0 || !json[0].hasOwnProperty('barkod')) throw new Error("Yüklenen dosyada 'barkod' sütunu bulunamadı.");
                 setKohaData(json);
                 setKohaDataMap(new Map(json.map(item => [String(item.barkod), item])));
+                if (isRestoringSession) {
+                    setError(''); // Clear the "please upload" message
+                    setPage('scan');
+                    setIsRestoringSession(false);
+                }
             } catch (err) { setError(`Dosya okunurken bir hata oluştu: ${err.message}`); } finally { setIsLoading(false); }
         };
         reader.onerror = () => { setIsLoading(false); setError("Dosya okuma başarısız oldu."); }
