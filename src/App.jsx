@@ -4,9 +4,11 @@ import { PieChart, Pie, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Leg
 import * as Tone from 'tone';
 
 // --- Custom Hooks & Libraries ---
+// Custom hook to dynamically load external scripts
 const useScript = (url, globalVarName) => {
   const [isReady, setIsReady] = useState(false);
   useEffect(() => {
+    // Check if the script's global variable already exists
     if (window[globalVarName]) {
       setIsReady(true);
       return;
@@ -26,6 +28,7 @@ const useScript = (url, globalVarName) => {
         script.addEventListener('load', handleLoad);
         script.addEventListener('error', handleError);
     }
+    // Cleanup function to remove event listeners
     return () => { if (script && script.parentElement) { script.removeEventListener('load', handleLoad); script.removeEventListener('error', handleError); } };
   }, [url, globalVarName]);
   return isReady;
@@ -33,11 +36,12 @@ const useScript = (url, globalVarName) => {
 
 
 // --- Robust Barcode Scanner Component ---
+// This component handles the camera-based barcode scanning functionality.
 const RobustBarcodeScanner = ({ onScan, onClose, isPaused }) => {
     const readerId = "robust-barcode-scanner";
     const [message, setMessage] = useState({ text: 'Kamera başlatılıyor...', type: 'info' });
     const scannerRef = useRef(null);
-    const throttleTimeoutRef = useRef(null);
+    const throttleTimeoutRef = useRef(null); // To prevent rapid re-scans of the same code
     const scannedCodesThisSessionRef = useRef(new Set()); // Tracks codes scanned only while camera is open
 
     // Clean up the timer when the component is unmounted
@@ -49,12 +53,14 @@ const RobustBarcodeScanner = ({ onScan, onClose, isPaused }) => {
         };
     }, []);
     
+    // Handles the result of a successful scan
     const handleScanResult = (decodedText) => {
         // Stop if paused (e.g., a modal is open) or if we are in a throttle cooldown
         if (isPaused || throttleTimeoutRef.current) {
             return;
         }
 
+        // Check if this barcode has already been scanned in the current camera session
         if (scannedCodesThisSessionRef.current.has(decodedText)) {
             setMessage({ text: 'Bu barkod bu oturumda zaten okutuldu.', type: 'warning' });
             return;
@@ -83,8 +89,8 @@ const RobustBarcodeScanner = ({ onScan, onClose, isPaused }) => {
             try {
                  setMessage({ text: 'Kamera başlatılıyor, lütfen bekleyin...', type: 'info' });
                 await html5QrCode.start(
-                    { facingMode: "environment" },
-                    { fps: 10, qrbox: { width: 250, height: 250 } },
+                    { facingMode: "environment" }, // Use the rear camera
+                    { fps: 10, qrbox: { width: 250, height: 250 } }, // Scanner configuration
                     handleScanResult,
                     (errorMessage) => { /* Non-critical scan errors can be ignored */ }
                 );
@@ -101,6 +107,7 @@ const RobustBarcodeScanner = ({ onScan, onClose, isPaused }) => {
 
         startCamera();
 
+        // Cleanup function to stop the camera when the component unmounts
         return () => {
             if (scannerRef.current && scannerRef.current.isScanning) {
                 scannerRef.current.stop().catch(err => console.error("Kamera durdurulurken hata oluştu:", err));
@@ -108,6 +115,7 @@ const RobustBarcodeScanner = ({ onScan, onClose, isPaused }) => {
         };
     }, [onScan]);
 
+    // Determines the style of the message box based on the message type
     const getMessageStyles = (type) => {
         switch (type) {
             case 'success': return 'bg-green-100 border-green-500 text-green-800';
@@ -135,52 +143,28 @@ const RobustBarcodeScanner = ({ onScan, onClose, isPaused }) => {
 
 
 // --- Data Constants & Icons ---
+// Initial data for libraries and locations, and definitions for warnings and icons.
 const INITIAL_LIBRARIES = [
-    ["12", "ADANA İL HALK KÜTÜPHANESİ"],
-    ["1530", "Adana Adalet Halk Kütüphanesi"],
-    ["1317", "Adana Aladağ İlçe Halk Kütüphanesi"],
-    ["113", "Adana Ceyhan İlçe Halk Kütüphanesi"],
-    ["1310", "Adana Ceyhan Murat Göğebakan Kültür Merkezi Halk Kütüphanesi"],
-    ["670", "Adana Feke İlçe Halk Kütüphanesi"],
-    ["760", "Adana İmamoğlu Remzi Oğuz Arık İlçe Halk Kütüphanesi"],
-    ["1200", "Adana Karacaoğlan Edebiyat Müze Kütüphanesi"],
-    ["796", "Adana Karaisalı İlçe Halk Kütüphanesi"],
-    ["675", "Adana Kozan Gazi Halk Kütüphanesi"],
-    ["114", "Adana Kozan Karacaoğlan İlçe Halk Kütüphanesi"],
-    ["1320", "Adana Kozan Özden Kültür Merkezi Halk Kütüphanesi"],
-    ["956", "Adana Pozantı İlçe Halk Kütüphanesi"],
-    ["499", "Adana Saimbeyli Azmi Yazıcıoğlu İlçe Halk Kütüphanesi"],
-    ["1588", "Adana Sarıçam Bebek ve Çocuk Kütüphanesi"],
-    ["1007", "Adana Sarıçam İlçe Halk Kütüphanesi"],
-    ["763", "Adana Sarıçam İncirlik 100. Yıl Çocuk Kütüphanesi"],
-    ["557", "Adana Seyhan Çağdaş Çocuk Kütüphanesi"],
-    ["1024", "Adana Seyhan Şakirpaşa Halk Kütüphanesi"],
-    ["995", "Adana Seyhan Yusuf Fırat Kotan İlçe Halk Kütüphanesi"],
-    ["1071", "Adana Tufanbeyli İlçe Halk Kütüphanesi"],
-    ["1135", "Adana Yumurtalık İlçe Halk Kütüphanesi"],
-    ["1139", "Adana Yüreğir Hacı Mehmet Sabancı İlçe Halk Kütüphanesi"],
-    ["1237", "Adana Yüreğir Kültür Merkezi Çocuk ve Gençlik Kütüphanesi"],
-    ["13", "ADIYAMAN İL HALK KÜTÜPHANESİ"],
+    ["12", "ADANA İL HALK KÜTÜPHANESİ"], ["1530", "Adana Adalet Halk Kütüphanesi"], ["1317", "Adana Aladağ İlçe Halk Kütüphanesi"],
+    ["113", "Adana Ceyhan İlçe Halk Kütüphanesi"], ["1310", "Adana Ceyhan Murat Göğebakan Kültür Merkezi Halk Kütüphanesi"],
+    ["670", "Adana Feke İlçe Halk Kütüphanesi"], ["760", "Adana İmamoğlu Remzi Oğuz Arık İlçe Halk Kütüphanesi"],
+    ["1200", "Adana Karacaoğlan Edebiyat Müze Kütüphanesi"], ["796", "Adana Karaisalı İlçe Halk Kütüphanesi"],
+    ["675", "Adana Kozan Gazi Halk Kütüphanesi"], ["114", "Adana Kozan Karacaoğlan İlçe Halk Kütüphanesi"],
+    ["1320", "Adana Kozan Özden Kültür Merkezi Halk Kütüphanesi"], ["956", "Adana Pozantı İlçe Halk Kütüphanesi"],
+    ["499", "Adana Saimbeyli Azmi Yazıcıoğlu İlçe Halk Kütüphanesi"], ["1588", "Adana Sarıçam Bebek ve Çocuk Kütüphanesi"],
+    ["1007", "Adana Sarıçam İlçe Halk Kütüphanesi"], ["763", "Adana Sarıçam İncirlik 100. Yıl Çocuk Kütüphanesi"],
+    ["557", "Adana Seyhan Çağdaş Çocuk Kütüphanesi"], ["1024", "Adana Seyhan Şakirpaşa Halk Kütüphanesi"],
+    ["995", "Adana Seyhan Yusuf Fırat Kotan İlçe Halk Kütüphanesi"], ["1071", "Adana Tufanbeyli İlçe Halk Kütüphanesi"],
+    ["1135", "Adana Yumurtalık İlçe Halk Kütüphanesi"], ["1139", "Adana Yüreğir Hacı Mehmet Sabancı İlçe Halk Kütüphanesi"],
+    ["1237", "Adana Yüreğir Kültür Merkezi Çocuk ve Gençlik Kütüphanesi"], ["13", "ADIYAMAN İL HALK KÜTÜPHANESİ"],
     ["110", "DEMO KÜTÜPHANE"]
 ];
 const INITIAL_LOCATIONS = [
-    ["AB", "Atatürk Bölümü"],
-    ["AÖÖK", "Adnan Ötüken Özel Koleksiyonu"],
-    ["BB", "Bebek Bölümü (0-3 Yaş)"],
-    ["D", "Depo"],
-    ["DB", "Danışma Bölümü"],
-    ["DG", "Diğer"],
-    ["GB", "Gençlik Bölümü"],
-    ["GK", "Gezici Kütüphane"],
-    ["IOK", "İlk Okuma Kitapları Bölümü"],
-    ["KB", "Kataloglama Bölümü"],
-    ["NE", "Nadir Eserler Bölümü"],
-    ["S", "Salon"],
-    ["SB", "Sanat Bölümü"],
-    ["SY", "Süreli Yayınlar Bölümü"],
-    ["YB", "Yetişkin Bölümü"],
-    ["YDB", "Yabancı Diller Bölümü"],
-    ["ÇB", "Çocuk Bölümü"]
+    ["AB", "Atatürk Bölümü"], ["AÖÖK", "Adnan Ötüken Özel Koleksiyonu"], ["BB", "Bebek Bölümü (0-3 Yaş)"],
+    ["D", "Depo"], ["DB", "Danışma Bölümü"], ["DG", "Diğer"], ["GB", "Gençlik Bölümü"], ["GK", "Gezici Kütüphane"],
+    ["IOK", "İlk Okuma Kitapları Bölümü"], ["KB", "Kataloglama Bölümü"], ["NE", "Nadir Eserler Bölümü"],
+    ["S", "Salon"], ["SB", "Sanat Bölümü"], ["SY", "Süreli Yayınlar Bölümü"], ["YB", "Yetişkin Bölümü"],
+    ["YDB", "Yabancı Diller Bölümü"], ["ÇB", "Çocuk Bölümü"]
 ];
 const WARNING_DEFINITIONS = { 
     invalidStructure: { id: 'invalidStructure', text: 'Yapıya Uygun Olmayan', color: '#E74C3C', sound: 'A#3', message: 'Okutulan barkod gerekli yapıyla eşleşmiyor.' }, 
@@ -211,7 +195,47 @@ const ICONS = {
     install: <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="8 17 12 21 16 17"/><line x1="12" y1="12" x2="12" y2="21"/><path d="M20.88 18.09A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.29"/></svg>,
 };
 
+// --- Mappings for Report Generation ---
+const MATERIAL_STATUS_MAP = {
+    '0': 'Eser Koleksiyonda', '1': 'Düşüm Yapıldı', '2': 'Devir Yapıldı',
+};
+const LOAN_ELIGIBILITY_MAP = {
+    '0': 'Ödünç Verilebilir', '1': 'Ödünç Verilemez- Diğer', '2': 'Ödünç Verilemez- Danışma Kaynağı',
+    '3': 'Ödünç Verilemez- Kayıp', '4': 'Ödünç Verilemez- Yıpranmış', '5': 'Ödünç Verilemez- Derleme',
+    '6': 'Ödünç Verilemez- Nadir Eser', '7': 'Ödünç Verilemez- Düşüm', '8': 'Ödünç Verilemez- Devir',
+    '9': 'Ödünç Verilemez- KHK', '10': 'Ödünç Verilemez- Kullanıcı Şikayeti', '11': 'Ödünç Verilemez- Süreli Yayın',
+};
+const LOCATION_CODE_MAP = {
+    'AB': 'Atatürk Bölümü', 'AÖÖK': 'Adnan Ötüken Özel Koleksiyonu (Adnan Ötüken İl Halk İçin)',
+    'Bakanlık Yayınları': 'Bakanlık Yayınları (Edebiyat Müze Kütüphaneleri İçin)', 'BB': 'Bebek Bölümü (0-3 Yaş)',
+    'BEYRA': 'Rami Yerleşkesi', 'D': 'Depo', 'DB': 'Danışma Bölümü', 'DG': 'Diğer',
+    'Edebiyat Kuramı': 'Edebiyat Kuramı (Edebiyat Müze Kütüphaneleri İçin)', 'EK': 'Etkinlik Kitapları Bölümü',
+    'GAY': 'Gezici Kütüphane Anadolu Yakası', 'GB': 'Gençlik Bölümü', 'GD1': 'Geçici Derme1',
+    'GD2': 'Geçici Derme2', 'GD3': 'Geçici Derme3', 'GD4': 'Geçici Derme4 (Kurumlar)',
+    'Gİ': 'Gör-İşit Bölümü', 'GK': 'Gezici Kütüphane', 'GK2': 'Gezici Kütüphane 2',
+    'IOK': 'İlk Okuma Kitapları Bölümü', 'İmzalı Kitaplar': 'İmzalı Kitaplar (Edebiyat Müze Kütüphaneleri İçin)',
+    'KB': 'Kataloglama Bölümü', 'KK': 'Kent Kitaplığı', 'KOK': 'Osmaniye Fakıuşağı Konteyner Kent',
+    'NE': 'Nadir Eserler Bölümü', 'NÖ': 'Nobel Ödüllü Kitaplar', 'OÖ': 'Okul Öncesi Bölümü',
+    'RA1': 'Atatürk İhtisas (Rami Kütüphanesi)', 'RA10': 'Toplum Bilimleri: 142 (Rami Kütüphanesi)',
+    'RA11': 'Dil ve Dil Bilimi: 163 (Rami Kütüphanesi)', 'RA12': 'Doğa Bilimleri ve Matematik: 141 (Rami Kütüphanesi)',
+    'RA13': 'Teknoloji ve Uygulamalı Bilimler: 150 (Rami Kütüphanesi)', 'RA14': 'Güzel Sanatlar: 153 (Rami Kütüphanesi)',
+    'RA15': 'Edebiyat & Retorik: 154/155 (Rami Kütüphanesi)', 'RA16': 'Tarih & Coğrafya: 168 (Rami Kütüphanesi)',
+    'RA18': 'İlk Öğretim Çalışma Salonu (10-14 yaş): 125 (Rami Kütüphanesi)', 'RA19': 'Atatürk İhtisas: 114 (Rami Kütüphanesi)',
+    'RA2': 'İlk Öğretim Çalışma Salonu (6-9 yaş): 124 (Rami Kütüphanesi)', 'RA20': 'Atatürk İhtisas: 115 (Rami Kütüphanesi)',
+    'RA21': 'Biyografi Kitaplığı: 118 (Rami Kütüphanesi)', 'RA22': 'Günay-Turgut Kut İhtisas Kitaplığı (Yazma Eserler Okuma Salonu): 177 (Rami Kütüphanesi)',
+    'RA23': 'Engelsiz Bilgi Merkezi: 148 (Rami Kütüphanesi)', 'RA3': 'Bebek Kütüphanesi (Masal 0-3 yaş): 126/127 (Rami Kütüphanesi)',
+    'RA4': 'Lise Hazırlık: 129/130 (Rami Kütüphanesi)', 'RA5': 'Üniversite Hazırlık: 134 (Rami Kütüphanesi)',
+    'RA7': 'Genel Konular: 156 (Rami Kütüphanesi)', 'RA8': 'Psikoloji ve Felsefe: 139 (Rami Kütüphanesi)',
+    'RA9': 'Din: 146 (Rami Kütüphanesi)', 'S': 'Salon', 'SAM': 'Şehir Araştırmaları Merkezi',
+    'SB': 'Sanat Bölümü', 'SY': 'Süreli Yayınlar Bölümü', 'TEDA Kitapları': 'TEDA Kitapları',
+    'Türk Edebiyatı': 'Türk Edebiyatı (Edebiyat Müze Kütüphaneleri İçin)', 'YB': 'Yetişkin Bölümü',
+    'YC': 'Yetişkin Cep (Adnan Ötüken İl Halk İçin)', 'YDB': 'Yabancı Diller Bölümü', 'ZBB': 'Ziya Bey Bölümü',
+    'ÇB': 'Çocuk Bölümü', 'Ödüllü Kitaplar - Dünya Edebiyatı': 'Ödüllü Kitaplar - Dünya Edebiyatı (Edebiyat Müze Kütüphaneleri İçin)',
+    'Ödüllü Kitaplar - Türk Edebiyatı': 'Ödüllü Kitaplar - Türk Edebiyatı (Edebiyat Müze Kütüphaneleri İçin)', 'ÖK': 'Özel Koleksiyon',
+};
+
 // --- Utilities & Components ---
+// A collection of reusable components and utility functions used throughout the application.
 const synth = new Tone.Synth().toDestination();
 const CustomTooltip = ({ active, payload, label }) => { if (active && payload && payload.length) { return <div className="bg-white p-2 border border-gray-300 rounded shadow-lg"><p className="font-bold text-slate-800">{label}</p><p className="text-sm text-slate-600">{`Sayı: ${payload[0].value}`}</p></div>; } return null; };
 const FileUploader = ({ onFileAccepted, children, title, disabled, accept }) => { const onDrop = useCallback(acceptedFiles => { onFileAccepted(acceptedFiles[0]); }, [onFileAccepted]); const { getRootProps, getInputProps, isDragActive } = useDropzone({ onDrop, multiple: false, disabled, accept }); return <div {...getRootProps()} className={`border-2 border-dashed rounded-lg p-8 text-center transition-colors ${disabled ? 'bg-slate-100 text-slate-400' : 'cursor-pointer'} ${isDragActive ? 'border-blue-500 bg-blue-50' : 'border-slate-300 hover:border-blue-400'}`}><input {...getInputProps()} /><p className="text-slate-500">{title}</p>{children}</div>; };
@@ -219,6 +243,31 @@ const Modal = ({ isOpen, onClose, children }) => { if (!isOpen) return null; ret
 const WarningModal = ({ isOpen, onClose, title, warnings, barcode }) => { const [isCopied, setIsCopied] = useState(false); const handleCopy = (text) => { const textArea = document.createElement("textarea"); textArea.value = text; textArea.style.position = "fixed"; document.body.appendChild(textArea); textArea.focus(); textArea.select(); try { document.execCommand('copy'); setIsCopied(true); setTimeout(() => setIsCopied(false), 2000); } catch (err) { console.error("Panoya kopyalanamadı: ", err); } document.body.removeChild(textArea); }; const onLoanWarning = warnings.find(w => w.id === 'onLoan'); return <Modal isOpen={isOpen} onClose={onClose}><div className="flex justify-between items-center p-4 border-b"><h3 className="text-lg font-bold text-slate-800">{title}</h3><button onClick={onClose} className="text-slate-500 hover:text-slate-800 text-2xl">&times;</button></div><div className="p-5"><ul className="space-y-2 list-disc list-inside">{warnings.map(w => <li key={w.id} style={{color: w.color}} className="font-semibold">{w.message || w.text}</li>)}</ul>{onLoanWarning && barcode && <div className="mt-4 p-3 bg-slate-100 rounded-lg border border-slate-200"><p className="text-sm font-medium text-slate-800">Bu materyali Koha'da iade almak için:</p><a href={`https://personel.ekutuphane.gov.tr/cgi-bin/koha/circ/returns.pl`} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline font-semibold block mt-2 hover:text-blue-800">Koha İade Sayfasına Git</a><p className="text-xs text-slate-500 mt-1">İade sayfasını açtıktan sonra aşağıdaki barkodu yapıştırabilirsiniz.</p><div className="mt-3 flex items-center gap-2"><input type="text" readOnly value={barcode} className="w-full p-2 border bg-slate-200 rounded-md font-mono text-sm" /><button onClick={() => handleCopy(barcode)} className={`px-4 py-2 rounded-md text-white font-semibold transition-colors ${isCopied ? 'bg-green-500' : 'bg-blue-500 hover:bg-blue-600'}`}>{isCopied ? 'Kopyalandı!' : 'Barkodu Kopyala'}</button></div></div>}<button onClick={onClose} className="mt-6 bg-slate-600 text-white py-2 px-4 rounded hover:bg-slate-700 w-full font-bold">Tamam</button></div></Modal>; };
 const ConfirmationModal = ({ isOpen, onClose, message, onConfirm }) => { if (!isOpen) return null; const handleConfirm = () => { onConfirm(); onClose(); }; return <Modal isOpen={isOpen} onClose={onClose}><div className="p-6 text-center"><h3 className="text-lg font-medium text-slate-800 mb-4">{message}</h3><div className="flex justify-center gap-4"><button onClick={onClose} className="px-6 py-2 rounded-md bg-slate-200 text-slate-800 hover:bg-slate-300 font-semibold">Hayır</button><button onClick={handleConfirm} className="px-6 py-2 rounded-md bg-red-600 text-white hover:bg-red-700 font-semibold">Evet, Sil</button></div></div></Modal>; };
 const AddDataModal = ({ isOpen, onClose, onAdd, type }) => { const [code, setCode] = useState(''); const [name, setName] = useState(''); const handleAdd = () => { if(code && name) { onAdd(type, code, name); onClose(); setCode(''); setName(''); } }; return <Modal isOpen={isOpen} onClose={onClose}><div className="p-5"><h3 className="text-lg font-bold mb-4">Yeni {type === 'library' ? 'Kütüphane' : 'Lokasyon'} Ekle</h3><div className="space-y-4"><input type="text" value={code} onChange={e => setCode(e.target.value)} placeholder="Kod" className="w-full p-2 border border-slate-300 rounded-md" /><input type="text" value={name} onChange={e => setName(e.target.value)} placeholder="İsim" className="w-full p-2 border border-slate-300 rounded-md" /></div><div className="flex justify-end gap-2 mt-4"><button onClick={onClose} className="px-4 py-2 rounded-md bg-slate-200">İptal</button><button onClick={handleAdd} className="px-4 py-2 rounded-md bg-blue-600 text-white">Ekle</button></div></div></Modal>; };
+
+// Helper function to transform report data by replacing codes with descriptions
+const transformReportData = (data) => {
+    if (!Array.isArray(data)) return [];
+    return data.map(originalItem => {
+        if (!originalItem) return {}; // Handle null/undefined items in data array
+        const item = { ...originalItem };
+        
+        // Explicitly map to new keys and transform values
+        const transformedItem = {
+            ...item, // Copy all original properties first
+            'Materyal Statüsü': MATERIAL_STATUS_MAP[item['materyal_statusu_kodu']] || item['materyal_statusu_kodu'],
+            'Ödünç Verilebilirlik': LOAN_ELIGIBILITY_MAP[item['odunc_verilebilirlik_kodu']] || item['odunc_verilebilirlik_kodu'],
+            'Materyalin Yeri': LOCATION_CODE_MAP[item['materyalin_yeri_kodu']] || item['materyalin_yeri_kodu'],
+        };
+
+        // Delete the old keys to avoid duplication in the report
+        delete transformedItem['materyal_statusu_kodu'];
+        delete transformedItem['odunc_verilebilirlik_kodu'];
+        delete transformedItem['materyalin_yeri_kodu'];
+
+        return transformedItem;
+    });
+};
+
 
 const FullScreenLoader = ({ text }) => (
     <div className="fixed inset-0 bg-black bg-opacity-60 z-50 flex flex-col justify-center items-center">
@@ -233,6 +282,7 @@ const FullScreenLoader = ({ text }) => (
 );
 
 // --- Permission Screen Component ---
+// This screen is shown on first load to ask the user for camera permissions.
 const PermissionScreen = ({ onDecision }) => {
     const [message, setMessage] = useState({ text: '', type: 'none' });
     const [step, setStep] = useState('initial'); // 'initial', 'requesting', 'testing', 'test_success', 'permission_denied'
@@ -310,18 +360,18 @@ const PermissionScreen = ({ onDecision }) => {
 
                 {step === 'testing' && (
                      <>
-                        <p className={`text-lg ${getMessageStyles(message.type)}`}>{message.text}</p>
-                        <div className="p-4 border border-slate-200 rounded-lg space-y-3">
-                            <button onClick={handleCameraTest} className="w-full px-6 py-3 bg-blue-600 text-white font-semibold rounded-md hover:bg-blue-700 transition-colors">
-                                Kamerayı Test Et
-                            </button>
-                        </div>
-                     </>
+                         <p className={`text-lg ${getMessageStyles(message.type)}`}>{message.text}</p>
+                         <div className="p-4 border border-slate-200 rounded-lg space-y-3">
+                             <button onClick={handleCameraTest} className="w-full px-6 py-3 bg-blue-600 text-white font-semibold rounded-md hover:bg-blue-700 transition-colors">
+                                 Kamerayı Test Et
+                             </button>
+                         </div>
+                      </>
                 )}
                 
                 {(step === 'requesting' || step === 'test_success' || step === 'permission_denied') && (
                      <div className={`p-4 border rounded-lg space-y-3 ${message.type === 'success' ? 'border-green-200' : 'border-red-200'}`}>
-                        <p className={`mt-2 text-lg ${getMessageStyles(message.type)}`}>{message.text || 'İzin isteniyor...'}</p>
+                         <p className={`mt-2 text-lg ${getMessageStyles(message.type)}`}>{message.text || 'İzin isteniyor...'}</p>
                     </div>
                 )}
             </div>
@@ -330,6 +380,7 @@ const PermissionScreen = ({ onDecision }) => {
 };
 
 // --- Sidebar Component ---
+// The main navigation sidebar for the application.
 const Sidebar = ({ page, setPage, currentSessionName, selectedLibrary, kohaData, scannedItems, isMuted, setIsMuted, isMobileMenuOpen, setMobileMenuOpen, onShare, onInstall, installPrompt }) => {
     const navItems = [
         { id: 'start', label: 'Yeni Sayım', disabled: false },
@@ -356,10 +407,10 @@ const Sidebar = ({ page, setPage, currentSessionName, selectedLibrary, kohaData,
             <aside className={`w-64 bg-white shadow-lg flex flex-col h-screen fixed top-0 left-0 z-40 transition-transform transform ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'} md:translate-x-0`}>
                 <div className="p-3 flex items-center justify-between border-b border-slate-200">
                      <div className="flex items-center gap-2">
-                        <div className="flex flex-col">
-                             <h1 className="text-lg font-bold text-slate-800">Koha Sayım Uygulaması</h1>
-                             <p className="text-[10px] text-slate-500 leading-tight">(T.C. Kültür ve Turizm Bakanlığı - Kütüphaneler ve Yayımlar Genel Müdürlüğü'ne bağlı kütüphaneler için geliştirilmiştir.)</p>
-                        </div>
+                         <div className="flex flex-col">
+                              <h1 className="text-lg font-bold text-slate-800">Koha Sayım Uygulaması</h1>
+                              <p className="text-[10px] text-slate-500 leading-tight">(T.C. Kültür ve Turizm Bakanlığı - Kütüphaneler ve Yayımlar Genel Müdürlüğü'ne bağlı kütüphaneler için geliştirilmiştir.)</p>
+                         </div>
                     </div>
                     <button className="md:hidden p-1 text-slate-500" onClick={() => setMobileMenuOpen(false)}>
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
@@ -488,7 +539,7 @@ const StartScreen = ({ sessions, sessionNameInput, setSessionNameInput, startNew
                             <button onClick={()=> setAddDataModal({isOpen: true, type: 'library'})} className="px-3 bg-slate-200 rounded-md hover:bg-slate-300">Yeni Ekle</button>
                         </div>
                          <div className="text-right">
-                            <a href="https://www.ismailkaraca.com.tr/kutuphanekod.html" target="_blank" rel="noopener noreferrer" className="text-xs text-blue-600 hover:underline mt-1 inline-block">Kütüphane Kod ve İsim Listesi için tıklayınız.</a>
+                             <a href="https://www.ismailkaraca.com.tr/kutuphanekod.html" target="_blank" rel="noopener noreferrer" className="text-xs text-blue-600 hover:underline mt-1 inline-block">Kütüphane Kod ve İsim Listesi için tıklayınız.</a>
                          </div>
                     </div>
                     <div>
@@ -501,9 +552,9 @@ const StartScreen = ({ sessions, sessionNameInput, setSessionNameInput, startNew
                             <button onClick={()=> setAddDataModal({isOpen: true, type: 'location'})} className="px-3 bg-slate-200 rounded-md hover:bg-slate-300">Yeni Ekle</button>
                         </div>
                         <p className="text-xs text-slate-500 mt-1">Yer seçimi yaparsanız, sayım yaptığınız yerde olmayan materyallerle ilgili uyarı verilecektir.</p>
-                        <div className="text-right">
-                            <a href="https://www.ismailkaraca.com.tr/bolumkod.html" target="_blank" rel="noopener noreferrer" className="text-xs text-blue-600 hover:underline mt-1 inline-block">Bölüm Kod ve İsim Listesi için tıklayınız.</a>
-                        </div>
+                         <div className="text-right">
+                             <a href="https://www.ismailkaraca.com.tr/bolumkod.html" target="_blank" rel="noopener noreferrer" className="text-xs text-blue-600 hover:underline mt-1 inline-block">Bölüm Kod ve İsim Listesi için tıklayınız.</a>
+                         </div>
                     </div>
                     <div>
                         <div className="flex justify-between items-center mb-2">
@@ -594,7 +645,7 @@ const ScanScreen = ({ isCameraOpen, isQrCodeReady, isCameraAllowed, setIsCameraO
                             <div className="mt-2 text-xs text-center text-red-800 bg-red-100 p-2 rounded-lg border border-red-200">
                                 <p className="font-semibold">
                                     <a href="#" onClick={(e) => { e.preventDefault(); localStorage.removeItem('cameraPermissionChoiceMade'); localStorage.removeItem('cameraPermissionStatus'); window.location.reload(); }} className="underline hover:text-red-900">
-                                       Kamera İzni Vermek İçin Tıklayın.
+                                        Kamera İzni Vermek İçin Tıklayın.
                                     </a>
                                 </p>
                                 <p className="font-bold mt-1">Not: Tüm işlemler sıfırlanacaktır.</p>
@@ -605,7 +656,7 @@ const ScanScreen = ({ isCameraOpen, isQrCodeReady, isCameraAllowed, setIsCameraO
                             <input id="barcode-input" type="tel" value={barcodeInput} onChange={handleBarcodeInput} placeholder="Barkodu okutun veya elle girin" className="w-full p-2 border border-slate-300 rounded-md" autoFocus />
                             <button type="submit" className="w-full bg-slate-600 text-white p-2 rounded-md hover:bg-slate-700">Ekle</button>
                         </form>
-                        {lastScanned && <div className={`p-3 rounded-md border-l-4 ${lastScanned.isValid ? 'bg-green-100 border-green-500' : 'bg-yellow-100 border-yellow-500'}`}><p className="font-bold text-slate-800">{lastScanned.barcode}</p><p className="text-sm text-slate-600">{lastScanned.data?.['eser_adi'] || 'Eser bilgisi bulunamadı'}</p>{lastScanned.warnings.map(w => <p key={w.id} style={{color: w.color}} className="text-sm font-semibold">{w.message || w.text}</p>)}</div>}
+                        {lastScanned && <div className={`p-3 rounded-md border-l-4 ${lastScanned.isValid ? 'bg-green-100 border-green-500' : 'bg-yellow-100 border-yellow-500'}`}><p className="font-mono text-slate-800">{lastScanned.barcode}</p><p className="text-sm text-slate-600">{lastScanned.data?.['eser_adi'] || 'Eser bilgisi bulunamadı'}</p>{lastScanned.warnings.map(w => <p key={w.id} style={{color: w.color}} className="text-sm font-semibold">{w.message || w.text}</p>)}</div>}
                         <div className="mt-4">
                             <button onClick={() => setPage('update-on-loan')} disabled={scannedItems.length === 0 || isBulkLoading} className="w-full bg-green-600 text-white font-bold py-3 px-4 rounded-md hover:bg-green-700 disabled:bg-green-400 disabled:cursor-not-allowed">Sayımı Bitir</button>
                             <p className="text-xs text-slate-500 text-center mt-2">"Sayımı Bitir"e tıkladığınızda; özet grafikler ve raporlar görüntülenir. Daha sonra menüden "Sayım" ekranına tekrar dönüş yapabilirsiniz.</p>
@@ -800,26 +851,26 @@ const SummaryScreen = ({ currentSessionName, summaryData, preAnalysisReports, po
                     <BarChart layout="vertical" data={summaryData.topErrorLocationsData} margin={{ top: 20, right: 30, left: 100, bottom: 5 }}><CartesianGrid strokeDasharray="3 3" /><XAxis type="number" /><YAxis type="category" dataKey="name" /><Tooltip /><Legend /><Bar dataKey="Hata Sayısı" fill="#E74C3C"><LabelList dataKey="Hata Sayısı" position="right" style={{ fill: '#333' }} /></Bar></BarChart>
                  </ChartContainer>
             </div>
-             <div ref={locationStatusRef} className="bg-white p-6 rounded-lg shadow-sm border h-[500px] mb-8 flex flex-col">
+              <div ref={locationStatusRef} className="bg-white p-6 rounded-lg shadow-sm border h-[500px] mb-8 flex flex-col">
                  <div className="flex justify-between items-center mb-2">
-                    <h3 className="text-xl font-semibold text-center text-slate-700 flex-1">Lokasyon Bazında Sayım Durumu (Aktif Koleksiyon)</h3>
-                    <button onClick={() => downloadChart(locationStatusRef, `lokasyon_durumu_${currentSessionName}.png`)} disabled={!isHtmlToImageReady} title="Grafiği İndir" className="p-1 text-slate-500 hover:bg-slate-200 rounded-full disabled:opacity-50">
-                        {ICONS.download}
-                    </button>
-                </div>
-                <ResponsiveContainer>
-                    <BarChart data={summaryData.locationStatusData} margin={{ top: 20, right: 30, left: 20, bottom: 70 }}>
-                        <CartesianGrid strokeDasharray="3 3" />
-                        <XAxis dataKey="name" angle={-45} textAnchor="end" interval={0} />
-                        <YAxis />
-                        <Tooltip />
-                        <Legend verticalAlign="top" wrapperStyle={{ paddingBottom: 10 }}/>
-                        <Bar dataKey="Geçerli" stackId="a" fill="#2ECC71" />
-                        <Bar dataKey="Uyarılı" stackId="a" fill="#FAD7A0" />
-                        <Bar dataKey="Eksik" stackId="a" fill="#95A5A6" />
-                    </BarChart>
-                </ResponsiveContainer>
-            </div>
+                     <h3 className="text-xl font-semibold text-center text-slate-700 flex-1">Lokasyon Bazında Sayım Durumu (Aktif Koleksiyon)</h3>
+                     <button onClick={() => downloadChart(locationStatusRef, `lokasyon_durumu_${currentSessionName}.png`)} disabled={!isHtmlToImageReady} title="Grafiği İndir" className="p-1 text-slate-500 hover:bg-slate-200 rounded-full disabled:opacity-50">
+                         {ICONS.download}
+                     </button>
+                 </div>
+                 <ResponsiveContainer>
+                     <BarChart data={summaryData.locationStatusData} margin={{ top: 20, right: 30, left: 20, bottom: 70 }}>
+                         <CartesianGrid strokeDasharray="3 3" />
+                         <XAxis dataKey="name" angle={-45} textAnchor="end" interval={0} />
+                         <YAxis />
+                         <Tooltip />
+                         <Legend verticalAlign="top" wrapperStyle={{ paddingBottom: 10 }}/>
+                         <Bar dataKey="Geçerli" stackId="a" fill="#2ECC71" />
+                         <Bar dataKey="Uyarılı" stackId="a" fill="#FAD7A0" />
+                         <Bar dataKey="Eksik" stackId="a" fill="#95A5A6" />
+                     </BarChart>
+                 </ResponsiveContainer>
+             </div>
             <div className="mt-10">
                 <div className="mb-12">
                     <h2 className="text-3xl font-bold mb-2 text-slate-800">Sayım Sonucu Raporları</h2>
@@ -846,10 +897,12 @@ const SummaryScreen = ({ currentSessionName, summaryData, preAnalysisReports, po
 };
 
 export default function App() {
+    // Dynamically load necessary external scripts
     const isXlsxReady = useScript('https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js', 'XLSX');
     const isQrCodeReady = useScript('https://unpkg.com/html5-qrcode', 'Html5Qrcode');
     const isHtmlToImageReady = useScript('https://cdnjs.cloudflare.com/ajax/libs/html-to-image/1.11.11/html-to-image.min.js', 'htmlToImage');
     
+    // State management for the entire application
     const [page, setPage] = useState('permission'); // 'permission', 'start', 'pre-reports', 'scan', 'summary'
     const [isMobileMenuOpen, setMobileMenuOpen] = useState(false);
     const [isCameraAllowed, setIsCameraAllowed] = useState(false);
@@ -884,9 +937,10 @@ export default function App() {
     const manualInputDebounceRef = useRef(null);
 
     useEffect(() => {
-        // Tarayıcının sayfayı otomatik olarak çevirmeye çalışmasını önlemek için dil etiketini 'tr' olarak ayarla
+        // Set document language to prevent auto-translation issues
         document.documentElement.lang = 'tr';
         
+        // Handle PWA installation prompt
         const handleBeforeInstallPrompt = (e) => {
             e.preventDefault();
             setInstallPrompt(e);
@@ -969,10 +1023,11 @@ export default function App() {
             if (savedLocs) setCustomLocations(JSON.parse(savedLocs));
         } catch (e) {
             console.error("Veriler yüklenemedi:", e);
-            setPage('start'); // Hata durumunda ana sayfaya yönlendir
+            setPage('start'); // Fallback to start page on error
         }
     }, []);
     
+    // Auto-save session data to localStorage whenever it changes
     useEffect(() => {
         if (currentSessionName) {
             const sessionToSave = {
@@ -984,7 +1039,7 @@ export default function App() {
             };
 
             try {
-                // Don't stringify kohaData if it's large, handle re-upload on load
+                // Stringify kohaData for saving, but handle potential size issues
                 sessionToSave.kohaData = JSON.stringify(kohaData);
                 localStorage.setItem(`koha_session_${currentSessionName}`, JSON.stringify(sessionToSave));
             } catch (e) {
@@ -995,7 +1050,7 @@ export default function App() {
                 localStorage.setItem(`koha_session_${currentSessionName}`, JSON.stringify(sessionToSave));
             }
 
-            // Update the sessions list
+            // Update the sessions list for the start screen
             setSessions(prev => ({...prev, [currentSessionName]: {name: currentSessionName, items: scannedItems, lastUpdated: new Date().toISOString()}}));
         }
     }, [currentSessionName, selectedLibrary, selectedLocation, scannedItems, kohaData]);
@@ -1102,6 +1157,7 @@ export default function App() {
         reader.readAsArrayBuffer(file);
     };
     
+    // Core logic for processing a scanned or entered barcode
     const processBarcode = useCallback((barcode, isBulk = false) => {
         const rawBarcode = String(barcode).trim();
         if (!rawBarcode || !selectedLibrary) return false;
@@ -1163,7 +1219,7 @@ export default function App() {
         const itemData = kohaDataMap.get(normalizedBarcode);
         const warnings = [];
         if (itemData) {
-            // Kütüphane kodu kontrolü barkod ön ekinden yapıldığı için kaldırıldı.
+            // Library code check is now done via barcode prefix, so it's removed from here.
             if (selectedLocation && String(itemData['materyalin_yeri_kodu'] || '') !== selectedLocation) warnings.push(WARNING_DEFINITIONS.locationMismatch);
             const loanEligibilityCode = String(itemData['odunc_verilebilirlik_kodu']);
             if (!['0', '2'].includes(loanEligibilityCode)) {
@@ -1388,9 +1444,11 @@ export default function App() {
     const filteredScannedItems = useMemo(() => scannedItems.filter(item => (searchTerm ? (item.barcode.includes(searchTerm) || String(item.data?.['eser_adi'] || '').toLowerCase().includes(searchTerm.toLowerCase())) : true) && (warningFilter === 'all' ? true : item.warnings.some(w => w.id === warningFilter))), [scannedItems, searchTerm, warningFilter]);
 
     // --- Report Generation ---
+    // Functions to generate and download reports in TXT and XLSX formats.
     const downloadTxt = (data, filename) => { const blob = new Blob([data], { type: 'text/plain;charset=utf-8' }); const url = URL.createObjectURL(blob); const link = document.createElement('a'); link.href = url; link.download = filename; document.body.appendChild(link); link.click(); document.body.removeChild(link); URL.revokeObjectURL(url); };
     const downloadXlsx = (data, filename) => { if (!isXlsxReady) { alert("Excel kütüphanesi hazır değil."); return; } const ws = window.XLSX.utils.json_to_sheet(data); const wb = window.XLSX.utils.book_new(); window.XLSX.utils.book_append_sheet(wb, ws, "Rapor"); window.XLSX.writeFile(wb, filename); };
     
+    // Configuration for pre-analysis reports (based on initial Excel file)
     const PRE_ANALYSIS_REPORTS_CONFIG = useMemo(() => [
         { 
             id: 'preOnLoan', 
@@ -1400,7 +1458,7 @@ export default function App() {
             description: 'Koha verisine göre halihazırda bir okuyucunun üzerinde ödünçte görünen materyaller.', 
             generator: () => { 
                 const data = kohaData.filter(i => String(i['odunc_durumu']) === '1'); 
-                downloadXlsx(data, `on_analiz_oduncteki_materyaller_${currentSessionName}.xlsx`); 
+                downloadXlsx(transformReportData(data), `on_analiz_oduncteki_materyaller_${currentSessionName}.xlsx`); 
             } 
         },
         { 
@@ -1411,7 +1469,7 @@ export default function App() {
             description: 'Koha verisine göre materyal statüsü "düşüm" veya "devir" gibi koleksiyon dışı bir durumu gösteren tüm materyaller.', 
             generator: () => { 
                 const data = kohaData.filter(i => String(i['materyal_statusu_kodu']) !== '0'); 
-                downloadXlsx(data, `on_analiz_dusum_devir_statulu_${currentSessionName}.xlsx`); 
+                downloadXlsx(transformReportData(data), `on_analiz_dusum_devir_statulu_${currentSessionName}.xlsx`); 
             } 
         },
         { 
@@ -1422,24 +1480,26 @@ export default function App() {
             description: 'Koha verisine göre Ödünç Verilebilirlik Durumu "Ödünç Verilebilir" Olmayan Tüm Materyaller.', 
             generator: () => { 
                 const data = kohaData.filter(i => String(i['odunc_verilebilirlik_kodu']) !== '0'); 
-                downloadXlsx(data, `on_analiz_odunc_verilemeyenler_${currentSessionName}.xlsx`); 
+                downloadXlsx(transformReportData(data), `on_analiz_odunc_verilemeyenler_${currentSessionName}.xlsx`); 
             } 
         },
     ], [kohaData, currentSessionName, isXlsxReady]);
 
 
+    // Configuration for post-scan reports (based on scanned items)
     const POST_SCAN_REPORTS_CONFIG = useMemo(() => [
-        { id: 'writeOff', title: 'Düşüm İşlemi İçin Barkodlar (Eksikler)', format: '.txt', icon: ICONS.writeOff, description: "Bu dosya, Koha Materyal Düzeltme/Düşüm Modülü'ne yüklenerek materyallerin topluca düşümünü sağlar.", links: [{ text: 'Koha Düşüm Modülü', url: 'https://personel.ekutuphane.gov.tr/cgi-bin/koha/tools/batchMod.pl' }], notes: ['Sadece Müdür/Yönetici yetkisine sahip personel erişebilir.', 'Yetkisi olmayanlar koha@ktb.gov.tr adresinden talep edebilir.'], generator: () => { const scannedBarcodes = new Set(scannedItems.filter(i => !i.warnings.some(w => w.id === 'duplicate')).map(i => i.barcode)); const missingBarcodes = kohaData.filter(i => !scannedBarcodes.has(String(i.barkod))).map(i => String(i.barkod).slice(0, 12)); downloadTxt(missingBarcodes.join('\n'), `sayim_sonucu_dusum_icin_eksik_barkodlar_${currentSessionName}.txt`); } },
-        { id: 'missing', title: 'Eksik Materyaller', format: '.xlsx', icon: ICONS.missing, description: 'Sayım sırasında hiç okutulmamış olan, kütüphane koleksiyonuna ait materyallerin listesi.', generator: () => { const scannedBarcodes = new Set(scannedItems.filter(i => !i.warnings.some(w => w.id === 'duplicate')).map(i => i.barcode)); const missingItems = kohaData.filter(i => !scannedBarcodes.has(String(i.barkod))); downloadXlsx(missingItems, `sayim_sonucu_eksik_materyaller_${currentSessionName}.xlsx`); } },
+        { id: 'writeOff', title: 'Düşüm İşlemi İçin Barkodlar (Eksikler)', format: '.txt', icon: ICONS.writeOff, description: "Bu dosya, Koha Materyal Düzeltme/Düşüm Modülü'ne yüklenerek materyallerin topluca düşümünü sağlar.", links: [{ text: 'Koha Düşüm Modülü', url: 'https://personel.ekutuphane.gov.tr/cgi-bin/koha/tools/batchMod.pl' }], notes: ['Sadece Müdür/Yönetici yetkisine sahip personel erişebilir.', 'Yetkisi olmayanlar koha@ktb.gov.tr adresinden talep edebilir.'], generator: () => { const scannedBarcodes = new Set(scannedItems.filter(i => !i.warnings.some(w => w.id === 'duplicate')).map(i => i.barcode)); const missingBarcodes = kohaData.filter(i => String(i['materyal_statusu_kodu']) === '0' && !scannedBarcodes.has(String(i.barkod))).map(i => String(i.barkod).slice(0, 12)); downloadTxt(missingBarcodes.join('\n'), `sayim_sonucu_dusum_icin_eksik_barkodlar_${currentSessionName}.txt`); } },
+        { id: 'missing', title: 'Eksik Materyaller', format: '.xlsx', icon: ICONS.missing, description: 'Sayım sırasında hiç okutulmamış olan, kütüphane koleksiyonuna ait materyallerin listesi.', generator: () => { const scannedBarcodes = new Set(scannedItems.filter(i => !i.warnings.some(w => w.id === 'duplicate')).map(i => i.barcode)); const missingItems = kohaData.filter(i => String(i['materyal_statusu_kodu']) === '0' && !scannedBarcodes.has(String(i.barkod))); downloadXlsx(transformReportData(missingItems), `sayim_sonucu_eksik_materyaller_${currentSessionName}.xlsx`); } },
         { id: 'duplicateScans', title: 'Tekrar Okutulan Barkodlar', format: '.xlsx', icon: ICONS.all, description: 'Sayım sırasında birden fazla kez okutulan tüm barkodların listesi. Bu rapor, hem koleksiyon listesinde olan hem de olmayan tekrar okutulmuş barkodları içerir.', generator: () => { const barcodeCounts = scannedItems.reduce((acc, item) => { acc[item.barcode] = (acc[item.barcode] || 0) + 1; return acc; }, {}); const duplicates = Object.entries(barcodeCounts).filter(([, count]) => count > 1).map(([barcode, count]) => { const firstInstance = scannedItems.find(item => item.barcode === barcode); const itemData = firstInstance?.data; const wrongLibWarning = firstInstance.warnings.find(w => w.id === 'wrongLibrary'); return { 'Barkod': barcode, 'Tekrar Sayısı': count, 'Eser Adı': itemData?.['eser_adi'] || 'Bilinmiyor', 'Farklı Kütüphane Adı': wrongLibWarning?.libraryName || '' }; }); downloadXlsx(duplicates, `sayim_sonucu_tekrar_okutulanlar_${currentSessionName}.xlsx`); } },
         { id: 'invalidStructure', title: '❗ Yapıya Uygun Olmayan Barkodlar (Okutulanlar)', format: '.xlsx', icon: ICONS.status, description: 'Sayım sırasında okutulan ve barkod yapısı bilinen hiçbir kütüphane koduna uymayan barkodlar.', generator: () => { const data = scannedItems.filter(i => i.warnings.some(w => w.id === 'invalidStructure')).map(i => ({ Hatalı_Barkod: i.barcode })); downloadXlsx(data, `sayim_sonucu_yapiya_uygun_olmayanlar_${currentSessionName}.xlsx`); } },
         { id: 'deletedScanned', title: '❗ Listede Olmayan ve Sayımı Yapılan Barkodlar', format: '.xlsx', icon: ICONS.status, description: 'Sayım sırasında okutulan ancak Koha\'dan indirilen listede bulunamayan barkodlar (muhtemelen sistemden silinmiş veya hatalı girilmiş).', generator: () => { const data = scannedItems.filter(i => i.warnings.some(w => w.id === 'deleted' || w.id === 'autoCompletedNotFound')).map(i => ({ Barkod: i.barcode, 'Not': 'Okutuldu, listede bulunamadı' })); downloadXlsx(data, `sayim_sonucu_listede_olmayan_okutulanlar_${currentSessionName}.xlsx`); } },
-        { id: 'allResults', title: 'Tüm Sayım Sonuçları (Uyarılar Dahil)', format: '.xlsx', icon: ICONS.all, description: 'Sayım boyunca okutulan tüm materyallerin, aldıkları uyarılarla birlikte tam listesi.', generator: () => { const data = scannedItems.map(i => { const wrongLibWarning = i.warnings.find(w => w.id === 'wrongLibrary'); return { Barkod: i.barcode, 'Eser Adı': i.data?.['eser_adi'] || '', Uyarılar: i.warnings.map(w => w.message || w.text).join(', ') || 'Temiz', 'Farklı Kütüphane Adı': wrongLibWarning?.libraryName || '', ...i.data }; }); downloadXlsx(data, `sayim_sonucu_tum_sonuclar_${currentSessionName}.xlsx`); } },
-        { id: 'cleanList', title: 'Temiz Liste (Uyarısız Okutulanlar)', format: '.xlsx', icon: ICONS.clean, description: 'Sayım sırasında okutulan ve hiçbir uyarı almayan, durumu ve konumu doğru olan materyallerin listesi.', generator: () => { const data = scannedItems.filter(i => i.isValid).map(i => i.data); downloadXlsx(data, `sayim_sonucu_temiz_liste_${currentSessionName}.xlsx`); } },
+        { id: 'allResults', title: 'Tüm Sayım Sonuçları (Uyarılar Dahil)', format: '.xlsx', icon: ICONS.all, description: 'Sayım boyunca okutulan tüm materyallerin, aldıkları uyarılarla birlikte tam listesi.', generator: () => { const data = scannedItems.map(i => { const wrongLibWarning = i.warnings.find(w => w.id === 'wrongLibrary'); const transformedKohaData = i.data ? transformReportData([i.data])[0] : {}; return { Barkod: i.barcode, 'Eser Adı': i.data?.['eser_adi'] || '', Uyarılar: i.warnings.map(w => w.message || w.text).join(', ') || 'Temiz', 'Farklı Kütüphane Adı': wrongLibWarning?.libraryName || '', ...transformedKohaData }; }); downloadXlsx(data, `sayim_sonucu_tum_sonuclar_${currentSessionName}.xlsx`); } },
+        { id: 'cleanList', title: 'Temiz Liste (Uyarısız Okutulanlar)', format: '.xlsx', icon: ICONS.clean, description: 'Sayım sırasında okutulan ve hiçbir uyarı almayan, durumu ve konumu doğru olan materyallerin listesi.', generator: () => { const data = scannedItems.filter(i => i.isValid).map(i => i.data); downloadXlsx(transformReportData(data), `sayim_sonucu_temiz_liste_${currentSessionName}.xlsx`); } },
         { id: 'wrongLibrary', title: 'Kütüphanenize Ait Olmayan ve Okutulan Barkodlar', format: '.xlsx', icon: ICONS.wrongLib, description: 'Sayım sırasında okutulan ancak sayım yapılan kütüphaneye ait olmayan (farklı şube koduna sahip) materyaller.', generator: () => { const data = scannedItems.filter(i => i.warnings.some(w => w.id === 'wrongLibrary')).map(i => { const wrongLibWarning = i.warnings.find(w => w.id === 'wrongLibrary'); return { 'Barkod': i.barcode, 'Ait Olduğu Kütüphane': wrongLibWarning?.libraryName || 'Bilinmiyor' }; }); downloadXlsx(data, `sayim_sonucu_kutuphane_disi_${currentSessionName}.xlsx`); } },
-        { id: 'locationMismatch', title: 'Yer Uyumsuzları (Okutulanlar)', format: '.xlsx', icon: ICONS.location, description: 'Sayım sırasında, başlangıçta seçilen lokasyon dışında bir yerde okutulan materyaller.', generator: () => { const data = scannedItems.filter(i => i.warnings.some(w => w.id === 'locationMismatch')).map(i => i.data); downloadXlsx(data, `sayim_sonucu_yer_uyumsuz_${currentSessionName}.xlsx`); } },
+        { id: 'locationMismatch', title: 'Yer Uyumsuzları (Okutulanlar)', format: '.xlsx', icon: ICONS.location, description: 'Sayım sırasında, başlangıçta seçilen lokasyon dışında bir yerde okutulan materyaller.', generator: () => { const data = scannedItems.filter(i => i.warnings.some(w => w.id === 'locationMismatch')).map(i => i.data); downloadXlsx(transformReportData(data), `sayim_sonucu_yer_uyumsuz_${currentSessionName}.xlsx`); } },
     ], [kohaData, scannedItems, currentSessionName, selectedLibrary, isXlsxReady, combinedLibraries]);
 
+    // Calculate summary data for the dashboard and charts
     const summaryData = useMemo(() => {
         if (scannedItems.length === 0 && kohaData.length === 0) return null;
         const STATUS_MAP = { '0': 'Eser Koleksiyonda', '1': 'Düşüm Yapıldı', '2': 'Devir Yapıldı' };
@@ -1453,6 +1513,7 @@ export default function App() {
         const warningCounts = scannedItems.flatMap(item => item.warnings).reduce((acc, warning) => { acc[warning.id] = (acc[warning.id] || 0) + 1; return acc; }, {}); const warningBarData = Object.entries(warningCounts).map(([id, count]) => ({ name: WARNING_DEFINITIONS[id]?.text || id, Sayı: count })); const scanProgress = scannedItems.reduce((acc, item) => { const hour = new Date(item.timestamp).getHours().toString().padStart(2, '0') + ':00'; acc[hour] = (acc[hour] || 0) + 1; return acc; }, {}); const scanProgressData = Object.entries(scanProgress).map(([time, count]) => ({ time, 'Okutulan Sayısı': count })).sort((a,b) => a.time.localeCompare(b.time)); const topErrorLocations = scannedItems.filter(i => i.warnings.length > 0).reduce((acc, item) => { const loc = item.data?.['materyalin_yeri_kodu'] || 'Bilinmeyen'; acc[loc] = (acc[loc] || 0) + 1; return acc; }, {}); const topErrorLocationsData = Object.entries(topErrorLocations).map(([name, count]) => ({ name, 'Hata Sayısı': count })).sort((a, b) => b['Hata Sayısı'] - a['Hata Sayısı']).slice(0, 10); let scanSpeed = 0; if(scannedItems.length > 1){ const firstScanTime = new Date(scannedItems[scannedItems.length - 1].timestamp).getTime(); const lastScanTime = new Date(scannedItems[0].timestamp).getTime(); const durationMinutes = (lastScanTime - firstScanTime) / (1000 * 60); scanSpeed = durationMinutes > 0 ? Math.round(scannedItems.length / durationMinutes) : "∞"; } const activeKohaData = kohaData.filter(item => String(item['materyal_statusu_kodu']) === '0'); const activeScannedItems = scannedItems.filter(item => item.data && String(item.data['materyal_statusu_kodu']) === '0'); const uniqueActiveScannedItems = [...new Map(activeScannedItems.map(item => [item.barcode, item])).values()]; const valid = uniqueActiveScannedItems.filter(item => item.isValid).length; const invalid = uniqueActiveScannedItems.length - valid; const activeKohaBarcodes = new Set(activeKohaData.map(item => String(item.barkod))); const activeScannedBarcodes = new Set(uniqueActiveScannedItems.map(item => item.barcode)); const notScannedCount = [...activeKohaBarcodes].filter(b => !activeScannedBarcodes.has(b)).length; const pieData = [ { name: 'Geçerli', value: valid }, { name: 'Uyarılı', value: invalid }, { name: 'Eksik', value: notScannedCount } ]; const locationStatus = {}; activeKohaData.forEach(item => { const loc = item['materyalin_yeri_kodu'] || 'Bilinmeyen'; if(!locationStatus[loc]) locationStatus[loc] = { 'Geçerli': 0, 'Uyarılı': 0, 'Eksik': 0 }; }); uniqueActiveScannedItems.forEach(item => { const loc = item.data?.['materyalin_yeri_kodu'] || 'Bilinmeyen'; if(!locationStatus[loc]) locationStatus[loc] = { 'Geçerli': 0, 'Uyarılı': 0, 'Eksik': 0 }; if(item.isValid) locationStatus[loc]['Geçerli']++; else locationStatus[loc]['Uyarılı']++; }); const scannedActiveKohaBarcodes = new Set(uniqueActiveScannedItems.map(i => i.barcode)); activeKohaData.forEach(item => { const loc = item['materyalin_yeri_kodu'] || 'Bilinmeyen'; if(!scannedActiveKohaBarcodes.has(String(item.barkod))) { locationStatus[loc]['Eksik']++; } }); const locationStatusData = Object.entries(locationStatus).map(([name, data]) => ({ name, ...data })); return { totalScanned: scannedItems.length, valid, invalid, notScannedCount, scanSpeed, pieData, warningBarData, scanProgressData, locationStatusData, topErrorLocationsData, materialStatusPieData }; }, [scannedItems, kohaData]);
     
     // --- Render Functions ---
+    // Maps page state to the corresponding component to render.
     const pageTitles = {
         start: 'Yeni Sayım',
         'pre-reports': 'Ön Raporlar',
@@ -1465,7 +1526,7 @@ export default function App() {
     const MobileHeader = ({ onMenuClick, pageTitle }) => (
         <header className="md:hidden bg-white shadow-md p-4 flex items-center justify-between sticky top-0 z-20">
             <button onClick={onMenuClick} className="p-2 text-slate-600">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
             </button>
             <h2 className="text-lg font-bold text-slate-800">{pageTitle}</h2>
             <div className="w-8"></div> {/* Spacer to balance the title */}
@@ -1517,10 +1578,10 @@ export default function App() {
             
             <div className="md:ml-64 flex flex-col min-h-screen bg-slate-100">
                  {page !== 'permission' && (
-                    <MobileHeader
-                        onMenuClick={() => setMobileMenuOpen(true)}
-                        pageTitle={pageTitles[page]}
-                    />
+                     <MobileHeader
+                         onMenuClick={() => setMobileMenuOpen(true)}
+                         pageTitle={pageTitles[page]}
+                     />
                  )}
                 <main className="flex-1">
                     {page === 'permission' ? (
