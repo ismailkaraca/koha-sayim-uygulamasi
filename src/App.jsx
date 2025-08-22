@@ -1015,6 +1015,25 @@ export default function App() {
             console.error("Ses çalınamadı:", e);
         }
     }, [isMuted]);
+    
+    const loadSession = useCallback((sessionName) => {
+        const sessionString = localStorage.getItem(`koha_session_${sessionName}`);
+        if (sessionString) {
+            const session = JSON.parse(sessionString);
+            setCurrentSessionName(session.name);
+            setSelectedLibrary(session.library);
+            setSelectedLocation(session.location);
+            setScannedItems(session.items || []);
+            processedBarcodesRef.current = new Set((session.items || []).map(i => i.barcode));
+            setLastScanned((session.items || []).length > 0 ? session.items[0] : null);
+            
+            // IMPORTANT: Clear kohaData and require re-upload to prevent storage issues.
+            setKohaData([]);
+            setKohaDataMap(new Map());
+            setError(`"${sessionName}" oturumu yüklendi. Devam etmek için lütfen ilgili Koha sayım dosyasını (.xlsx) tekrar yükleyin.`);
+            setPage('start'); // Go back to start to re-upload
+        }
+    }, []);
 
     useEffect(() => {
         try {
@@ -1033,17 +1052,38 @@ export default function App() {
             if (savedLibs) setCustomLibraries(JSON.parse(savedLibs));
             const savedLocs = localStorage.getItem('customLocations');
             if (savedLocs) setCustomLocations(JSON.parse(savedLocs));
+
+            // **NEW**: Restore active session on page load
+            const activeSessionName = localStorage.getItem('activeKohaSessionName');
+            if (activeSessionName && localStorage.getItem(`koha_session_${activeSessionName}`)) {
+                loadSession(activeSessionName);
+            }
+
         } catch (e) {
             console.error("Veriler yüklenemedi:", e);
             setPage('start'); // Fallback to start page on error
         }
-    }, []);
+    }, [loadSession]);
     
+    // **NEW**: Add protection against accidental page refresh/close
+    useEffect(() => {
+        const handleBeforeUnload = (e) => {
+            // Only show prompt if a session is active
+            if (currentSessionName) {
+                e.preventDefault();
+                e.returnValue = ''; // Required for cross-browser compatibility
+            }
+        };
+
+        window.addEventListener('beforeunload', handleBeforeUnload);
+        return () => {
+            window.removeEventListener('beforeunload', handleBeforeUnload);
+        };
+    }, [currentSessionName]);
+
     // Auto-save session data to localStorage whenever it changes
     useEffect(() => {
         if (currentSessionName) {
-            // IMPORTANT: Do not save kohaData to localStorage to avoid exceeding quota.
-            // It will be re-uploaded when the session is loaded.
             const sessionToSave = {
                 name: currentSessionName,
                 library: selectedLibrary,
@@ -1054,13 +1094,13 @@ export default function App() {
     
             try {
                 localStorage.setItem(`koha_session_${currentSessionName}`, JSON.stringify(sessionToSave));
+                localStorage.setItem('activeKohaSessionName', currentSessionName); // **NEW**: Save active session name
                 
-                // Update the main sessions list (summary only)
                 setSessions(prev => {
                     const updatedSessions = {...prev};
                     updatedSessions[currentSessionName] = {
                         name: currentSessionName, 
-                        items: { length: scannedItems.length }, // Only store length for display
+                        items: { length: scannedItems.length },
                         lastUpdated: new Date().toISOString()
                     };
                     localStorage.setItem('kohaInventorySessions', JSON.stringify(updatedSessions));
@@ -1090,26 +1130,37 @@ export default function App() {
         setPage('pre-reports');
     };
     
-    const loadSession = (sessionName) => {
-        const sessionString = localStorage.getItem(`koha_session_${sessionName}`);
-        if (sessionString) {
-            const session = JSON.parse(sessionString);
-            setCurrentSessionName(session.name);
-            setSelectedLibrary(session.library);
-            setSelectedLocation(session.location);
-            setScannedItems(session.items || []);
-            processedBarcodesRef.current = new Set((session.items || []).map(i => i.barcode));
-            setLastScanned((session.items || []).length > 0 ? session.items[0] : null);
-            
-            // IMPORTANT: Clear kohaData and require re-upload to prevent storage issues.
-            setKohaData([]);
-            setKohaDataMap(new Map());
-            setError(`"${sessionName}" oturumu yüklendi. Devam etmek için lütfen ilgili Koha sayım dosyasını (.xlsx) tekrar yükleyin.`);
-            setPage('start'); // Go back to start to re-upload
-        }
-    };
+    const deleteSession = useCallback((sessionName) => {
+        setConfirmationModal({
+            isOpen: true,
+            message: `"${sessionName}" isimli sayımı silmek istediğinizden emin misiniz? Bu işlem geri alınamaz.`,
+            onConfirm: () => {
+                const newSessions = { ...sessions };
+                delete newSessions[sessionName];
+                setSessions(newSessions);
+                localStorage.removeItem(`koha_session_${sessionName}`);
+                localStorage.setItem('kohaInventorySessions', JSON.stringify(newSessions));
 
-    const deleteSession = (sessionName) => { setConfirmationModal({ isOpen: true, message: `"${sessionName}" isimli sayımı silmek istediğinizden emin misiniz? Bu işlem geri alınamaz.`, onConfirm: () => { const newSessions = { ...sessions }; delete newSessions[sessionName]; setSessions(newSessions); localStorage.removeItem(`koha_session_${sessionName}`); localStorage.setItem('kohaInventorySessions', JSON.stringify(newSessions)); } }); };
+                // **NEW**: Clear active session if it's the one being deleted
+                if (localStorage.getItem('activeKohaSessionName') === sessionName) {
+                    localStorage.removeItem('activeKohaSessionName');
+                    if (currentSessionName === sessionName) {
+                        setCurrentSessionName('');
+                        setSessionNameInput('');
+                        setSelectedLibrary('');
+                        setSelectedLocation('');
+                        setScannedItems([]);
+                        setKohaData([]);
+                        setKohaDataMap(new Map());
+                        processedBarcodesRef.current.clear();
+                        setLastScanned(null);
+                        setError('');
+                        setPage('start');
+                    }
+                }
+            }
+        });
+    }, [sessions, currentSessionName]);
     
     const handleAddCustomData = (type, code, name) => {
         if (type === 'library') {
