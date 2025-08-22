@@ -145,10 +145,26 @@ const RobustBarcodeScanner = ({ onScan, onClose, isPaused }) => {
 // --- Data Constants & Icons ---
 // Initial data for libraries and locations, and definitions for warnings and icons.
 const INITIAL_LIBRARIES = [
-  ["1001","Ankara Sincan Törekent Halk  Kütüphanesi"]
+    ["12", "ADANA İL HALK KÜTÜPHANESİ"], ["1530", "Adana Adalet Halk Kütüphanesi"], ["1317", "Adana Aladağ İlçe Halk Kütüphanesi"],
+    ["113", "Adana Ceyhan İlçe Halk Kütüphanesi"], ["1310", "Adana Ceyhan Murat Göğebakan Kültür Merkezi Halk Kütüphanesi"],
+    ["670", "Adana Feke İlçe Halk Kütüphanesi"], ["760", "Adana İmamoğlu Remzi Oğuz Arık İlçe Halk Kütüphanesi"],
+    ["1200", "Adana Karacaoğlan Edebiyat Müze Kütüphanesi"], ["796", "Adana Karaisalı İlçe Halk Kütüphanesi"],
+    ["675", "Adana Kozan Gazi Halk Kütüphanesi"], ["114", "Adana Kozan Karacaoğlan İlçe Halk Kütüphanesi"],
+    ["1320", "Adana Kozan Özden Kültür Merkezi Halk Kütüphanesi"], ["956", "Adana Pozantı İlçe Halk Kütüphanesi"],
+    ["499", "Adana Saimbeyli Azmi Yazıcıoğlu İlçe Halk Kütüphanesi"], ["1588", "Adana Sarıçam Bebek ve Çocuk Kütüphanesi"],
+    ["1007", "Adana Sarıçam İlçe Halk Kütüphanesi"], ["763", "Adana Sarıçam İncirlik 100. Yıl Çocuk Kütüphanesi"],
+    ["557", "Adana Seyhan Çağdaş Çocuk Kütüphanesi"], ["1024", "Adana Seyhan Şakirpaşa Halk Kütüphanesi"],
+    ["995", "Adana Seyhan Yusuf Fırat Kotan İlçe Halk Kütüphanesi"], ["1071", "Adana Tufanbeyli İlçe Halk Kütüphanesi"],
+    ["1135", "Adana Yumurtalık İlçe Halk Kütüphanesi"], ["1139", "Adana Yüreğir Hacı Mehmet Sabancı İlçe Halk Kütüphanesi"],
+    ["1237", "Adana Yüreğir Kültür Merkezi Çocuk ve Gençlik Kütüphanesi"], ["13", "ADIYAMAN İL HALK KÜTÜPHANESİ"],
+    ["110", "DEMO KÜTÜPHANE"]
 ];
 const INITIAL_LOCATIONS = [
-    ["YB", "Yetişkin Bölümü"], ["ÇB", "Çocuk Bölümü"]
+    ["AB", "Atatürk Bölümü"], ["AÖÖK", "Adnan Ötüken Özel Koleksiyonu"], ["BB", "Bebek Bölümü (0-3 Yaş)"],
+    ["D", "Depo"], ["DB", "Danışma Bölümü"], ["DG", "Diğer"], ["GB", "Gençlik Bölümü"], ["GK", "Gezici Kütüphane"],
+    ["IOK", "İlk Okuma Kitapları Bölümü"], ["KB", "Kataloglama Bölümü"], ["NE", "Nadir Eserler Bölümü"],
+    ["S", "Salon"], ["SB", "Sanat Bölümü"], ["SY", "Süreli Yayınlar Bölümü"], ["YB", "Yetişkin Bölümü"],
+    ["YDB", "Yabancı Diller Bölümü"], ["ÇB", "Çocuk Bölümü"]
 ];
 const WARNING_DEFINITIONS = { 
     invalidStructure: { id: 'invalidStructure', text: 'Yapıya Uygun Olmayan', color: '#E74C3C', sound: 'A#3', message: 'Okutulan barkod gerekli yapıyla eşleşmiyor.' }, 
@@ -612,7 +628,7 @@ const PreReportsScreen = ({ currentSessionName, error, setPage, preAnalysisRepor
     </div>
 );
 
-const ScanScreen = ({ isCameraOpen, isQrCodeReady, isCameraAllowed, setIsCameraOpen, handleCameraScan, warningModal, currentSessionName, combinedLibraries, selectedLibrary, combinedLocations, selectedLocation, barcodeInput, handleBarcodeInput, handleManualEntry, lastScanned, handleBulkUpload, isBulkLoading, setPage, scannedItems, filteredScannedItems, searchTerm, setSearchTerm, warningFilter, setWarningFilter, handleDeleteItem, handleClearAllScans }) => {
+const ScanScreen = ({ isCameraOpen, isQrCodeReady, isCameraAllowed, setIsCameraOpen, handleCameraScan, warningModal, currentSessionName, combinedLibraries, selectedLibrary, combinedLocations, selectedLocation, barcodeInput, handleBarcodeInput, handleManualEntry, lastScanned, handleBulkUpload, isBulkLoading, setPage, scannedItems, filteredScannedItems, searchTerm, setSearchTerm, warningFilter, setWarningFilter, handleDeleteItem, handleClearAllScans, fileUploaderKey }) => {
     const bulkUploadTitle = "Toplu barkod(12 veya 13 haneli) içeren not defteri(.txt) veya Excel(.xlsx) dosyası yüklemek için tıklayın";
     const bulkUploadAccept = {
         'text/plain': ['.txt'],
@@ -624,8 +640,8 @@ const ScanScreen = ({ isCameraOpen, isQrCodeReady, isCameraAllowed, setIsCameraO
         <>
             {isCameraOpen && isQrCodeReady && isCameraAllowed && <RobustBarcodeScanner onClose={() => setIsCameraOpen(false)} onScan={handleCameraScan} isPaused={warningModal.isOpen} />}
             <div className="flex flex-col md:flex-row h-full bg-slate-50">
-                <div className="w-full md:w-1/3 lg:w-1/4 p-4 bg-white border-r flex flex-col">
-                    <div className="flex-grow space-y-4">
+                <div className="w-full md:w-1/3 lg:w-1/4 p-4 bg-white border-r flex flex-col h-full">
+                    <div className="flex-1 overflow-y-auto pr-2 space-y-4">
                         <h2 className="text-xl font-bold text-slate-800">Sayım: {currentSessionName}</h2>
                         <div className="text-sm text-slate-600">
                             <p><span className="font-semibold">Kütüphane:</span> {combinedLibraries.get(selectedLibrary)}</p>
@@ -655,11 +671,11 @@ const ScanScreen = ({ isCameraOpen, isQrCodeReady, isCameraAllowed, setIsCameraO
                             <button onClick={() => setPage('update-on-loan')} disabled={scannedItems.length === 0 || isBulkLoading} className="w-full bg-green-600 text-white font-bold py-3 px-4 rounded-md hover:bg-green-700 disabled:bg-green-400 disabled:cursor-not-allowed">Sayımı Bitir</button>
                             <p className="text-xs text-slate-500 text-center mt-2">"Sayımı Bitir"e tıkladığınızda; özet grafikler ve raporlar görüntülenir. Daha sonra menüden "Sayım" ekranına tekrar dönüş yapabilirsiniz.</p>
                         </div>
-                    </div>
-                    <div className="mt-4 space-y-2">
-                        <div>
-                            <label className="font-semibold text-slate-700">Toplu Yükleme (.txt/.xlsx):</label>
-                            <FileUploader onFileAccepted={handleBulkUpload} title={bulkUploadTitle} accept={bulkUploadAccept} disabled={isBulkLoading} />
+                        <div className="mt-4 space-y-2">
+                            <div>
+                                <label className="font-semibold text-slate-700">Toplu Yükleme (.txt/.xlsx):</label>
+                                <FileUploader key={fileUploaderKey} onFileAccepted={handleBulkUpload} title={bulkUploadTitle} accept={bulkUploadAccept} disabled={isBulkLoading} />
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -913,6 +929,7 @@ export default function App() {
     const [isLoading, setIsLoading] = useState(false);
     const [isBulkLoading, setIsBulkLoading] = useState(false);
     const [bulkProgress, setBulkProgress] = useState({ current: 0, total: 0 });
+    const [fileUploaderKey, setFileUploaderKey] = useState(0);
     const [error, setError] = useState('');
     const [warningModal, setWarningModal] = useState({ isOpen: false, title: '', warnings: [], barcode: null });
     const [confirmationModal, setConfirmationModal] = useState({ isOpen: false, message: '', onConfirm: () => {} });
@@ -1025,6 +1042,8 @@ export default function App() {
     // Auto-save session data to localStorage whenever it changes
     useEffect(() => {
         if (currentSessionName) {
+            // IMPORTANT: Do not save kohaData to localStorage to avoid exceeding quota.
+            // It will be re-uploaded when the session is loaded.
             const sessionToSave = {
                 name: currentSessionName,
                 library: selectedLibrary,
@@ -1032,23 +1051,27 @@ export default function App() {
                 items: scannedItems,
                 lastUpdated: new Date().toISOString()
             };
-
+    
             try {
-                // Stringify kohaData for saving, but handle potential size issues
-                sessionToSave.kohaData = JSON.stringify(kohaData);
                 localStorage.setItem(`koha_session_${currentSessionName}`, JSON.stringify(sessionToSave));
+                
+                // Update the main sessions list (summary only)
+                setSessions(prev => {
+                    const updatedSessions = {...prev};
+                    updatedSessions[currentSessionName] = {
+                        name: currentSessionName, 
+                        items: { length: scannedItems.length }, // Only store length for display
+                        lastUpdated: new Date().toISOString()
+                    };
+                    localStorage.setItem('kohaInventorySessions', JSON.stringify(updatedSessions));
+                    return updatedSessions;
+                });
             } catch (e) {
-                console.error("Oturum kaydedilemedi (veri büyük olabilir):", e);
-                setError("Oturum verisi çok büyük olduğu için kaydedilemedi. Lütfen sayfayı yenilemeyin.");
-                // Save without kohaData as a fallback
-                delete sessionToSave.kohaData;
-                localStorage.setItem(`koha_session_${currentSessionName}`, JSON.stringify(sessionToSave));
+                 console.error("Oturum kaydedilemedi:", e);
+                 setError("Oturum kaydedilirken bir hata oluştu. Tarayıcı depolama alanı dolu olabilir.");
             }
-
-            // Update the sessions list for the start screen
-            setSessions(prev => ({...prev, [currentSessionName]: {name: currentSessionName, items: scannedItems, lastUpdated: new Date().toISOString()}}));
         }
-    }, [currentSessionName, selectedLibrary, selectedLocation, scannedItems, kohaData]);
+    }, [currentSessionName, selectedLibrary, selectedLocation, scannedItems]);
 
     const handlePermissionDecision = (allow) => {
         setIsCameraAllowed(allow);
@@ -1077,30 +1100,16 @@ export default function App() {
             setScannedItems(session.items || []);
             processedBarcodesRef.current = new Set((session.items || []).map(i => i.barcode));
             setLastScanned((session.items || []).length > 0 ? session.items[0] : null);
-            setError('');
-
-            if (session.kohaData) {
-                 try {
-                    const parsedData = JSON.parse(session.kohaData);
-                    setKohaData(parsedData);
-                    setKohaDataMap(new Map(parsedData.map(item => [String(item.barkod), item])));
-                    setPage('pre-reports');
-                } catch (e) {
-                    setError("Kayıtlı oturum verisi bozuk. Lütfen Excel dosyasını tekrar yükleyin.");
-                    setKohaData([]);
-                    setKohaDataMap(new Map());
-                    setPage('start'); // Go back to start to re-upload
-                }
-            } else {
-                setError("Bu oturum için kayıtlı veri bulunamadı. Lütfen devam etmek için ilgili Koha Excel dosyasını yükleyin.");
-                setKohaData([]);
-                setKohaDataMap(new Map());
-                setPage('start'); // Go back to start to re-upload
-            }
+            
+            // IMPORTANT: Clear kohaData and require re-upload to prevent storage issues.
+            setKohaData([]);
+            setKohaDataMap(new Map());
+            setError(`"${sessionName}" oturumu yüklendi. Devam etmek için lütfen ilgili Koha sayım dosyasını (.xlsx) tekrar yükleyin.`);
+            setPage('start'); // Go back to start to re-upload
         }
     };
 
-    const deleteSession = (sessionName) => { setConfirmationModal({ isOpen: true, message: `"${sessionName}" isimli sayımı silmek istediğinizden emin misiniz? Bu işlem geri alınamaz.`, onConfirm: () => { const newSessions = { ...sessions }; delete newSessions[sessionName]; setSessions(newSessions); localStorage.removeItem(`koha_session_${sessionName}`); } }); };
+    const deleteSession = (sessionName) => { setConfirmationModal({ isOpen: true, message: `"${sessionName}" isimli sayımı silmek istediğinizden emin misiniz? Bu işlem geri alınamaz.`, onConfirm: () => { const newSessions = { ...sessions }; delete newSessions[sessionName]; setSessions(newSessions); localStorage.removeItem(`koha_session_${sessionName}`); localStorage.setItem('kohaInventorySessions', JSON.stringify(newSessions)); } }); };
     
     const handleAddCustomData = (type, code, name) => {
         if (type === 'library') {
@@ -1266,6 +1275,7 @@ export default function App() {
                 // All chunks are processed
                 setIsBulkLoading(false);
                 setBulkProgress({ current: 0, total: 0 });
+                setFileUploaderKey(prevKey => prevKey + 1); // Reset the file uploader
             }
         }
         processChunk();
@@ -1567,7 +1577,7 @@ export default function App() {
             case 'summary':
                 return <SummaryScreen {...{ currentSessionName, summaryData, preAnalysisReports: PRE_ANALYSIS_REPORTS_CONFIG, postScanReports: POST_SCAN_REPORTS_CONFIG, isXlsxReady, isHtmlToImageReady }} />;
             case 'scan':
-                return <ScanScreen {...{ isCameraOpen, isQrCodeReady, isCameraAllowed, setIsCameraOpen, handleCameraScan, warningModal, currentSessionName, combinedLibraries, selectedLibrary, combinedLocations, selectedLocation, barcodeInput, handleBarcodeInput, handleManualEntry, lastScanned, handleBulkUpload, isBulkLoading, setPage, scannedItems, filteredScannedItems, searchTerm, setSearchTerm, warningFilter, setWarningFilter, handleDeleteItem, handleClearAllScans }} />;
+                return <ScanScreen {...{ isCameraOpen, isQrCodeReady, isCameraAllowed, setIsCameraOpen, handleCameraScan, warningModal, currentSessionName, combinedLibraries, selectedLibrary, combinedLocations, selectedLocation, barcodeInput, handleBarcodeInput, handleManualEntry, lastScanned, handleBulkUpload, isBulkLoading, setPage, scannedItems, filteredScannedItems, searchTerm, setSearchTerm, warningFilter, setWarningFilter, handleDeleteItem, handleClearAllScans, fileUploaderKey }} />;
             default:
                 return null;
         }
