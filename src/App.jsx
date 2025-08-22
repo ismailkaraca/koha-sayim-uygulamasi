@@ -145,6 +145,7 @@ const RobustBarcodeScanner = ({ onScan, onClose, isPaused }) => {
 // --- Data Constants & Icons ---
 // Initial data for libraries and locations, and definitions for warnings and icons.
 const INITIAL_LIBRARIES = [
+["1001", "Ankara Sincan Törekent Halk Kütüphanesi"]	,
 ["12", "ADANA  İL HALK KÜTÜPHANESİ"]	,
 ["1530", "Adana Adalet Halk Kütüphanesi"]	,
 ["1317", "Adana Aladağ İlçe Halk Kütüphanesi"]	,
@@ -303,7 +304,6 @@ const INITIAL_LIBRARIES = [
 ["1343", "Ankara Sincan Evliya Çelebi Halk Kütüphanesi"]	,
 ["131", "Ankara Sincan İlçe Halk Kütüphanesi"]	,
 ["1202", "Ankara Sincan Şuayip Çalkın Halk Kütüphanesi"]	,
-["1001", "Ankara Sincan Törekent Halk Kütüphanesi"]	,
 ["363", "Ankara Sincan Yenikent Halk Kütüphanesi"]	,
 ["1410", "Ankara Telif İhtisas Kütüphanesi"]	,
 ["1568", "Ankara Ticaret İhtisas Kütüphanesi"]	,
