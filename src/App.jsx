@@ -1085,9 +1085,16 @@ export default function App() {
         };
         window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
 
+        // Add meta tag to prevent Google Translate from showing the translation popup
+        const meta = document.createElement('meta');
+        meta.name = 'google';
+        meta.content = 'notranslate';
+        document.head.appendChild(meta);
+
         return () => {
             window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
             document.head.removeChild(link);
+            document.head.removeChild(meta);
         };
     }, []);
 
@@ -1826,4 +1833,3 @@ export default function App() {
         </div>
     );
 }
-
