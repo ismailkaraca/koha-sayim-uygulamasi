@@ -145,7 +145,7 @@ const RobustBarcodeScanner = ({ onScan, onClose, isPaused }) => {
 // --- Data Constants & Icons ---
 // Initial data for libraries and locations, and definitions for warnings and icons.
 const INITIAL_LIBRARIES = [
-["1001", "Ankara Sincan Törekent Halk Kütüphanesi"]	,
+  ["1001", "Ankara Sincan Törekent Halk Kütüphanesi"]	,
 ["12", "ADANA  İL HALK KÜTÜPHANESİ"]	,
 ["1530", "Adana Adalet Halk Kütüphanesi"]	,
 ["1317", "Adana Aladağ İlçe Halk Kütüphanesi"]	,
@@ -1548,9 +1548,10 @@ const INITIAL_LIBRARIES = [
 ["1512", "Zonguldak Gökçebey İlçe Halk Kütüphanesi"]	,
 ["1496", "Zonguldak Kilimli İlçe Halk Kütüphanesi"]	,
 ["1292", "Zonguldak Kozlu İlçe Halk Kütüphanesi"]	
+
 ];
 const INITIAL_LOCATIONS = [
-["YB", "Yetişkin Bölümü"]	,
+   ["YB", "Yetişkin Bölümü"]	,
 ["ÇB", "Çocuk Bölümü"]	,
 ["AB", "Atatürk Bölümü"]	,
 ["AÖÖK", "Adnan Ötüken Özel Koleksiyonu (Adnan Ötüken İl Halk İçin)"]	,
@@ -1606,6 +1607,12 @@ const INITIAL_LOCATIONS = [
 ["SY", "Süreli Yayınlar Bölümü"]	,
 ["TEDA Kitapları", "TEDA Kitapları"]	,
 ["Türk Edebiyatı", "Türk Edebiyatı (Edebiyat Müze Kütüphaneleri İçin)"]	
+["YC", "Yetişkin Cep  (Adnan Ötüken İl Halk İçin)"]	,
+["YDB", "Yabancı Diller Bölümü"]	,
+["ZBB", "Ziya Bey Bölümü"]	,
+["Ödüllü Kitaplar - Dünya Edebiyatı", "Ödüllü Kitaplar - Dünya Edebiyatı (Edebiyat Müze Kütüphaneleri İçin)"]	,
+["Ödüllü Kitaplar - Türk Edebiyatı", "Ödüllü Kitaplar - Türk Edebiyatı (Edebiyat Müze Kütüphaneleri İçin)"]	,
+["ÖK", "Özel Koleksiyon"]	
 
 ];
 const WARNING_DEFINITIONS = { 
@@ -2426,6 +2433,9 @@ export default function App() {
     const manualInputDebounceRef = useRef(null);
 
     useEffect(() => {
+        // Set document language to prevent auto-translation issues
+        document.documentElement.lang = 'tr';
+        
         // --- PWA SETUP ---
         // 1. Create and register the service worker
         const serviceWorkerCode = `
@@ -3265,3 +3275,4 @@ export default function App() {
         </div>
     );
 }
+
